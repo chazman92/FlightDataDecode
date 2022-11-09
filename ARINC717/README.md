@@ -1,53 +1,53 @@
-# ARINC717 目录   
+# Arinc717 Directory
 
-### 更新   
-* 整理完成。 2022-02   
-* 使用的例程是 `TEST_myqar.py`。   
-* 预计,今后不再更新了。2022-02   
-
-
-
-### 说明   
-**此目录的程序，是用来解码 ARINC 717 Aligned 格式的文件。**   
-ARINC 717 Aligned 文件,是从 ARINC 717 文件整理而来。主要做了两件事,   
-* 把 12 bits word 找出来, 存为 16 bits(2 bytes)。补在高位的 4 bits 可以根据需要设置些状态。比如,表示当前帧是补的。   
-* 根据同步字, 如果源文件有缺帧/漏帧, 则用空帧补齐。为了在解码时,能够直接计算参数位置, 而无需扫描文件。  
+### renew   
+* Completion of finishing. 2022-02
+* The routine used is `test_myqar.py`.
+* It is expected that it will not be updated in the future. 2022-02
 
 
-所有python3程序用到的库   
-  * `import csv`  
-  * `from io import StringIO`  
-  * `import gzip`  
-  * `import os,sys,getopt`  
-  * `import zipfile`  
+
+### illustrate   
+** The program for this directory is a file used to decode Arinc 717 Aligned format. **
+ArinC 717 Aligned file is organized from the Arinc 717 file. Main two things,
+* Find 12 bits word and save it to 16 bits (2 bytes). The 4 BITS that can be made up at a high level can set some states as needed. For example, the current frame is supplemented.
+* According to the synchronous word, if the source file has a deficient frame/leakage frame, use an empty frame to make up. In order to decod, the parameter position can be directly calculated without scanning files.
 
 
-编写时使用的是 python-3.9.2 版本。import包都是 python-3.9.2内置或自带的包。   
-在 python-3.6.8 中测试OK。   
-理论上,在所有的 python-3.x 都能运行。   
+All python3 libraries used in Python3
+  * `Import CSV`
+  * `From IO Import Stringio`
+  * `Import gzip`
+  * `Import OS, Sys, Getopt`
+  * `Import Zipfile`
 
-这些程序需要 vec 目录中的配置文件。(机型编码规范, 或者参数编码规则)    
-配置文件的来源，请看 [vec目录中的README](https://github.com/osnosn/FlightDataDecode/tree/main/ARINC717/vec).    
 
-此目录中的 py 脚本，都可以作为命令行程序运行。   
-直接运行，会给出帮助。   
-```
-$ ./TEST_myqar.py  -h
+When writing, Python-3.9.2 is used. Import package is a built-in or built-in package of Python-3.9.2.
+Test OK in python-3.6.8.
+Theoretically, all Python-3.x can run.
+
+These programs require configuration files in the VEC directory. (Model coding specifications, or parameter coding rules)
+For the source of the configuration file, please see the readme in the [VEC directory] (https://github.com/osnosn/flightAdatadecode/min/arinc717/vec).
+
+The PY script in this directory can run as the command line program.
+Running directly will help.
+`` `
+$ ./Test_myqar.py -h
 Usage:
-   命令行工具。
- 读取 wgl中 raw.dat,根据参数编码规则,解码一个参数。
-./TEST_myqar.py [-h|--help]
-   * (必要参数)
-   -h, --help                 print usage.
- * -f, --file xxx.wgl.zip     "....wgl.zip" filename
- * -p, --param alt_std        show "ALT_STD" param. 自动全部大写。
-   --paramlist                list all param name.
-   -w xxx.csv            参数写入文件"xxx.csv"
-   -w xxx.csv.gz         参数写入文件"xxx.csv.gz"
-```
+   Command line tool.
+ Read the raw.dat in WGL, and decode a parameter according to the parameter coding rules.
+./Test_myqar.py [-h |-Help]
+   * (Necessary parameters)
+   -H, -Help proprint usage.
+ * -F, --file xxx.wgl.zip ".... wgl.zip" filename
+ * -P, -Param Alt_Std Show "Alt_Std" Param. Automatic all capital.
+   -Paramlist list all paras name.
+   -W xxx.csv parameter write file "xxx.csv"
+   -W xxx.csv.gz parameter write the file "xxx.csv.gz"
+`` `
 
-### 其他  
-* 认为此项目对您有帮助，请点个星星，或留个言，或发封邮件给我，让我高兴一下.  
-  If you think this project is helpful to you, click a Star, or leave a message, or send me an Email to make me happy.
+### other  
+* I think this project is helpful to you, please click on the stars, leave a saying, or send me an email to me, and make me happy.
+  If you think this project is helpful to you, click a Star, or Leave a message, or see me an email to make me happy.
 
 

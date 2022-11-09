@@ -16,7 +16,7 @@ def main():
     print('mem:',sysmem())
 
     if PARAMLIST:
-        #-----------列出记录中的所有参数名称--------------
+        #-----------List all parameter names in the record--------------
         regularlist,superlist=myQAR.paramlist()
         #---regular parameter
         ii=0
@@ -37,7 +37,7 @@ def main():
         print()
         print('mem:',sysmem())
 
-        #-----------参数写入csv文件--------------------
+        #-----------Parameter write to CSV file write to CSV file--------------------
         if WFNAME is not None and len(WFNAME)>0:
             print('Write into file "%s".' % WFNAME)
             df_pm=pd.concat([pd.DataFrame(regularlist),pd.DataFrame(superlist)])
@@ -46,7 +46,7 @@ def main():
         return
 
     if PARAM is None:
-        #-----------打印参数的配置内容-----------------
+        #-----------Configuration content of print parameterstion content of print parameters-----------------
         for vv in ('ALT_STD','AC_TAIL7'):
             fra=myQAR.getFRA(vv)
             if len(fra)<1:
@@ -60,7 +60,7 @@ def main():
             print()
         print('DataVer:',myQAR.dataVer())
     else:
-        #-----------获取一个参数--------------------
+        #-----------Get a parameter--------------------
         pm_list=myQAR.get_param(PARAM)
         #print(pm_list)
         if len(pm_list)<1:
@@ -74,14 +74,14 @@ def main():
 
         df_pm=pd.DataFrame(pm_list)
 
-        #-----------参数写入csv文件--------------------
+        #-----------Parameter write to CSV file--------------------
         if WFNAME is not None and len(WFNAME)>0:
             print('Write into file "%s".' % WFNAME)
             #df_pm.to_csv(WFNAME,index=False)
             df_pm.to_csv(WFNAME,sep='\t',index=False)
             return
 
-        #-----------显示参数的部分内容--------------------
+        #-----------Part of the content of the parameter--------------------
         pd.set_option('display.min_row',200)
         if len(pm_list)>1200:
             print( df_pm['v'][1000:1200].tolist() )
@@ -109,31 +109,31 @@ def showsize(size):
     size /=1024.0
     if size<1024.0*2:
         return '%.2f G'%(size)
-import psutil         #非必需库
+import psutil         #Non -essential library
 def sysmem():
     '''
-    获取本python程序占用的内存大小
+    Get the memory occupied by the Python program
     '''
-    size=psutil.Process(os.getpid()).memory_info().rss #实际使用的物理内存，包含共享内存
-    #size=psutil.Process(os.getpid()).memory_full_info().uss #实际使用的物理内存，不包含共享内存
+    size=psutil.Process(os.getpid()).memory_info().rss #The actual physical memory, including shared memory
+    #size = psutil.process (os.getpid ()). Memory_full_info (). Uss #actual physical memory used
     return showsize(size)
 
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读取 wgl中 raw.dat,根据参数编码规则,解码一个参数。')
+    print(u'   Command line tool.')
+    print(u' Read the raw.dat in WGL, and decode a parameter according to the parameter coding rules.')
 
     print(sys.argv[0]+' [-h|--help]')
-    print('   * (必要参数)')
+    print('   * (Necessary parameters)')
     print('   -h, --help                 print usage.')
     print(' * -f, --file xxx.wgl.zip     "....wgl.zip" filename')
     print(' * -p, --param alt_std        show "ALT_STD" param. 自动全部大写。')
     print('   --paramlist                list all param name.')
-    print('   -w xxx.csv            参数写入文件"xxx.csv"')
-    print('   -w xxx.csv.gz         参数写入文件"xxx.csv.gz"')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
-    print(u' 认为此项目对您有帮助，请发封邮件给我，让我高兴一下.')
+    print('   -w xxx.csv         Parameter writing file "xxx.csv"')
+    print('   -w xxx.csv.gz        Parameter writing file "xxx.csv.gz"')
+    print(u'\n               Author: Southern Airlines, llgz@csair.com')
+    print(u' I think this project is helpful to you, please seal the email to me, let me be happy. ')
     print(u' If you think this project is helpful to you, please send me an email to make me happy.')
     print()
     return
@@ -166,8 +166,8 @@ if __name__=='__main__':
             PARAMLIST=True
         elif op in('-p','--param',):
             PARAM=value
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        FNAME=args[0]  #Only take the first one
     if FNAME is None:
         usage()
         exit()

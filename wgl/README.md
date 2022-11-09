@@ -1,78 +1,76 @@
-# wgl 目录  
+# WGL directory
 
-### 更新  
-* 2022-02 第一次更新  
-  - `get_param_from_wgl.py`最终可以提取出单个的记录参数(原始值,还没转换为使用值)。  
-* 2022-02 再次更新  
-  - `get_param_from_wgl.py` 可以获取部分 BNR, BCD, CHARACTER 类型的值，并转换为使用值。  
-  - 问题: UTC 类型的似乎不行。参数的rate没有处理。  
-* 2022-02 再次更新  
-  - 对于 ARINC 573/717 的记录格式   
-    - `Get_param_from_wgl.py` 可以正确的获取所有记录参数(除了超级帧参数)。能够处理 BNR,BCD,CHARACTER 类型的值，并转换为使用值。  
-    - 解码后的参数,可以存为 csv 文件。  
-    - 返回参数时，同时给出了对应的秒(从0开始)。  
-    - 程序会根据 rate 值，把所有的记录值都解码出来。比如: VRTG 是每秒 8 个记录。  
-    - 记录参数中，有 `UTC_HOUR, UTC_MIN, UTC_SEC, DAT_YEAR, DAT_MONTH, DAT_DAY` 这些记录参数。(有的解码库会缺少某个参数)。你可以用这些参数来修正 frame time。  
-    - 问题: 没有处理超级帧。如果参数是记录在超级帧中，解码会失败，或者解码出的内容是错误的。  
-  - 对于 ARINC 767 的记录格式   
-    - 只能找出每帧的开始和结束。找出帧头,和帧尾的格式。   
-* 2022-02 再次更新  
-  - 对于 ARINC 573/717 的记录格式: 增加支持 DISCRETE, PACKED BITS, UTC, 类型的值。共支持7种: BCD, BNR LINEAR, BNR SEGMENTS, CHARACTER, DISCRETE, PACKED BITS, UTC.    
-* 2022-02 再次更新  
-  - 对于 ARINC 573/717 的记录格式: 可以解码所有的参数，包括 regular, superframe 参数。  
+### renew  
+* 2022-02 The first update
+  -`get_param_from_wgl.py` can finally extract a single record parameter (original value, not converted to use value).
+* 2022-02 update again
+  -`get_param_from_wgl.py` can obtain the values ​​of parts of the BNR, BCD, Character, and convert it to the use value.
+  -The question: UTC type does not seem to be. The rate of the parameters is not processed.
+* 2022-02 update again
+  -The record format of Arinc 573/717
+    -`Get_param_from_wgl.py` can correctly obtain all record parameters (except the super frame parameter). It can handle the values ​​of BNR, BCD, Character, and convert it to the use value.
+    -Code parameters can be stored as CSV files.
+    -At the corresponding seconds when returning the parameter (starting from 0).
+    -Base will decode all the record values ​​according to the Rate value. For example: VRTG is 8 records per second.
+    -The record parameters in the record parameters are `UTC_HOUR, UTC_MIN, UTC_SEC, DAT_YEAR, DAT_MONTH, DAT_DAY`. (Some decoding libraries will miss a certain parameter). You can use these parameters to modify the Frame Time.
+    -The Question: There is no handling of the superframe. If the parameters are recorded in the super frame, the decoding will fail, or the contents of decoding are wrong.
+  -The record format for Arinc 767
+    -In the beginning and end of each frame. Find the format of the frame head, and the format of the frame.
+* 2022-02 update again
+  -The record format for ArinC 573/717: Increases the value of supporting Discrete, Packed Bits, UTC, and type. A total of 7: BCD, BNR Linear, BNR Segments, Character, Discrete, Packed Bits, UTC.
+* 2022-02 update again
+  -The record format for Arinc 573/717: You can decode all parameters, including regula, superframe parameters.
 
 
 
-### 说明
-这个目录中的py程序，可以使用。但没有达到完全可用状态。  
-是我在了解 无线QAR(WQAR) 原始 raw.dat 文件过程中，编写的程序。   
-**目前可以解码出所有的记录参数。**   
-有兴趣的，可以参考一下。  
+### illustrate
+The PY program in this directory can be used. But it did not reach a complete usable state.
+It is a program written in the process of understanding the original raw.dat file of wireless QAR (wqar).
+** can currently decode all record parameters. **
+If you are interested, please refer to it.
 
-整理后的代码，将会放在其他目录。【[ARINC717](https://github.com/osnosn/FlightDataDecode/tree/main/ARINC717)】,【[ARINC767](https://github.com/osnosn/FlightDataDecode/tree/main/ARINC767)】   
+The organic code will be placed in other directory. 【[ARINC717](https://github.com/osnosn/FlightDataDecode/tree/main/ARINC717)】,【[ARINC767](https://github.com/osnosn/FlightDataDecode/tree/main/ARINC767)】   
 
------------
-此目录中的 py 脚本，都可以作为命令行程序运行。   
-直接运行，会给出帮助。   
-```
+------------
+The PY script in this directory can run as the command line program.
+Running directly will help.
+`` `
 $ ./Get_param_from_wgl.py
 Usage:
-   命令行工具。
- 读取 wgl中 raw.dat,根据参数编码规则,解码一个参数。
-./Get_param_from_wgl.py [-h|--help]
-   * (必要参数)
-   -h, --help                 print usage.
- * -f, --file xxx.wgl.zip     "....wgl.zip" filename
- * -p, --param alt_std        show "ALT_STD" param. 自动全部大写。
-   --paramlist                list all param name.
-   -w xxx.csv            参数写入文件"xxx.csv"
-   -w xxx.csv.gz         参数写入文件"xxx.csv.gz"
-```
+   Command line tool.
+ Read the raw.dat in WGL, and decode a parameter according to the parameter coding rules.
+./Get_param_from_wgl.py [-h |-Help]
+   * (Necessary parameters)
+   -H, -Help proprint usage.
+ * -F, --file xxx.wgl.zip ".... wgl.zip" filename
+ * -P, -Param Alt_Std Show "Alt_Std" Param. Automatic all capital.
+   -Paramlist list all paras name.
+   -W xxx.csv parameter write file "xxx.csv"
+   -W xxx.csv.gz parameter write the file "xxx.csv.gz"
+`` `
 
-wgl 目录中有两个空文件，只是给出个例子，看看压缩包内,文件名的命名规律。  
-  * `B-1234_20210121132255.wgl.zip` ,这是 ARINC 717 aligned   
-  * `B-123420220102114550M.zip` ,这是 ARINC 767 格式  
+There are two empty files in the WGL directory, just give an example to see the name of the file name in the compressed package.
+  * `B-1234_20210121132255.wgl.zip`, this is ArinC 717 Aligned
+  * `B-123420220102114550m.zip`, this is ArinC 767 format
 
-这两个文件的内容是一样的。  
-  * `Get_param_from_arinc717_aligned.py`   
-  * `Get_param_from_wgl.py`   
+The contents of these two files are the same.
+  * `Get_param_from_arinc717_aligned.py`
+  * `Get_param_from_wgl.py`
 
-所有python3程序用到的库   
-  * `import os,sys,getopt`  
-  * `from datetime import datetime`  
-  * `import zipfile`  
-  * `from io import BytesIO`  
-  * `from io import StringIO`  
-  * `import pandas as pd`   解码，未用到，读air配置文件,依赖了。读其他配置文件, 用到了。  
-  * `import psutil`   解码，未用到  
-  * `import struct`   解码，未用到  
-
-
-编写时使用的是 python3.9.2 版本。pandas-1.3.4, numpy-1.21.4, psutil-5.9.0, 其他包都是 python-3.9.2 内置或自带的包。   
-在 python-3.6.8 中测试OK。pandas-1.0.3, numpy-1.18.2, psutil-5.8.0    
-理论上,在所有的 python-3.x 都能运行。   
-
-这些程序需要 vec 目录中的配置文件。(机型编码规范, 或者参数编码规则)    
-配置文件的来源，请看 [vec目录中的README](https://github.com/osnosn/FlightDataDecode/tree/main/wgl/vec).    
+All python3 libraries used in Python3
+  * `Import OS, Sys, Getopt`
+  * `From dateTime Import Datetime`
+  * `Import Zipfile`
+  * `From IO Import bytesio`
+  * `From IO Import Stringio`
+  * `Import Pandas as PD` decoding, not used, read the AIR configuration file, dependence. Read other configuration files and use it.
+  * `Import psutil` decoding, not used
+  * `Import Struct` decoding, not used
 
 
+The Python 3.9.2 version is used. pandas-1.3.4, numpy-1.21.4, PSUTIL-5.9.0, and other bags are Python-3.9.2 built-in or built-in bags.
+Test OK in python-3.6.8. pandas-1.0.3, numpy-1.18.2, PSUTIL-5.8.0
+Theoretically, all Python-3.x can run.
+
+These programs require configuration files in the VEC directory. (Model coding specifications, or parameter coding rules)
+For the source of the configuration file, please see the readme in the [VEC directory] (https://github.com/osnosn/flightAdatadecode/min/wgl/vec).

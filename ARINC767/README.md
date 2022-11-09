@@ -1,22 +1,20 @@
-# ARINC767 目录  
+# Arinc767 Directory
 
-### 更新  
-* ~~等 wgl 中的测试程序完成后，再做。2022-02~~   
-* 格式不复杂, xml定义文件, 本应该随着原始记录文件,打包在一起的。可惜我拿到的原始记录文件中,xml被摘除了。所以此程序不再继续写了。2022-02   
-
-
-### 说明  
-* `647a-1.zip` XML 样例, 来源 https://www.aviation-ia.com/support-files/647a-1
+### renew  
+* ~~ After the test program in WGL is completed, do it.2022-02 ~~
+* The format is not complicated, and the XML definition file should be packaged with the original record file.Unfortunately, XML was removed in the original record file I got.So this program no longer continues to write.2022-02
 
 
-程序需要 vec 目录中的配置文件。(机型编码规范, 或者参数编码规则)    
-配置文件的来源，请看 [vec目录中的README](https://github.com/osnosn/FlightDataDecode/tree/main/ARINC767/vec).    
+### illustrate  
+* `647a-1.zip` xml sample, source https://www.av before-support-files/647a-1
+
+
+The program requires the configuration file in the VEC directory.(Model coding specifications, or parameter coding rules)
+For the source of the configuration file, please see the readme in the [VEC directory] (https://github.com/osnosn/flightAdatadecode/min/arinc767/vec).
 
 
 
 
-### 其他  
-* 认为此项目对您有帮助，请点个星星，或留个言，或发封邮件给我，让我高兴一下.  
-  If you think this project is helpful to you, click a Star, or leave a message, or send me an Email to make me happy.
-
-
+### other  
+* I think this project is helpful to you, please click on the stars, leave a saying, or send me an email to me, and make me happy.
+  If you think this project is helpful to you, click a Star, or Leave a message, or see me an email to make me happy.

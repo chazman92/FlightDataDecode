@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
- 读解码库，参数配置文件 vec 中 xx.par 文件。比如 010XXX.par
-    author:南方航空,LLGZ@csair.com
+ Read the decoding library, the parameter configuration file VEC xx.par file.Such as 010xxx.par
+    Author: Southern Airlines, llgz@csair.com
 """
 import os
 import zipfile
@@ -12,7 +12,7 @@ import csv
 from io import StringIO
 import config_vec as conf
 
-#PAR=None  #保存读入的配置. 当作为模块,被调用时使用.
+#PAR=None  #Save the read -in configuration. When used as a module, use it when being called.
 #DataVer=None
 
 def main():
@@ -23,7 +23,7 @@ def main():
     par_conf=read_parameter_file(FNAME)
 
     if PARAMLIST:
-        #----------显示所有参数名-------------
+        #----------Show all parameter names-------------
         ii=0
         for vv in par_conf:
             print(vv[0], end=',\t')
@@ -61,7 +61,7 @@ def main():
         else:
             print('Parameter %s not found in Regular parameter.'%param)
         '''
-        # 只找出第一条记录，通常par参数只会有一条记录
+        #Only find the first record, usually the PAR parameter will only have one record
         idx=0
         for row in par_conf:
             if row[0] == param: break
@@ -95,7 +95,7 @@ def main():
         print('\t',par_conf[0][ii])
 
 
-    #----写CSV文件--------
+    #----Write CSV file--------
     if len(TOCSV)>4:
         print('Write to CSV file:',TOCSV)
         if TOCSV.endswith('.gz'):
@@ -111,22 +111,22 @@ def read_parameter_file(dataver):
     #global PAR
     #global DataVer
 
-    dataver='%06d' % int(dataver)  #6位字符串
+    dataver='%06d' % int(dataver)  #6 -bit string
     #if PAR is not None and DataVer==dataver:
     #    return PAR
     #else:
     #    DataVer=dataver
     #    PAR=None
 
-    filename_zip=dataver+'.par'     #.vec压缩包内的文件名
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec文件名
+    filename_zip=dataver+'.par'     #.The file name in VEC compressed package
+    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.VEC file name
 
     if os.path.isfile(zip_fname)==False:
         print('ERR,ZipFileNotFound',zip_fname,flush=True)
         raise(Exception('ERR,ZipFileNotFound'))
 
     try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #打开zip文件
+        fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
     except zipfile.BadZipFile as e:
         print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
         raise(Exception('ERR,FailOpenZipFile'))
@@ -134,14 +134,14 @@ def read_parameter_file(dataver):
     par_conf=[]
     with StringIO(fzip.read(filename_zip).decode('utf16')) as fp:
         ki=-1
-        offset=0  #总偏移
-        PAR_offset={}  #各行记录的，偏移和长度
-        one_par={}  #单个参数的记录汇总
+        offset=0  #Overturn
+        PAR_offset={}  #Records of various rows, offset and length
+        one_par={}  #Record summary of a single parameter
         for line in fp.readlines():
             line=line.strip('\r\n //')
             tmp1=line.split('|',1)
             tmp2=tmp1[1].split('\t')
-            if tmp1[0] == '1':  #记录的开始行
+            if tmp1[0] == '1':  #Beginning of the record
                 ki +=1
                 if ki>0:
                     #print('one_par:',one_par,'\n')
@@ -152,15 +152,15 @@ def read_parameter_file(dataver):
                     #if ki>2:
                     #    break
                 one_par={}
-            if tmp1[0] == '13': #记录的结束行
+            if tmp1[0] == '13': #End of the record
                 continue
-            if ki==0:  #文件头,记录的注释头
-                if tmp1[0] in PAR_offset: #文件头中不应该有重复
+            if ki==0:  #File header, record header
+                if tmp1[0] in PAR_offset: #There should be no duplication in the file header
                     raise(Exception('ERROR, "%s" in PAR_offset' % (tmp1[0]) ))
                 else:
-                    PAR_offset[ tmp1[0] ]=[ offset , len(tmp2) ]  #记录各组记录，应在整条记录的位置
-                    offset += len(tmp2)  #总偏移
-            #记录完整的一个参数的记录
+                    PAR_offset[ tmp1[0] ]=[ offset , len(tmp2) ]  #Record records should be in the location of the entire record
+                    offset += len(tmp2)  #Overturn
+            #Record a complete parameter record
             if tmp1[0] not in one_par:
                 one_par[ tmp1[0] ]=[]
                 for jj in tmp2:
@@ -173,25 +173,25 @@ def read_parameter_file(dataver):
     fzip.close()
 
     #PAR=par_conf
-    return par_conf       #返回list
+    return par_conf       #Return to list
 
 def one_PAR(PAR_offset,one_par):
     '''
-    拼装 一行记录. 一个参数的记录
-       author:南方航空,LLGZ@csair.com
+    Dotted a line of record. A record of a parameter
+       Author: Southern Airlines, llgz@csair.com
     '''
     ONE=[]
-    for kk in PAR_offset:  #每个记录 子行
-        for jj in range( PAR_offset[ kk ][1] ):  #根据子行的长度，全部初始化为空list
+    for kk in PAR_offset:  #Each recorded child line
+        for jj in range( PAR_offset[ kk ][1] ):  #According to the length of the child, all are initialized to empty list
             ONE.append([])
         if kk in one_par:
-            if PAR_offset[kk][1] != len(one_par[kk]):  #对应记录的数目不正确
+            if PAR_offset[kk][1] != len(one_par[kk]):  #The number of recorded records is incorrect
                 raise(Exception('one_par[%s] length require %d not %d' % (kk, PAR_offset[kk][1], len(one_par))))
 
             offset=PAR_offset[ kk ][0]
-            for jj in range( len(one_par[ kk ]) ):  #把one_par的对应项extend 到ONE的对应位置
+            for jj in range( len(one_par[ kk ]) ):  #The corresponding item of One_PAR to the corresponding position of one
                 ONE[offset+jj].extend( one_par[kk][jj] )
-    for jj in range( len(ONE) ):  #整理记录。只有一条记录的，去除list
+    for jj in range( len(ONE) ):  #Organize records.Only one record, remove list
         if len(ONE[jj])==0:
             ONE[jj]=None
         elif len(ONE[jj])==1:
@@ -205,16 +205,16 @@ def one_PAR(PAR_offset,one_par):
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读解码库，参数配置文件 vec 中 xx.par 文件。比如 010XXX.par')
+    print(u'Command line tool.')
+    print(u' Read the decoding library, the parameter configuration file VEC xx.par file.Such as 010xxx.par')
     print(sys.argv[0]+' [-h|--help]')
     print('   -h, --help        print usage.')
-    print('   -v, --ver=10XXX      dataver 中的参数配置表')
+    print('   -v, --ver=10XXX      The parameter configuration table in dataver')
     print('   --csv xxx.csv        save to "xxx.csv" file.')
     print('   --csv xxx.csv.gz     save to "xxx.csv.gz" file.')
     print('   --paramlist          list all param name.')
     print('   -p,--param alt_std   show "alt_std" param.')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
+    print(u'\n Author: Southern Airlines, llgz@csair.com')
     print()
     return
 if __name__=='__main__':
@@ -246,8 +246,8 @@ if __name__=='__main__':
             PARAMLIST=True
         elif op in('-p','--param',):
             PARAM=value
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        FNAME=args[0]  #Only take the first one
     if FNAME is None:
         usage()
         exit()

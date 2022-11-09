@@ -6,7 +6,7 @@
    author:南方航空,LLGZ@csair.com
 """
 import os
-selfpath=os.path.dirname(os.path.realpath(__file__)) #本脚本自身所在的目录
+selfpath=os.path.dirname(os.path.realpath(__file__)) #The directory where the script itself is located
 
 vec=os.path.join(selfpath,'vec')
 #aircraft=os.path.join(selfpath,'aircraft.air')
@@ -48,8 +48,8 @@ if __name__=='__main__':
             FNAME=value
         elif op in('-d',):
             DUMPDATA=True
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        FNAME=args[0]  #Only take the first one
 
     if DUMPDATA:
         main()

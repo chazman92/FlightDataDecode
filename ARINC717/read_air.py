@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
- 读取 aircraft.air 文件。机尾号与解码库的对应表。
-    author:南方航空,LLGZ@csair.com
+Read the Aircraft.air file.The corresponding table of the tail number and the decoding library.
+    Author: Southern Airlines, llgz@csair.com
 """
 import csv
 import config_vec as conf
 import gzip
 
-#AIR=None  #保存读入的配置. 当作为模块,被调用时使用.
+#AIR = None #Save the configuration of the read in. When used as a module, use it when being called.
 
 def main(reg):
     global FNAME,DUMPDATA
@@ -19,14 +19,14 @@ def main(reg):
     FNAME=conf.aircraft
 
     air_csv=air(FNAME)
-    #第一行是标题。第二行,是第一行的继续
-    #从第三行开始，是数据表
-    #最后一行，是个注释
+    #The first line is the title.The second line is the continuation of the first line
+    #From the third line, it is the data table
+    #The last line is a comment
     columns=air_csv[0]
 
     if ALLREG:
-        #----------显示所有机尾号-------------
-        #第0列是机尾号
+        #----------Display all machine tail numbers-------------
+        #Column 0 is the tail number
         ii=1
         for vv in air_csv:
             if vv[0].startswith('//'):
@@ -36,7 +36,7 @@ def main(reg):
                 print()
             ii+=1
         print()
-        #----写CSV文件--------
+        #----Write CSV file--------
         if len(TOCSV)>4:
             print('Write to CSV file:',TOCSV)
             if TOCSV.endswith('.gz'):
@@ -58,7 +58,7 @@ def main(reg):
         return
 
     if ALLVER:
-        #----------显示所有解码库号-------------
+        #----------Display all decoding library numbers-------------
         dataVer=[]
         for row in air_csv:
             if len(row)<2: continue
@@ -75,7 +75,7 @@ def main(reg):
         return
 
     if ALLTYPE:
-        #----------显示所有机型号-------------
+        #----------Display all model models-------------
         print('All aircraft Type:')
         acType=[]
         for row in air_csv:
@@ -107,14 +107,14 @@ def main(reg):
         print()
         return
 
-    if reg is not None and len(reg)>0: #给出特定机尾号的记录
+    if reg is not None and len(reg)>0: #Records of a specific machine tail number
         reg=reg.upper()
         if not reg.startswith('B-'):
             reg = 'B-'+reg
         print(reg)
         idx=[]
         ii=0
-        for row in air_csv: #找机尾号,所有的
+        for row in air_csv: #,, All
             if row[0]==reg: idx.append(ii)
             ii +=1
         if len(idx)>0:
@@ -131,7 +131,7 @@ def main(reg):
         return
 
     #--------------DUMP------------
-    #---显示columns---
+    #---Show columns---
     #print(len(columns))
     print('Columns:')
     ii=0
@@ -148,7 +148,7 @@ def main(reg):
     #        'Version for analysis/FDR',
     #        'Version for analysis/FDR2', '//AGS'
             ]
-    #---显示 指定列的 前后5行---
+    #---Display the front and back 5 lines of the specified column---
     print('Dump head row:')
     show_col=(0,1,2,3,4,5,12,13,14,15)
     ttl_rows=len(air_csv)
@@ -166,7 +166,7 @@ def main(reg):
             print(row[cc]+',',end='\t')
         print()
 
-    #----写CSV文件--------
+    #----Write CSV file--------
     if len(TOCSV)>4:
         print('Write to CSV file:',TOCSV)
         if TOCSV.endswith('.gz'):
@@ -191,7 +191,7 @@ def air(csv_filename):
         buf=csv.reader(fp,delimiter='\t')
         for row in buf:
             air_csv.append(row)
-    #第一行和第二行合并,删除第二行 
+    #The first line and the second line merge, delete the second line
     air_csv[0].append(','.join(air_csv[1]))
     del air_csv[1]
     #AIR=air_csv
@@ -203,8 +203,8 @@ def air(csv_filename):
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读取 aircraft.air 文件。机尾号与解码库的对应表。')
+    print(u'Command line tool.')
+    print(u'Read the Aircraft.air file.The corresponding table of the tail number and the decoding library.')
     print(sys.argv[0]+' [-h|--help] ')
     print('   -h, --help      print usage.')
     print('   -d                 dump "aircraft.air" file.')
@@ -214,7 +214,7 @@ def usage():
     print('   --allreg           list all REGistration number from "aircraft.air" file.')
     print('   --allver           list all DataVer number from "aircraft.air" file.')
     print('   --alltype          list all aircraft Type from "aircraft.air" file.')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
+    print(u'\n               Author: Southern Airlines, llgz@csair.com')
     print()
     return
 if __name__=='__main__':
@@ -250,8 +250,8 @@ if __name__=='__main__':
             DUMPDATA=True
         elif op in('--csv',):
             TOCSV=value
-    if len(args)>0:  #命令行剩余参数
-        REG=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        REG=args[0]  #Only take the first one
 
     if ALLTYPE or ALLREG or ALLVER or DUMPDATA or REG or len(TOCSV)>0:
         main(REG)

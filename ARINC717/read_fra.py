@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-读解码库，参数配置文件 vec 中 xx.fra 文件。比如 010XXX.fra
-仅支持 ARINC 573 PCM 格式
-   author:南方航空,LLGZ@csair.com
+Read the decoding library, the parameter configuration file VEC xx.fra file.Such as 010xxx.fra
+Only support ArinC 573 PCM format
+   Author: Southern Airlines, llgz@csair.com
 """
 import os
 import zipfile
@@ -12,7 +12,7 @@ import gzip
 from io import StringIO
 import config_vec as conf
 
-#FRA=None  #保存读入的配置. 当作为模块,被调用时使用.
+#FRA=None  #Save the read -in configuration. When used as a module, use it when being called.
 #DataVer=None
 
 def main():
@@ -28,7 +28,7 @@ def main():
     #print(fra_conf.keys())
 
     if PARAMLIST:
-        #----------显示所有参数名-------------
+        #----------Show all parameter names-------------
         #print(fra_conf['2'].iloc[:,0].tolist())
         #---regular parameter
         print('------------------------------------------------')
@@ -48,7 +48,7 @@ def main():
                 print()
             ii+=1
         print()
-        #----写CSV文件--------
+        #----Write CSV file--------
         if len(TOCSV)>4:
             print('Write to CSV file:',TOCSV)
             if TOCSV.endswith('.gz'):
@@ -66,13 +66,13 @@ def main():
             fp.close()
         return
 
-    if PARAM is not None and len(PARAM)>0:  #显示单个参数名
-        #----------显示单个参数的配置内容-------------
+    if PARAM is not None and len(PARAM)>0:  #Display a single parameter name
+        #----------Display the configuration content of a single parameter-------------
         param=PARAM.upper()
         #---regular parameter
         idx=[]
         ii=0
-        for row in fra_conf['2']: #找出所有记录
+        for row in fra_conf['2']: #Find out all the records
             if row[0] == param: idx.append(ii)
             ii +=1
         if len(idx)>0:
@@ -87,7 +87,7 @@ def main():
         #---superframe parameter
         idx=[]
         ii=0
-        for row in fra_conf['4']: #找出所有记录
+        for row in fra_conf['4']: #Find out all the records
             if row[0] == param: idx.append(ii)
             ii +=1
         if len(idx)>0:
@@ -173,22 +173,22 @@ def read_parameter_file(dataver):
         print('ERR,dataver %s not support.' % (dataver,) )
         print('Use "read_frd.py instead.')
         return None
-    dataver='%06d' % dataver  #6位字符串
+    dataver='%06d' % dataver  #6 -bit string
     #if FRA is not None and DataVer==dataver:
     #    return FRA
     #else:
     #    DataVer=dataver
     #    FRA=None
 
-    filename_zip=dataver+'.fra'     #.vec压缩包内的文件名
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec文件名
+    filename_zip=dataver+'.fra'     #.vec compressed package file name
+    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec file name
 
     if os.path.isfile(zip_fname)==False:
         print('ERR,ZipFileNotFound',zip_fname,flush=True)
         raise(Exception('ERR,ZipFileNotFound,%s'%(zip_fname)))
 
     try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #打开zip文件
+        fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
     except zipfile.BadZipFile as e:
         print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
         raise(Exception('ERR,FailOpenZipFile,%s'%(zip_fname)))
@@ -198,9 +198,9 @@ def read_parameter_file(dataver):
         for line in fp.readlines():
             line_tr=line.strip('\r\n //')
             tmp1=line_tr.split('|',1)
-            if line.startswith('//') and tmp1[0] == '3':     # "3|..." 的标题比较特殊，末尾少了一个tab
+            if line.startswith('//') and tmp1[0] == '3':     #The title of "3 | ..." is special, and one tab is missing at the end
                 tmp1[1] += '\t'
-            if line.startswith('//') and tmp1[0] == '7':     # "7|..." 的标题比较特殊，起始多了一个tab
+            if line.startswith('//') and tmp1[0] == '7':     # The title of "7 | ..." is relatively special.
                 tmp1[1]=tmp1[0].lstrip()
             tmp2=tmp1[1].split('\t')
             if tmp1[0] in fra_conf:
@@ -214,23 +214,23 @@ def read_parameter_file(dataver):
     fzip.close()
     #FRA=fra_conf
     #return FRA
-    return fra_conf       #返回list
+    return fra_conf       #Return to list
 
 
 
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读解码库，参数配置文件 vec 中 xx.fra 文件。比如 010XXX.fra')
+    print(u'Command line tool.')
+    print(u'Read the decoding library, the parameter configuration file VEC xx.fra file.Such as 010xxx.fra ')
     print(sys.argv[0]+' [-h|--help]')
     print('   -h, --help        print usage.')
-    print('   -v, --ver=10XXX      dataver 中的参数配置表')
+    print('   -v, --ver=10XXX      dataver The parameter configuration table')
     print('   --csv xxx.csv        save to "xxx.csv" file.')
     print('   --csv xxx.csv.gz     save to "xxx.csv.gz" file.')
     print('   --paramlist          list all param name.')
     print('   -p,--param alt_std   show "alt_std" param.')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
+    print(u'\n               Author: Southern Airlines, llgz@csair.com')
     print()
     return
 if __name__=='__main__':
@@ -262,8 +262,8 @@ if __name__=='__main__':
             PARAMLIST=True
         elif op in('--param','-p',):
             PARAM=value
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        FNAME=args[0]  #Only take the first one
     if FNAME is None:
         usage()
         exit()
