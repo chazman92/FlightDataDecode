@@ -1,0 +1,26 @@
+import struct
+import sys
+import argparse
+#usage python qar_arinc429_reader.py my_qar_file.qar
+ 
+def read_arinc_words(qar_file):
+    with open(qar_file, 'rb') as f:
+        while True:
+            word_data = f.read(4)
+            if not word_data:
+                break
+
+            word = struct.unpack('>I', word_data)[0]
+            yield word
+
+def main():
+    parser = argparse.ArgumentParser(description='Read ARINC 429 words from an Airbus QAR file.')
+    parser.add_argument('qar_file', metavar='QAR_FILE', help='The QAR file to read from.')
+
+    args = parser.parse_args()
+
+    for arinc_word in read_arinc_words(args.qar_file):
+        print(hex(arinc_word))
+
+if __name__ == '__main__':
+    main()
