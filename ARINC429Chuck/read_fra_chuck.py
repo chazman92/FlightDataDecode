@@ -15,7 +15,7 @@ import pandas as pd
 import zipfile
 from io import StringIO
 import psutil
-import config_vec as conf
+#import config_vec as conf
 
 def main():
     global FNAME,DUMPDATA
@@ -178,57 +178,50 @@ def print_fra(FRA, frakey,colname):
     print('----------------')
 
 def read_parameter_file(dataver):
-    if isinstance(dataver,(str,float)):
-        dataver=int(dataver)
-    if str(dataver).startswith('787'):
-        print('ERR,dataver %s not support.' % (dataver,) )
-        print('Use "read_frd.py instead.')
-        return None
-    dataver='%06d' % dataver  #6 -bit string
 
-    filename_zip=dataver+'.fra'     #.The file name in VEC compressed package
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.VEC file name
+    # filename_zip=dataver+'.fra'     #.The file name in VEC compressed package
+    # zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.VEC file name
 
-    if os.path.isfile(zip_fname)==False:
-        print('ERR,ZipFileNotFound',zip_fname,flush=True)
-        raise(Exception('ERR,ZipFileNotFound,%s'%(zip_fname)))
+    # if os.path.isfile(zip_fname)==False:
+    #     print('ERR,ZipFileNotFound',zip_fname,flush=True)
+    #     raise(Exception('ERR,ZipFileNotFound,%s'%(zip_fname)))
 
-    try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
-    except zipfile.BadZipFile as e:
-        print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
-        raise(Exception('ERR,FailOpenZipFile,%s'%(zip_fname)))
-    
+    # try:
+    #     fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
+    # except zipfile.BadZipFile as e:
+    #     print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
+    #     raise(Exception('ERR,FailOpenZipFile,%s'%(zip_fname)))
+
+    fra_file = dataver + '.fra'
+    data_path = 'ARINC429Chuck/DataFrames/'
+
     FRA={}
-    with StringIO(fzip.read(filename_zip).decode('utf16')) as fp:
-    #with open(vec_fname,'r',encoding='utf16') as fp:
+    with open(data_path + fra_file,'rb') as fp:
         for line in fp.readlines():
-            line_tr=line.strip('\r\n //')
+            line_tr=line.decode('utf-8').strip('\r\n //')
             tmp1=line_tr.split('|',1)
-            if line.startswith('//') and tmp1[0] == '3':     # The title of "3 | ..." is relatively special, and one tab is missing at the end
-                tmp1[1] += '\t'
-            if line.startswith('//') and tmp1[0] == '7':     #The title of "7 | ..." is special.
-                tmp1[1]=tmp1[0].lstrip()
+            # if line.decode('utf-8').startswith('//') and tmp1[0] == '3':     # The title of "3 | ..." is relatively special, and one tab is missing at the end
+            #     tmp1[1] += '\t'
+            # if line.decode('utf-8').startswith('//') and tmp1[0] == '7':     #The title of "7 | ..." is special.
+            #     tmp1[1]=tmp1[0].lstrip()
             tmp2=tmp1[1].split('\t')
             if tmp1[0] in FRA:
                 if FRA[ tmp1[0]+'_len' ] != len(tmp2):
-                    print('ERR,data(%s) length require %d, but %d.' % (tmp1[0], FRA[ tmp1[0]+'_len' ], len(tmp2)) )
-                    #raise(Exception('ERR,DataLengthNotSame,data(%s) require %d but %d.'% (tmp1[0], FRA[ tmp1[0]+'_len' ], len(tmp2)) ))
+                    #print('ERR,data(%s) length require %d, but %d.' % (tmp1[0], FRA[ tmp1[0]+'_len' ], len(tmp2)) )
+                    raise(Exception('ERR,DataLengthNotSame,data(%s) require %d but %d.'% (tmp1[0], FRA[ tmp1[0]+'_len' ], len(tmp2)) ))
                 FRA[ tmp1[0] ].append( tmp2 )
             else:
                 FRA[ tmp1[0] ]=[ tmp2, ]
                 FRA[ tmp1[0]+'_len' ]=len(tmp2)
 
 
-    fzip.close()
-
     df_FRA={}
     for kk in FRA:
         if kk.endswith('_len'):
             continue
         df_FRA[kk]=pd.DataFrame(FRA[kk])
-    return df_FRA     #返回dataframe
-    #return FRA       #返回list
+    return df_FRA     #Return to DataFrame
+    #return FRA       #Return to list
 
 def showsize(size):
     if size<1024.0*2:
@@ -271,39 +264,46 @@ def usage():
     print()
     return
 if __name__=='__main__':
-    if(len(sys.argv)<2):
-        usage()
-        exit()
-    try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],'hv:p:f:',['help','ver=','csv=','paramlist','param='])
-    except getopt.GetoptError as e:
-        print(e)
-        usage()
-        exit(2)
-    FNAME=None
-    DUMPDATA=False
+    #comment out options
+    # if(len(sys.argv)<2):
+    #     usage()
+    #     sys.exit()
+    # try:
+    #     opts, args = getopt.gnu_getopt(sys.argv[1:],'hv:p:f:',['help','ver=','csv=','paramlist','param='])
+    # except getopt.GetoptError as e:
+    #     print(e)
+    #     usage()
+    #     sys.exit(2)
+    # FNAME=None
+    # DUMPDATA=False
+    # TOCSV=''
+    # PARAMLIST=False
+    # PARAM=None
+    FNAME='5471'
+    DUMPDATA=True
     TOCSV=''
-    PARAMLIST=False
+    PARAMLIST=True
     PARAM=None
-    for op,value in opts:
-        if op in ('-h','--help'):
-            usage()
-            exit()
-        elif op in('-v','--ver'):
-            FNAME=value
-        elif op in('-d',):
-            DUMPDATA=True
-        elif op in('--csv',):
-            TOCSV=value
-        elif op in('--paramlist',):
-            PARAMLIST=True
-        elif op in('--param','-p',):
-            PARAM=value
-    if len(args)>0:  #Command line remaining parameters
-        FNAME=args[0]  #Only take the first one
-    if FNAME is None:
-        usage()
-        exit()
+
+    # for op,value in opts:
+    #     if op in ('-h','--help'):
+    #         usage()
+    #         exit()
+    #     elif op in('-v','--ver'):
+    #         FNAME=value
+    #     elif op in('-d',):
+    #         DUMPDATA=True
+    #     elif op in('--csv',):
+    #         TOCSV=value
+    #     elif op in('--paramlist',):
+    #         PARAMLIST=True
+    #     elif op in('--param','-p',):
+    #         PARAM=value
+    # if len(args)>0:  #Command line remaining parameters
+    #     FNAME=args[0]  #Only take the first one
+    # if FNAME is None:
+    #     usage()
+    #     sys.exit()
 
     main()
     print('mem:',sysmem())

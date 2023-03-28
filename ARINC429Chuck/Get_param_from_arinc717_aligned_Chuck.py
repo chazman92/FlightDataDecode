@@ -92,30 +92,31 @@ https://github.com/KindVador/A429Library  #C++
        set 1 for each extra word
   --------------------------------------------  
 
-Based on the description of the above documents.Theoretically, the order of synchronous synchronous words should be: Sync1, Sync2, Sync3, Sync4, the number of Words/SEC.
-   Author: Southern Airlines, llgz@csair.com
-  --------------------------
-'''
+    Based on the description of the above documents.Theoretically, the order of synchronous synchronous words should be: Sync1, Sync2, Sync3, Sync4, the number of Words/SEC.
+    Author: Southern Airlines, llgz@csair.com
+    --------------------------
+    '''
 
-Real read files, (BitStream Format, Words/SEC = 1024, Synchro Word Length = 12bits)
+    Real read files, (BitStream Format, Words/SEC = 1024, Synchro Word Length = 12bits)
    * Take a single byte, position SYNC1 each time, and the sequence of synchronous words is 1, 2, 3, 4, and the interval is 0x400.
      The file should be processed, supplemented.There is no Frame lack in the middle.
 
- The program will be read in the aligned bit format format.
+    The program will be read in the aligned bit format format.
 """
 #import struct
 #from datetime import datetime
 import zipfile
 import psutil         #非必需库
 #from io import BytesIO
-#pandas不是必需的库。获取参数返回的是dist的list表。并没有用到pandas。
+#Pandas is not a necessary library.Get the parameter back is the list table of the dist.Pandas is not used.
 import pandas as pd   #非必需库
-import config_vec as conf
-import read_air as AIR
-import read_fra as FRA
-import read_par as PAR
+#import config_vec as conf
+#import read_air as AIR
+import read_fra_chuck as FRA
+import read_par_chuck as PAR
 #from decimal import Decimal
-#import arinc429  #没有使用# https://github.com/aeroneous/PyARINC429   #py3.5
+#import arinc429  #did not use
+#https://github.com/aeroneous/PyARINC429   #py3.5
 
 class DATA:
     'Used to save the classes of configuration parameters'
@@ -131,8 +132,8 @@ def main():
     air=getAIR(reg)
 
     if PARAMLIST:
-        #-----------列出记录中的所有参数名称--------------
-        fra=getFRA(air[0],'')  #第二个参数会被忽略
+        #-----------List all the parameter names in the record--------------
+        fra=getFRA(air[0],'')  #The second parameter will be ignored
         if len(fra)<1:
             print('Empty dataVer.')
             return
@@ -156,8 +157,8 @@ def main():
         return
 
     if PARAM is None:
-        #-----------打印参数的配置内容-----------------
-        for vv in ('ALT_STD','AC_TAIL7'): #打印这两个示例参数名
+        #-----------Configuration content of print parameters-----------------
+        for vv in ('ALT_STD','AC_TAIL7'): #Print these two sample parameter names
             fra=getFRA(air[0],vv)
             if len(fra)<1:
                 print('Empty dataVer.')
@@ -170,7 +171,7 @@ def main():
             print()
         print('dataVer:',air[0],air[1])
     else:
-        #-----------获取一个参数--------------------
+        #-----------Get a parameter--------------------
         fra =getFRA(air[0],PARAM)
         par =getPAR(air[0],PARAM)
         if len(fra)<1:
@@ -194,7 +195,7 @@ def main():
 
         df_pm=pd.DataFrame(pm_list)
 
-        #-----------参数写入csv文件--------------------
+        #-----------Parameter write to CSV file--------------------
         if WFNAME is not None and len(WFNAME)>0:
             print('Write into file "%s".' % WFNAME)
             #df_pm.to_csv(WFNAME,index=False)
@@ -218,7 +219,7 @@ def get_super(fra,par):
     /     \    
    |parity |   
   -------------------------------------  
-Author: Southern Airlines, llgz@csair.com
+    Author: Southern Airlines, llgz@csair.com
     '''
     global FNAME,WFNAME,DUMPDATA
 
@@ -528,7 +529,7 @@ def get_param(fra,par):
 
 def find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync):
     '''
-Determine whether the Frame_POS position meets the characteristics of synchronization.If not satisfied, continue to find the next starting location
+    Determine whether the Frame_POS position meets the characteristics of synchronization.If not satisfied, continue to find the next starting location
     '''
     #ttl_len=len(buf)
     while frame_pos<ttl_len - sync_word_len *2:  #Find the starting position of Frame
@@ -652,7 +653,7 @@ def arinc429_BCD_decode(word,conf):
                 'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
                 'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
                     }]
-Author: Southern Airlines, llgz@csair.com
+    Author: Southern Airlines, llgz@csair.com
     '''
     if conf['type']=='CHARACTER':
         if len(conf['part'])>0:
@@ -712,7 +713,7 @@ def arinc429_BNR_decode(word,conf):
                 'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
                 'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
                     }]
-Author: Southern Airlines, llgz@csair.com
+    Author: Southern Airlines, llgz@csair.com
     '''
     #According to Blen, obtain the mask value
     bits= (1 << conf['blen']) -1
@@ -977,15 +978,18 @@ def showsize(size):
     size /=1024.0
     if size<1024.0*2:
         return '%.2f G'%(size)
+
 def sysmem():
     '''
-    获取本python程序占用的内存大小
+    Get the memory occupied by the Python program
     '''
     size=psutil.Process(os.getpid()).memory_info().rss #The actual physical memory, including shared memory
     #size=psutil.Process(os.getpid()).memory_full_info().uss #The actual physical memory used does not include shared memory
     return showsize(size)
 
-import os,sys,getopt
+import os
+import sys
+import getopt
 def usage():
     print(u'Usage:')
     print(u'   Command line tool.')
@@ -1004,16 +1008,17 @@ def usage():
     print(u' If you think this project is helpful to you, please send me an email to make me happy.')
     print()
     return
+
 if __name__=='__main__':
     if(len(sys.argv)<2):
         usage()
-        exit()
+        sys.exit()
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],'hw:df:p:',['help','file=','paramlist','param=',])
     except getopt.GetoptError as e:
         print(e)
         usage()
-        exit(2)
+        sys.exit(2)
     FNAME=None
     WFNAME=None
     DUMPDATA=False
@@ -1040,7 +1045,7 @@ if __name__=='__main__':
         exit()
     if os.path.isfile(FNAME)==False:
         print(FNAME,'Not a file')
-        exit()
+        sys.exit()
 
     main()
 

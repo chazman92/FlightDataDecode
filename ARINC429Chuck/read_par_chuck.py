@@ -1,15 +1,12 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 import sys
 import os
-import psutil   #非必须库
+import psutil   #Non -required library
 #from datetime import datetime
-#pandas ,可以不使用 read_parameter_file() 可以返回list, 不返回DataFrame。
+#pandas ,You can return to the list without using Read_parameter_file (), without returning DataFrame.
 import pandas as pd
 import zipfile
 from io import StringIO
-import config_vec as conf
+#import config_vec as conf
 
 def main():
     global FNAME,DUMPDATA
@@ -20,7 +17,7 @@ def main():
     PAR=read_parameter_file(FNAME)
 
     if PARAMLIST:
-        #----------显示所有参数名-------------
+        #----------Show all parameter names-------------
         ii=0
         for vv in PAR.iloc[:,0].tolist():
             print(vv, end=',\t')
@@ -30,8 +27,8 @@ def main():
         print()
         if len(TOCSV)>4:
             print('Write to CSV file:',TOCSV)
-            PRA.iloc[:,0].to_csv(TOCSV,sep='\t')
-
+            PAR.iloc[:,0].to_csv(TOCSV,sep='\t') #typo said PRA Changed to PARAM
+#Not sure about this code
         if 0:
             dict2=PAR.iloc[:,[0,2,7,8,17,36,37,38]].to_dict('split')
             #print(dict2)
@@ -43,7 +40,7 @@ def main():
         return
 
     if PARAM is not None and len(PARAM)>0:
-        #----------显示单个参数的配置内容-------------
+        #----------Display configuration content of a single parameter-------------
         param=PARAM.upper()
         tmp=PAR
         tmp2=tmp[ tmp.iloc[:,0]==param ].copy() #dataframe
@@ -64,7 +61,7 @@ def main():
     tmp.iat[0,5]='S_Bit' # Sign Bit
     tmp.iat[0,7]='D_Bits'  # Data Bits
     tmp.iat[0,9]='FormatMode'   # Display Format Mode
-    tmp.iat[0,10]='字段长.分数部分'   # Field Length.Fractional Part
+    tmp.iat[0,10]='Field length. Score part'   # Field Length.Fractional Part
     print(tmp)
     #print(tmp.iat[0,9])
     #print(tmp.iat[0,10])
@@ -84,71 +81,74 @@ def main():
     print('PAR(%d):'%len(PAR))
     print('PAR:',getsizeof(PAR))
     print('end mem:',sysmem())
-    #print(PAR.loc[:,2].unique() ) #列出所有的Type
-    #print(PAR.loc[:,6].unique() ) #列出所有的SignBit
-    #print(PAR.loc[:,7].unique() ) #列出所有的MSB
-    #print(PAR.loc[:,8].unique() ) #列出所有的DataBit
-    #print(PAR.loc[:,12].unique() ) #列出所有的Computation:Value=Constant Value or Resol=Coef...
-    #print(PAR.loc[:,29].dropna().tolist() ) #列出所有的 Coef A(Res) ,有数组
-    #print(PAR.loc[:,30].dropna().tolist() ) #列出所有的 Coef b,有数组
-    #print(PAR.loc[:,31].dropna().tolist() ) #列出所有的 Dot,都是None
-    #print(PAR.loc[:,32].dropna().tolist() ) #列出所有的 X,都是None
-    #print(PAR.loc[:,33].dropna().tolist() ) #列出所有的 Y,都是None
-    #print(PAR.loc[:,34].unique() ) #列出所有的 Coef A,都是None
-    #print(PAR.loc[:,35].unique() ) #列出所有的 Power,都是None
-    #print(PAR.loc[0] ) #列出所有的column
+    #print(PAR.loc[:,2].unique() ) #List all Type
+    #print(PAR.loc[:,6].unique() ) #List all signbit
+    #print(PAR.loc[:,7].unique() ) #List all MSB
+    #print(PAR.loc[:,8].unique() ) #List all DataBit
+    #print(PAR.loc[:,12].unique() ) #List all computation: value = constant value or resol = coef ...
+    #print(PAR.loc[:,29].dropna().tolist() ) #List all COEF A (res), there are array
+    #print(PAR.loc[:,30].dropna().tolist() ) #List all COEF B, there are several arrays
+    #print(PAR.loc[:,31].dropna().tolist() ) #List all dots, none
+    #print(PAR.loc[:,32].dropna().tolist() ) #List all X, none
+    #print(PAR.loc[:,33].dropna().tolist() ) #List all Y, none
+    #print(PAR.loc[:,34].unique() ) #List all COEF A, all NONE
+    #print(PAR.loc[:,35].unique() ) #List all POWER, none
+    #print(PAR.loc[0] ) #List all column
     if len(TOCSV)>0:
         print('Write to CSV file:',TOCSV)
         PAR.to_csv(TOCSV)
 
 def read_parameter_file(dataver):
 
-    dataver='%06d' % int(dataver)  #6位字符串
+    #dataver='%06d' % int(dataver)  #6 -bit string
+    par_file = dataver + '.par'
+    data_path = 'ARINC429Chuck/DataFrames/'
+    
+    #filename_zip=dataver+'.par'     #.vec The file name in the compressed package
 
-    filename_zip=dataver+'.par'     #.vec压缩包内的文件名
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec文件名
+    #zip_fname=os.path.join(data_path ,dataver + '.par.zip')  #.zip file name
+    # if os.path.isfile(zip_fname)==False:
+    #     print('ERR,ZipFileNotFound',zip_fname,flush=True)
+    #     raise(Exception('ERR,ZipFileNotFound'))
 
-    if os.path.isfile(zip_fname)==False:
-        print('ERR,ZipFileNotFound',zip_fname,flush=True)
-        raise(Exception('ERR,ZipFileNotFound'))
-
-    try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #打开zip文件
-    except zipfile.BadZipFile as e:
-        print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
-        raise(Exception('ERR,FailOpenZipFile'))
+    # try:
+    #     fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
+    # except zipfile.BadZipFile as e:
+    #     print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
+    #     raise(Exception('ERR,FailOpenZipFile'))
+    
     
     PAR=[]
-    with StringIO(fzip.read(filename_zip).decode('utf16')) as fp:
-    #with open(vec_fname,'r',encoding='utf16') as fp:
+    with open(data_path + par_file,'rb') as fp:
+    #with StringIO(fzip.read(filename_zip).decode('utf16')) as fp:
         ki=-1
-        offset=0  #总偏移
-        PAR_offset={}  #各行记录的，偏移和长度
-        one_par={}  #单个参数的记录汇总
+        offset=0  #Overturn
+        PAR_offset={}  #Records of various rows, offset and length
+        one_par={}  #Record summary of a single parameter
         for line in fp.readlines():
-            line=line.strip('\r\n //')
+            line=line.decode('utf-8').strip('\r\n //')
             tmp1=line.split('|',1)
             tmp2=tmp1[1].split('\t')
-            if tmp1[0] == '1':  #记录的开始行
+            if tmp1[0] == '1':  #Beginning of the record
                 ki +=1
                 if ki>0:
-                    #print('one_par:',one_par,'\n')
+                    print('one_par:',one_par,'\n')
                     PAR.append( one_PAR(PAR_offset,one_par) )
-                    #if ki==1:
-                    #    print('PAR(%d):'%len(PAR), PAR,'\n')
-                    #    print('PAR_offset:',PAR_offset,'\n')
-                    #if ki>2:
+                    if ki==1:
+                       print('PAR(%d):'%len(PAR), PAR,'\n')
+                       print('PAR_offset:',PAR_offset,'\n')
+                    # if ki>2:
                     #    break
                 one_par={}
-            if tmp1[0] == '13': #记录的结束行
+            if tmp1[0] == '13': #End of the record
                 continue
-            if ki==0:  #文件头,记录的注释头
-                if tmp1[0] in PAR_offset: #文件头中不应该有重复
+            if ki==0:  #File header, record header
+                if tmp1[0] in PAR_offset: #There should be no duplication in the file header
                     raise(Exception('ERROR, "%s" in PAR_offset' % (tmp1[0]) ))
                 else:
-                    PAR_offset[ tmp1[0] ]=[ offset , len(tmp2) ]  #记录各组记录，应在整条记录的位置
-                    offset += len(tmp2)  #总偏移
-            #记录完整的一个参数的记录
+                    PAR_offset[ tmp1[0] ]=[ offset , len(tmp2) ]  #Record records should be in the location of the entire record
+                    offset += len(tmp2)  #Overturn
+            #Record a complete parameter record
             if tmp1[0] not in one_par:
                 one_par[ tmp1[0] ]=[]
                 for jj in tmp2:
@@ -158,32 +158,33 @@ def read_parameter_file(dataver):
                     one_par[ tmp1[0] ][jj].append( tmp2[jj] )
         PAR.append( one_PAR(PAR_offset,one_par) )
 
-    fzip.close()
+    #fzip.close()
 
-    return pd.DataFrame(PAR)  #返回dataframe
-    #return PAR       #返回list
+    return pd.DataFrame(PAR)  #Return to Dataframe
+    #return PAR       #Return to list
 
 def one_PAR(PAR_offset,one_par):
     '''
-    拼装 一行记录. 一个参数的记录
-       author:南方航空,LLGZ@csair.com
+    Editing a line of record. A record of a parameter
+       Author: Southern Airlines, llgz@csair.com
     '''
     ONE=[]
-    for kk in PAR_offset:  #每个记录 子行
-        for jj in range( PAR_offset[ kk ][1] ):  #根据子行的长度，全部初始化为空list
+    for kk in PAR_offset:  #Each recorded child line
+        for jj in range( PAR_offset[ kk ][1] ):  #According to the length of the child, all are initialized to empty list
             ONE.append([])
         if kk in one_par:
-            if PAR_offset[kk][1] != len(one_par[kk]):  #对应记录的数目不正确
-                raise(Exception('one_par[%s] length require %d not %d' % (kk, PAR_offset[kk][1], len(one_par))))
+            if PAR_offset[kk][1] != len(one_par[kk]):  #The number of recorded records is incorrect
+                raise(Exception('one_par[%s] length require %d not %d' % (kk, PAR_offset[kk][1], len(one_par[kk]))))
 
             offset=PAR_offset[ kk ][0]
-            for jj in range( len(one_par[ kk ]) ):  #把one_par的对应项extend 到ONE的对应位置
+            print(len(one_par[kk]))
+            for jj in range( len(one_par[kk]) ):  #The corresponding item of one_par to the corresponding position of the one
                 ONE[offset+jj].extend( one_par[kk][jj] )
-    for jj in range( len(ONE) ):  #整理记录。只有一条记录的，去除list
-        if len(ONE[jj])==0:
-            ONE[jj]=None
-        elif len(ONE[jj])==1:
-            ONE[jj]=ONE[jj][0]
+    for counter_j in range( len(ONE) ):  #Corresponding records.There is only one record, remove the list
+        if len (ONE[counter_j]) == 0:
+            ONE[counter_j]=None
+        elif len(ONE[counter_j])==1:
+            ONE[counter_j]=ONE[counter_j][0]
 
     #print('ONE(%d):'%len(ONE),  ONE, '\n')
     return ONE
@@ -205,8 +206,8 @@ def getsizeof(buf):
     size=sys.getsizeof(buf)
     return showsize(size)
 def sysmem():
-    size=psutil.Process(os.getpid()).memory_info().rss #实际使用的物理内存，包含共享内存
-    #size=psutil.Process(os.getpid()).memory_full_info().uss #实际使用的物理内存，不包含共享内存
+    size=psutil.Process(os.getpid()).memory_info().rss #The actual physical memory, including shared memory
+    #size=psutil.Process(os.getpid()).memory_full_info().uss #The actual physical memory used does not include shared memory
     return showsize(size)
 
 
@@ -214,52 +215,63 @@ def sysmem():
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读解码库，参数配置文件 vec 中 xx.par 文件。比如 010XXX.par')
+    print(u'   Command line tool.')
+    print(u' Read the decoding library, the parameter configuration file VEC xx.par file.Such as 010xxx.par')
     print(sys.argv[0]+' [-h|--help]')
     print('   -h, --help        print usage.')
-    print('   -v, --ver=10XXX      dataver 中的参数配置表')
+    print('   -v, --ver=10XXX      dataver The parameter configuration table')
     print('   --csv xxx.csv        save to "xxx.csv" file.')
     print('   --csv xxx.csv.gz     save to "xxx.csv.gz" file.')
     print('   --paramlist          list all param name.')
     print('   -p,--param alt_std   show "alt_std" param.')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
+    print(u'\n               Author: Southern Airlines, llgz@csair.com')
     print()
     return
 if __name__=='__main__':
-    if(len(sys.argv)<2):
-        usage()
-        exit()
-    try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],'hv:p:f:',['help','ver=','csv=','paramlist','param='])
-    except getopt.GetoptError as e:
-        print(e)
-        usage()
-        exit(2)
+    #turn off options for now
+    # if(len(sys.argv)<2):
+    #     usage()
+    #     sys.exit()
+    # try:
+    #     opts, args = getopt.gnu_getopt(sys.argv[1:],'hv:p:f:',['help','ver=','csv=','paramlist','param='])
+    # except getopt.GetoptError as e:
+    #     print(e)
+    #     usage()
+    #     sys.exit(2)
     FNAME=None
     DUMPDATA=False
     TOCSV=''
-    PARAMLIST=False
+    PARAMLIST=True
     PARAM=None
-    for op,value in opts:
-        if op in ('-h','--help'):
-            usage()
-            exit()
-        elif op in('-v','--ver'):
-            FNAME=value
-        elif op in('-d',):
-            DUMPDATA=True
-        elif op in('--csv',):
-            TOCSV=value
-        elif op in('--paramlist',):
-            PARAMLIST=True
-        elif op in('-p','--param',):
-            PARAM=value
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    #hardcode paths
+
+    # for op,value in opts:
+    #     if op in ('-h','--help'):
+    #         usage()
+    #         exit()
+    #     elif op in('-v','--ver'):
+    #         FNAME=value
+    #     elif op in('-d',):
+    #         DUMPDATA=True
+    #     elif op in('--csv',):
+    #         TOCSV=value
+    #     elif op in('--paramlist',):
+    #         PARAMLIST=True
+    #     elif op in('-p','--param',):
+    #         PARAM=value
+    # if len(args)>0:  #Command line remaining parameters
+    #     FNAME=args[0]  #Only take the first one
+
+    FNAME='5471'
+    #ARINC429Chuck/DataFrames/5471.par.zip
+    DUMPDATA=True
+    TOCSV=''
+    PARAMLIST=True
+    PARAM=None
+
     if FNAME is None:
         usage()
-        exit()
+        sys.exit()
 
     main()
     print('mem:',sysmem())

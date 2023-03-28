@@ -1,4 +1,4 @@
-// 1|Parameter Name	Description	Type Name	Source1 (Equip/Label/SDI)	Source2 (Equip/Label/SDI)	SSM	Sign Bit	MSB	Data Bits	Complement Of	Angle (Y or N)	Offset	Value=Constant Value or Resol=Coef A(Resolution) or ()	Word Range Min	Word Range Max	Operational Range Min	Operational Range Max	Display Format Mode	Positive Sign	Negative Sign	Field Length.Fractional Part	Units	Allowed Categories	Update Date	Update Rate	Internal Format (Float ,Unsigned or Signed)	Hidden Parameter
+// 1|Parameter Name	Description	Type Name	Source1 (Equip/Label/SDI)	Source2 (Equip/Label/SDI)	SSM	Sign Bit	MSB	Data Bits	Complement Of	Angle (Y or N)	Offset	Value=Constant Value or Resol=Coef A(Resolution) or ()	Word Range Min	Word Range Max	Operational Range Min	Operational Range Max	Display Format Mode	Positive Sign	Negative Sign	Field Length.Fractional Part	Units	Allowed Categories	Update Date	Update Rate	Internal Format (Float ,Unsigned or Signed)								Hidden Parameter
 // 2|Seg	From	Coef A(Res)	Coef b
 // 3|Dot	X (raw value)	Y (eng. value)
 // 4|Coef A	Power
@@ -797,38 +797,38 @@
 1|DFCLC_2_AVXX	Storm L P C capacity Tuner engine #2 ( average parameter)	COMPUTED / DMU SOFT	//	//			32	32		N			-10	10	-.2	.2	DECIMAL	0	N	5.2		ABCDEFGHIJKLMNOP	2004-10-11	0	Float		Y	Y	2				Y
 1|DFCLPC_1	Storm low pressure compressor capacity tuner Engine #1	BNR LINEAR (A*X)	EIU-1/017/	//	4	29	28	15	2	N		Resol=.0001220703125	-4	4	-.2	.2	DECIMAL	0	N	5.2		ABCDEFGHIJKLMNOP	2014-05-13	1	Float		Y	Y	1				Y
 1|DFCLPC_2	Storm low pressure compressor capacity tuner Engine #2	BNR LINEAR (A*X)	EIU-2/017/	//	4	29	28	15	2	N		Resol=.0001220703125	-4	4	-.2	.2	DECIMAL	0	N	5.2		ABCDEFGHIJKLMNOP	2014-05-13	1	Float		Y	Y	1				Y
-1|DFLM_1	Debris Rate Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DFLM_1_AV04	Debris Rate Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DFLM_1_R04	Debris Rate Ferrous –Long-term (Max) 1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DFLM_1_R26	Debris Rate Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DFLM_1_R27	Debris Rate Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DFLM_1_S1R22	Debris Rate Ferrous –Long-term (Max) 1 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFLM_1_S2R22	Debris Rate Ferrous –Long-term (Max) 1 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFLM_1_S3R22	Debris Rate Ferrous –Long-term (Max) 1 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFLM_2	Debris Rate Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DFLM_2_AV04	Debris Rate Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DFLM_2_R04	Debris Rate Ferrous –Long-term (Max) 2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DFLM_2_R26	Debris Rate Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DFLM_2_R27	Debris Rate Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DFLM_2_S1R22	Debris Rate Ferrous –Long-term (Max) 2 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFLM_2_S2R22	Debris Rate Ferrous –Long-term (Max) 2 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFLM_2_S3R22	Debris Rate Ferrous –Long-term (Max) 2 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFSM_1	Debris Rate Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DFSM_1_AV04	Debris Rate Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DFSM_1_R04	Debris Rate Ferrous –Short-term (Max) 1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DFSM_1_R26	Debris Rate Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DFSM_1_R27	Debris Rate Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DFSM_1_S1R22	Debris Rate Ferrous –Short-term (Max) 1 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFSM_1_S2R22	Debris Rate Ferrous –Short-term (Max) 1 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFSM_1_S3R22	Debris Rate Ferrous –Short-term (Max) 1 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFSM_2	Debris Rate Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DFSM_2_AV04	Debris Rate Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DFSM_2_R04	Debris Rate Ferrous –Short-term (Max) 2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DFSM_2_R26	Debris Rate Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DFSM_2_R27	Debris Rate Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DFSM_2_S1R22	Debris Rate Ferrous –Short-term (Max) 2 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFSM_2_S2R22	Debris Rate Ferrous –Short-term (Max) 2 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DFSM_2_S3R22	Debris Rate Ferrous –Short-term (Max) 2 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFLM_1	Debris Rate Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DFLM_1_AV04	Debris Rate Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DFLM_1_R04	Debris Rate Ferrous ï¿½Long-term (Max) 1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DFLM_1_R26	Debris Rate Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DFLM_1_R27	Debris Rate Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DFLM_1_S1R22	Debris Rate Ferrous ï¿½Long-term (Max) 1 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFLM_1_S2R22	Debris Rate Ferrous ï¿½Long-term (Max) 1 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFLM_1_S3R22	Debris Rate Ferrous ï¿½Long-term (Max) 1 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFLM_2	Debris Rate Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DFLM_2_AV04	Debris Rate Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DFLM_2_R04	Debris Rate Ferrous ï¿½Long-term (Max) 2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DFLM_2_R26	Debris Rate Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DFLM_2_R27	Debris Rate Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DFLM_2_S1R22	Debris Rate Ferrous ï¿½Long-term (Max) 2 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFLM_2_S2R22	Debris Rate Ferrous ï¿½Long-term (Max) 2 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFLM_2_S3R22	Debris Rate Ferrous ï¿½Long-term (Max) 2 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFSM_1	Debris Rate Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DFSM_1_AV04	Debris Rate Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DFSM_1_R04	Debris Rate Ferrous ï¿½Short-term (Max) 1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DFSM_1_R26	Debris Rate Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DFSM_1_R27	Debris Rate Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DFSM_1_S1R22	Debris Rate Ferrous ï¿½Short-term (Max) 1 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFSM_1_S2R22	Debris Rate Ferrous ï¿½Short-term (Max) 1 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFSM_1_S3R22	Debris Rate Ferrous ï¿½Short-term (Max) 1 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFSM_2	Debris Rate Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DFSM_2_AV04	Debris Rate Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DFSM_2_R04	Debris Rate Ferrous ï¿½Short-term (Max) 2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DFSM_2_R26	Debris Rate Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DFSM_2_R27	Debris Rate Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DFSM_2_S1R22	Debris Rate Ferrous ï¿½Short-term (Max) 2 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFSM_2_S2R22	Debris Rate Ferrous ï¿½Short-term (Max) 2 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DFSM_2_S3R22	Debris Rate Ferrous ï¿½Short-term (Max) 2 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
 1|DISIDMU_DSW1	DMU input discrete word #1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999999	0	100000000	HEXA			8.0		ABCDEFGHIJKLMNOP	2002-06-28	0	Unsigned		Y	Y	2				Y
 1|DMC_DEGC_ON	DMC status =0 if Deg C unit are selected = 1 if Deg F are selected	DISCRETE	DMC-1/305/01	DMC-2/305/10	1		27	1		N	0		0	1	0	1	OPTION			1.0		ABCDEFGHIJKLNMOP	1994-10-03	1	Unsigned		Y	Y	1				Y
 6|0	DEGC
@@ -875,38 +875,38 @@
 6|1	ON
 1|DMUSN_ON_2_F	DMU snapshot engine #2	FILTERED	//	//			32	32		N			0	9	0	1	BINARY			1.0		ABCDEFGHIJKLMNOP	2005-05-10	0	Unsigned		Y	Y	2				Y
 7|DMUSN_ON_2	1
-1|DNFLM_1	Debris Rate Non-Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DNFLM_1_1R22	Debris Rate Non-Ferrous –Long-term (Max) 1 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFLM_1_2R22	Debris Rate Non-Ferrous –Long-term (Max) 1 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFLM_1_3R22	Debris Rate Non-Ferrous –Long-term (Max) 1 set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFLM_1_AV04	Debris Rate Non-Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DNFLM_1_R04	Debris Rate Non-Ferrous –Long-term (Max) eng#1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DNFLM_1_R26	Debris Rate Non-Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DNFLM_1_R27	Debris Rate Non-Ferrous –Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DNFLM_2	Debris Rate Non-Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DNFLM_2_1R22	Debris Rate Non-Ferrous –Long-term (Max) 2 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFLM_2_2R22	Debris Rate Non-Ferrous –Long-term (Max) 2 set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFLM_2_3R22	Debris Rate Non-Ferrous –Long-term (Max) 2 set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFLM_2_AV04	Debris Rate Non-Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DNFLM_2_R04	Debris Rate Non-Ferrous –Long-term (Max) eng#2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DNFLM_2_R26	Debris Rate Non-Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DNFLM_2_R27	Debris Rate Non-Ferrous –Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DNFSM_1	Debris Rate Non-Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DNFSM_1_1R22	Debris Rate Non-Ferrous –Short-term (Max) 1 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFSM_1_2R22	Debris Rate Non-Ferrous –Short-term (Max) 1 set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFSM_1_3R22	Debris Rate Non-Ferrous –Short-term (Max) 1 set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFSM_1_AV04	Debris Rate Non-Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DNFSM_1_R04	Debris Rate Non-Ferrous –Short-term (Max) eng#1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DNFSM_1_R26	Debris Rate Non-Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DNFSM_1_R27	Debris Rate Non-Ferrous –Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
-1|DNFSM_2	Debris Rate Non-Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
-1|DNFSM_2_1R22	Debris Rate Non-Ferrous –Short-term (Max) 2 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFSM_2_2R22	Debris Rate Non-Ferrous –Short-term (Max) 2 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFSM_2_3R22	Debris Rate Non-Ferrous –Short-term (Max) 2 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
-1|DNFSM_2_AV04	Debris Rate Non-Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
-1|DNFSM_2_R04	Debris Rate Non-Ferrous –Short-term (Max) eng#2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
-1|DNFSM_2_R26	Debris Rate Non-Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
-1|DNFSM_2_R27	Debris Rate Non-Ferrous –Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DNFLM_1	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DNFLM_1_1R22	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFLM_1_2R22	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFLM_1_3R22	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1 set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFLM_1_AV04	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DNFLM_1_R04	Debris Rate Non-Ferrous ï¿½Long-term (Max) eng#1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DNFLM_1_R26	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DNFLM_1_R27	Debris Rate Non-Ferrous ï¿½Long-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DNFLM_2	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DNFLM_2_1R22	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFLM_2_2R22	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2 set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFLM_2_3R22	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2 set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFLM_2_AV04	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DNFLM_2_R04	Debris Rate Non-Ferrous ï¿½Long-term (Max) eng#2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DNFLM_2_R26	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DNFLM_2_R27	Debris Rate Non-Ferrous ï¿½Long-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DNFSM_1	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DNFSM_1_1R22	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1 set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFSM_1_2R22	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1 set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFSM_1_3R22	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1 set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFSM_1_AV04	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DNFSM_1_R04	Debris Rate Non-Ferrous ï¿½Short-term (Max) eng#1 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DNFSM_1_R26	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DNFSM_1_R27	Debris Rate Non-Ferrous ï¿½Short-term (Max) 1	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
+1|DNFSM_2	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-10-25	0	Float		Y	Y	2				Y
+1|DNFSM_2_1R22	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2 Set 1 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFSM_2_2R22	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2 Set 2 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFSM_2_3R22	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2 Set 3 report 22	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-27	0	Float		Y	Y	2				Y
+1|DNFSM_2_AV04	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2013-11-25	0	Float		Y	Y	2				Y
+1|DNFSM_2_R04	Debris Rate Non-Ferrous ï¿½Short-term (Max) eng#2 report 04	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-11-26	0	Float		Y	Y	2				Y
+1|DNFSM_2_R26	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-07	0	Float		Y	Y	2				Y
+1|DNFSM_2_R27	Debris Rate Non-Ferrous ï¿½Short-term (Max) 2	COMPUTED / DMU SOFT	//	//			32	32		N			0	99999	0	65535	DECIMAL			5.0	FP	ABCDEFGHIJKLMNOP	2014-01-09	0	Float		Y	Y	2				Y
 1|DP_UNB_1	Displacement unbalance eng #1	BNR LINEAR (A*X)	EVMU/227/01	//	4		28	8	2	N	0	Resol=.1	0	25.6	-25.6	25.6	DECIMAL			4.1	MILS	ABCDEFGHIJKLNMOP	1994-03-02	4	Float		N	N	1				Y
 1|DP_UNB_2	Displacement unbalance eng #2	BNR LINEAR (A*X)	EVMU/227/10	//	4		28	8	2	N	0	Resol=.1	0	25.6	-25.6	25.6	DECIMAL			4.1	MILS	ABCDEFGHIJKLNMOP	1994-03-02	4	Float		N	N	1				Y
 1|DPA	Delta Pressure for APIC APUs	BNR LINEAR (A*X)	APU/165/01	//	4		28	9	2	N		Resol=.078125	0	40	0	25	DECIMAL			5.2	PSI	ABCDEFGHIJKLMNOP	2005-06-23	4	Float		Y	Y	1				Y
@@ -1708,19 +1708,19 @@
 1|FLEX5_1		PACKED BITS	EIU-1/267/	//	0		31	21		N			0	2097152	0	524288	HEXA			6.0		ABCDEFGHIJKLMNOP	2014-05-13	16	Unsigned		N	N	1				Y
 1|FLEX5_2		PACKED BITS	EIU-2/267/	//	0		31	21		N			0	2097152	0	524288	HEXA			6.0		ABCDEFGHIJKLMNOP	2014-05-13	16	Unsigned		N	N	1				Y
 1|FLG73	flag generation raport 73 	COMPUTED / USER PROG	//	//			32	32		N			0	99	0	10	DECIMAL			2.0	INCH/S	ABCDEFGHIJKLMNOP	2018-08-02	0	Float		N	N	2				Y
-1|FLG73S	flag de début de monitoring engine 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-04-26	0	Float		N	N	2				Y
+1|FLG73S	flag de dï¿½but de monitoring engine 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-04-26	0	Float		N	N	2				Y
 1|FLG74	flag generation raport 74	COMPUTED / USER PROG	//	//			32	32		N			0	99	0	10	DECIMAL			2.0	INCH/S	ABCDEFGHIJKLMNOP	2018-08-02	0	Float		N	N	2				Y
-1|FLG74S	flag de début de monitoring engine 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-05-29	0	Float		N	N	2				Y
+1|FLG74S	flag de dï¿½but de monitoring engine 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-05-29	0	Float		N	N	2				Y
 1|FLG75	flag generation raport 75	COMPUTED / USER PROG	//	//			32	32		N			0	99	0	10	DECIMAL			2.0	INCH/S	ABCDEFGHIJKLMNOP	2018-08-02	0	Float		N	N	2				Y
-1|FLG75S	flag de début de monitoring engine 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-12	0	Float		N	N	2				Y
-1|FLG75S136	flag de début de monitoring engine 1 for event 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
-1|FLG75S24	flag de début de monitoring engine 1 for event 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
-1|FLG75S25	flag de début de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
+1|FLG75S	flag de dï¿½but de monitoring engine 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-12	0	Float		N	N	2				Y
+1|FLG75S136	flag de dï¿½but de monitoring engine 1 for event 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
+1|FLG75S24	flag de dï¿½but de monitoring engine 1 for event 1	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
+1|FLG75S25	flag de dï¿½but de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
 1|FLG76	flag generation raport 76	COMPUTED / USER PROG	//	//			32	32		N			0	99	0	10	DECIMAL			2.0	INCH/S	ABCDEFGHIJKLMNOP	2018-08-02	0	Float		N	N	2				Y
-1|FLG76S	flag de début de monitoring engine 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-07-05	0	Float		N	N	2				Y
-1|FLG76S136	flag de début de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-07-05	0	Float		N	N	2				Y
-1|FLG76S24	flag de début de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-07-05	0	Float		N	N	2				Y
-1|FLG76S25	flag de début de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
+1|FLG76S	flag de dï¿½but de monitoring engine 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-07-05	0	Float		N	N	2				Y
+1|FLG76S136	flag de dï¿½but de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-07-05	0	Float		N	N	2				Y
+1|FLG76S24	flag de dï¿½but de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-07-05	0	Float		N	N	2				Y
+1|FLG76S25	flag de dï¿½but de monitoring engine 1 for event 2	COMPUTED / USER PROG	//	//			32	32		N			0	100	0	10	DECIMAL			5.2	INCH/S	ABCDEFGHIJKLMNOP	2018-06-14	0	Float		N	N	2				Y
 1|FLG77E1	flag for Event 1 for report 77	COMPUTED / USER PROG	//	//			32	32		N			0	9	0	10	DECIMAL			1.0		ABCDEFGHIJKLMNOP	2019-04-12	0	Float		N	N	2				Y
 1|FLG77E2	flag for Event 2 for report 77	COMPUTED / USER PROG	//	//			32	32		N			0	9	0	10	DECIMAL			1.0		ABCDEFGHIJKLMNOP	2019-04-12	0	Float		N	N	2				Y
 1|FLG77E3	flag for Event 3 for report 77	COMPUTED / USER PROG	//	//			32	32		N			0	9	0	10	DECIMAL			1.0		ABCDEFGHIJKLMNOP	2019-04-12	0	Float		N	N	2				Y

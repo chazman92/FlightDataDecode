@@ -12,7 +12,8 @@
 				"esbenp.prettier-vscode",
 				"DavidAnson.vscode-markdownlint",
 				"eamodio.gitlens",
-				"funkyremi.vscode-google-translate"
+				"funkyremi.vscode-google-translate",
+				"mechatroner.rainbow-csv"
 			]
 		}
 	}
