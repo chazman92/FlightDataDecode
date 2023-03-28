@@ -14,12 +14,14 @@ def read_arinc_words(qar_file):
             yield word
 
 def main():
-    parser = argparse.ArgumentParser(description='Read ARINC 429 words from an Airbus QAR file.')
-    parser.add_argument('qar_file', metavar='QAR_FILE', help='The QAR file to read from.')
+    #parser = argparse.ArgumentParser(description='Read ARINC 429 words from an Airbus QAR file.')
+    #parser.add_argument('qar_file', metavar='QAR_FILE', help='The QAR file to read from.')
 
-    args = parser.parse_args()
+    #args = parser.parse_args()
+    qar_file_path = 'ARINC429Chuck/DataFrames/N2002J-REC25038.DAT'
 
-    for arinc_word in read_arinc_words(args.qar_file):
+    #for arinc_word in read_arinc_words(args.qar_file):
+    for arinc_word in read_arinc_words(qar_file_path):
         print(hex(arinc_word))
 
 if __name__ == '__main__':
