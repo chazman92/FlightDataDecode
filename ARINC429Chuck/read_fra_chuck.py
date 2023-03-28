@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-读解码库，参数配置文件 vec 中 xx.fra 文件。比如 010XXX.fra
-仅支持 ARINC 573 PCM 格式
+Read the decoding library, parameter configuration file vec Mid -xx.fra file.Such as 010xxx.fra
+Only support ARINC 573 PCM Format
    author:China Southern Airlines, LLGZ@csair.com
 """
 import sys
 import os
-   #非必须库
+#Non -required library
 #from datetime import datetime
 #pandas cannot use, read_parameter_file() can return list, Does not return a DataFrame.
 import pandas as pd
@@ -35,7 +35,7 @@ def main():
     #print(FRA.keys())
 
     if PARAMLIST:
-        #----------显示所有参数名-------------
+        #----------Show all parameter names-------------
         #print(FRA['2'].iloc[:,0].tolist())
         #---regular parameter
         ii=0
@@ -184,17 +184,17 @@ def read_parameter_file(dataver):
         print('ERR,dataver %s not support.' % (dataver,) )
         print('Use "read_frd.py instead.')
         return None
-    dataver='%06d' % dataver  #6位字符串
+    dataver='%06d' % dataver  #6 -bit string
 
-    filename_zip=dataver+'.fra'     #.vec压缩包内的文件名
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec文件名
+    filename_zip=dataver+'.fra'     #.The file name in VEC compressed package
+    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.VEC file name
 
     if os.path.isfile(zip_fname)==False:
         print('ERR,ZipFileNotFound',zip_fname,flush=True)
         raise(Exception('ERR,ZipFileNotFound,%s'%(zip_fname)))
 
     try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #打开zip文件
+        fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
     except zipfile.BadZipFile as e:
         print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
         raise(Exception('ERR,FailOpenZipFile,%s'%(zip_fname)))
@@ -205,9 +205,9 @@ def read_parameter_file(dataver):
         for line in fp.readlines():
             line_tr=line.strip('\r\n //')
             tmp1=line_tr.split('|',1)
-            if line.startswith('//') and tmp1[0] == '3':     # "3|..." 的标题比较特殊，末尾少了一个tab
+            if line.startswith('//') and tmp1[0] == '3':     # The title of "3 | ..." is relatively special, and one tab is missing at the end
                 tmp1[1] += '\t'
-            if line.startswith('//') and tmp1[0] == '7':     # "7|..." 的标题比较特殊，起始多了一个tab
+            if line.startswith('//') and tmp1[0] == '7':     #The title of "7 | ..." is special.
                 tmp1[1]=tmp1[0].lstrip()
             tmp2=tmp1[1].split('\t')
             if tmp1[0] in FRA:
@@ -249,8 +249,8 @@ def getsizeof(buf,mode=True):
     else:
         return size
 def sysmem():
-    size=psutil.Process(os.getpid()).memory_info().rss #实际使用的物理内存，包含共享内存
-    #size=psutil.Process(os.getpid()).memory_full_info().uss #实际使用的物理内存，不包含共享内存
+    size=psutil.Process(os.getpid()).memory_info().rss #Actually used physical memory, including shared memory
+    #size=psutil.Process(os.getpid()).memory_full_info().uss #The actual physical memory used does not include shared memory
     return showsize(size)
 
 
@@ -258,16 +258,16 @@ def sysmem():
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读解码库，参数配置文件 vec 中 xx.fra 文件。比如 010XXX.fra')
+    print(u'Command line tool.')
+    print(u'Read the decoding library, the parameter configuration file VEC xx.fra file.Such as 010xxx.fra ')
     print(sys.argv[0]+' [-h|--help]')
     print('   -h, --help        print usage.')
-    print('   -v, --ver=10XXX      dataver 中的参数配置表')
+    print('   -v, --ver=10XXX      Parameter configuration table in dataver')
     print('   --csv xxx.csv        save to "xxx.csv" file.')
     print('   --csv xxx.csv.gz     save to "xxx.csv.gz" file.')
     print('   --paramlist          list all param name.')
     print('   -p,--param alt_std   show "alt_std" param.')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
+    print(u'\ n Author: Southern Airlines, llgz@csair.com ')
     print()
     return
 if __name__=='__main__':
@@ -299,8 +299,8 @@ if __name__=='__main__':
             PARAMLIST=True
         elif op in('--param','-p',):
             PARAM=value
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        FNAME=args[0]  #Only take the first one
     if FNAME is None:
         usage()
         exit()
