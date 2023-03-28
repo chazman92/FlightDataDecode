@@ -1,10 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
- 读取 wgl中 eofloacat.qar 。没什么用。
-    author:南方航空,LLGZ@csair.com
-"""
 import struct
 #from datetime import datetime
 import zipfile
@@ -45,14 +41,14 @@ def main():
 
 import os,sys,getopt
 def usage():
-    print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读取 wgl中 eofloacat.qar 。没什么用。')
-    print(sys.argv[0]+' [-h|--help]')
-    print('   -h, --help     print usage.')
-    print('   -f, --file=    "....wgl.zip" filename')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
-    print()
+     print(u'Usage:')
+     print(u' command line tool.')
+     print(u' read eofloacat.qar in wgl. Not useful.')
+     print(sys.argv[0]+' [-h|--help]')
+     print('-h, --help print usage.')
+     print(' -f, --file= "....wgl.zip" filename')
+     print(u'\n author: China Southern Airlines, LLGZ@csair.com')
+     print()
     return
 if __name__=='__main__':
     if(len(sys.argv)<2):
