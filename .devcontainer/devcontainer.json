@@ -3,7 +3,16 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-python.python"
+				"ms-python.python",
+				"caiqichang.vscode-translation",
+				"GitHub.copilot-labs",
+				"GitHub.copilot",
+				"ms-python.pylint",
+				"mohsen1.prettify-json",
+				"esbenp.prettier-vscode",
+				"DavidAnson.vscode-markdownlint",
+				"eamodio.gitlens",
+				"funkyremi.vscode-google-translate"
 			]
 		}
 	}

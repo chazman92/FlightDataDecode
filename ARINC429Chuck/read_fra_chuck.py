@@ -4,13 +4,13 @@
 """
 读解码库，参数配置文件 vec 中 xx.fra 文件。比如 010XXX.fra
 仅支持 ARINC 573 PCM 格式
-   author:南方航空,LLGZ@csair.com
+   author:China Southern Airlines, LLGZ@csair.com
 """
 import sys
 import os
    #非必须库
 #from datetime import datetime
-#pandas 可以不使用, read_parameter_file() 可以返回list, 不返回DataFrame。
+#pandas cannot use, read_parameter_file() can return list, Does not return a DataFrame.
 import pandas as pd
 import zipfile
 from io import StringIO
