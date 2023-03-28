@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-读取 wgl 中 raw.dat 。
-解码一个参数。
-仅支持 ARINC 573/717 PCM 格式
+Read raw.dat in WGL.
+Decoding a parameter.
+Only support ArinC 573/717 PCM format
 ------
 https://github.com/aeroneous/PyARINC429   #py3.5
 https://github.com/KindVador/A429Library  #C++
@@ -92,16 +92,16 @@ https://github.com/KindVador/A429Library  #C++
        set 1 for each extra word
   --------------------------------------------  
 
- 根据上述的文档的描述。 理论上synchro同步字出现的顺序应该是，sync1,sync2,sync3,sync4, 间隔为 words/sec 的个数。
-   author:南方航空,LLGZ@csair.com
+Based on the description of the above documents.Theoretically, the order of synchronous synchronous words should be: Sync1, Sync2, Sync3, Sync4, the number of Words/SEC.
+   Author: Southern Airlines, llgz@csair.com
   --------------------------
 '''
 
- 实际读取文件， (bitstream format, words/sec=1024, Synchro Word Length=12bits)
-   * 每次读取取单个字节，定位sync1, 同步字出现顺序是 1, 2, 3, 4, 间隔为 0x400.
-     文件应该是被处理，补齐。中间没有frame缺失。
+Real read files, (BitStream Format, Words/SEC = 1024, Synchro Word Length = 12bits)
+   * Take a single byte, position SYNC1 each time, and the sequence of synchronous words is 1, 2, 3, 4, and the interval is 0x400.
+     The file should be processed, supplemented.There is no Frame lack in the middle.
 
- 程序将按照 aligned bit format 格式读取。
+ The program will be read in the aligned bit format format.
 """
 #import struct
 #from datetime import datetime
@@ -185,11 +185,11 @@ def main():
 
         print('PARAM:',PARAM)
         if len(fra['2'])>0:
-            pm_list=get_param(fra,par) #获取一个参数,regular
+            pm_list=get_param(fra,par) #Get a parameter, regula
         else:
-            pm_list=get_super(fra,par) #获取一个参数,superframe
+            pm_list=get_super(fra,par) #Get a parameter, superframe
         #print(pm_list)
-        print('Result[0]:',pm_list[0]) #打印第一组值
+        print('Result[0]:',pm_list[0]) #Print the first set of values
         print('DataVer:',air[0])
 
         df_pm=pd.DataFrame(pm_list)
@@ -201,7 +201,7 @@ def main():
             df_pm.to_csv(WFNAME,sep='\t',index=False)
             return
 
-        #-----------显示参数的部分内容--------------------
+        #-----------Part of the content of the parameter--------------------
         pd.set_option('display.min_row',200)
         print( df_pm['v'][1000:1200].tolist() )
 
@@ -210,7 +210,7 @@ def main():
 
 def get_super(fra,par):
     '''
-    获取 superframe 参数，返回 ARINC 429 format
+ Get the superframe parameter and return to Arinc 429 Format
   -------------------------------------
   bit:|32|31|30|29|28|27|26|25|24|23|22|21|20|19|18|17|16|15|14|13|12|11|10|9|8|7|6|5|4|3|2|1| 
       |  | SSM |                            DATA field                  | SDI|     label     | 
@@ -218,7 +218,7 @@ def get_super(fra,par):
     /     \    
    |parity |   
   -------------------------------------  
-    author:南方航空,LLGZ@csair.com  
+Author: Southern Airlines, llgz@csair.com
     '''
     global FNAME,WFNAME,DUMPDATA
 
@@ -241,19 +241,19 @@ def get_super(fra,par):
             'bin' :12,
             'occur': -1,
             },
-            #counter2  没有从配置文件读入(todo)
+            #Counter2 does not read from the configuration file (TODO)
             #{'part':1,}
             ]
-    if sync_word_len>1: #如果同步字 > 1 word
-        sync1=(sync1 << (12 * (sync_word_len-1))) +1  #生成长的同步字
+    if sync_word_len>1: #If synchronous words> 1 word
+        sync1=(sync1 << (12 * (sync_word_len-1))) +1  #Synchronous word for growth
         sync2=(sync2 << (12 * (sync_word_len-1))) +1
         sync3=(sync3 << (12 * (sync_word_len-1))) +1
         sync4=(sync4 << (12 * (sync_word_len-1))) +1
 
-    #----------参数配置的整理-----------
+    #----------Parameter configuration sorting-----------
     super_set=[]
-    for vv in fra['3']: #全部内容变为 int
-        p_set={  #临时变量
+    for vv in fra['3']: #All content becomes int
+        p_set={  #Temporary variables
             'frameNo':int(vv[0]),
             'sub' :int(vv[1]),
             'word':int(vv[2]),
@@ -262,37 +262,37 @@ def get_super(fra,par):
             'counterNo' :int(vv[5]),
             }
         super_set.append(p_set)
-    super_set=super_set[0] #只取了第一项,通常一个super参数只会对应一个frameNo
+    super_set=super_set[0] #Only the first item, usually a super parameter only corresponds to one frameno
 
-    #----------参数配置的整理,把一个period作为一个大frame处理-----------
+    #TheCollationOfTheParameterConfiguration,TreatAPeriodAsABigFrameProcessing
     superpm_set=[]
-    p_set=[]  #临时变量
+    p_set=[]  #Temporary variables
     last_part=0
-    for vv in fra['4']: #全部内容变为 int
+    for vv in fra['4']: #All content becomes int
         vv[0]=int(vv[0]) #part
         if vv[0]<=last_part:
-            #part=1,2,3 根据part分组
+            #Part = 1,2,3 according to the part group
             superpm_set.append(p_set)
             p_set=[]
         last_part=vv[0]
-        #frameNo=vv[2]   #应该由frameNo取找super_set中对应的配置,这里简单化了。
+        #frameNo=vv[2]   #The corresponding configuration of Frameno should be found in the super_set, which is simplified here.
         p_set.append({
             'part':vv[0],
             'rate': 1,
             'sub' :super_set['sub'],
             'word':super_set['word'] + (int(vv[3])-1) * word_sec * 4, #subframe + (Frame-1) * word_sec *4
-            'bout':int(vv[4]),  #以下两项bout,blen,应该用super_set中的设置,获取数据后,再用这里的配置取出最终bits。
-            'blen':int(vv[5]),  #但是因为super_set中的内容都是12,12。所以这里就直接用了最终配置。
+            'bout':int(vv[4]),  #The following two bouts, blen should be set in Super_Set. After getting the data, use the configuration here to remove the final bits.
+            'blen':int(vv[5]),  #But because the content in Super_Set is 12,12.So the final configuration is used here.
             'bin' :int(vv[6]),
             'occur' : -1,
             'resol': float(vv[7]), #resolution
             'period':int(vv[1]),
             })
-    if len(p_set)>0: #最后一组
+    if len(p_set)>0: #Last group
         superpm_set.append(p_set)
 
-    #----------打印参数-----------
-    print('Frame定义: Word/SEC:%d, syncLen(word):%d, sync1234: %X,%X,%X,%X'%(word_sec,sync_word_len,sync1,sync2,sync3,sync4) )
+    #----------Print parameter-----------
+    print('Frame definition: Word/SEC:%d, syncLen(word):%d, sync1234: %X,%X,%X,%X'%(word_sec,sync_word_len,sync1,sync2,sync3,sync4) )
     print('   SuperFrame Counter:',superframe_counter_set)
     print()
     print('super_set: ',super_set )
@@ -312,9 +312,9 @@ def get_super(fra,par):
             par['type'].find('UTC')!=0 :
         print('!!!Warning!!! Data Type "%s" Decoding maybe NOT correct.\n' % (par['type']) )
 
-    #----------打开zip压缩文件-----------
+    #----------Open the zip compression file-----------
     try:
-        fzip=zipfile.ZipFile(FNAME,'r') #打开zip文件
+        fzip=zipfile.ZipFile(FNAME,'r') #Open the zip file
     except zipfile.BadZipFile as e:
         print('==>ERR,FailOpenZipFile',e,FNAME,flush=True)
         raise(Exception('ERR,FailOpenZipFile,%s'%FNAME))
@@ -322,59 +322,59 @@ def get_super(fra,par):
     buf=fzip.read(filename_zip)
     fzip.close()
 
-    #----------寻找起始位置-----------
+    #----------Find the starting position-----------
     ttl_len=len(buf)
-    frame_pos=0  #frame开始位置,字节指针
+    frame_pos=0  #Frame starts position, byte pointer
     frame_pos=find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4) )
     if frame_pos > 0:
         print('!!!Warning!!! First SYNC at x%X, not beginning of DATA.'%(frame_pos),flush=True)
     if frame_pos >= ttl_len - sync_word_len *2:
-        #整个文件都没找到同步字
+        #No synchronous word was found throughout the file
         print('==>ERR, SYNC not found at end of DATA.',flush=True)
         raise(Exception('ERR,SYNC not found at end of DATA.'))
 
-    period=superpm_set[0][0]['period']   #简单的从第一组的第一条记录中获取period
+    period=superpm_set[0][0]['period']   #Simply obtain Period from the first record of the first group
 
-    #----------计算counter_mask-----------
-    #有的库 counter 是递增 1, N个period一循环。 有的是递增 256,一个period一循环。
-    #根据前后两个Frame中的counter值，确定mask。
+    #----------Calculate the counter_mask-----------
+    #Some libraries are increased by 1, n periods cycle.Some are increasing 256, a period cycle.
+    #Determine MASK according to the counter value in the two Frames.
     frame_counter  = get_arinc429(buf, frame_pos, superframe_counter_set, word_sec )
     frame_counter -= get_arinc429(buf, frame_pos + word_sec * 4 * 2, superframe_counter_set, word_sec )
     if abs(frame_counter) ==1:
-        count_mask = ( 1 << int(pow(period, 0.5)) ) -1  #平方根sqrt: pow(x, 0.5) or (x ** 0.5)
+        count_mask = ( 1 << int(pow(period, 0.5)) ) -1  #Square root SQRT: pow(x, 0.5) or (x ** 0.5)
         #count_mask= 0xf
     else:
         count_mask= 0
     print('counter sep:',frame_counter,period,bin(count_mask) )
     
-    #----------寻找SuperFrame起始位置-----------
+    #----------Looking for the starting position of Superframe-----------
     val_first=super_set['counterNo'] #superframe counter 1/2
-    if val_first==2: val_first=1  #counter2 没从配置中读入(todo)
+    if val_first==2: val_first=1  #Counter2 does not read from the configuration (TODO)
     val_first=superframe_counter_set[val_first-1]['v_first']
-    pm_sec=0.0   #参数的时间轴,秒数
+    pm_sec=0.0   #The timeline of the parameter, the number of seconds
     frame_pos,sec_add=find_FIRST_super(buf, ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4), val_first, superframe_counter_set, period, count_mask )
-    pm_sec += sec_add  #加上时间增量
+    pm_sec += sec_add  #Add time incremental
 
-    #----------读参数-----------
-    ii=0    #计数
-    pm_list=[] #参数列表
+    #----------Read parameter-----------
+    ii=0    #count
+    pm_list=[] #parameter list
     while True:
-        # 有几个dataVer的数据,不是从文件头开始,只匹配sync1会找错。且不排除中间会错/乱。
-        #所以每次都要确认first frame的位置。 实际测试,发现有同步字错误,但frame间隔正确。
-        frame_pos2=frame_pos   #保存旧位置
+        # There are several DataVER data, not starting from the file header, only sync1 will find it wrong.It is not ruled out that it will be wrong/chaos in the middle.
+        #So every time you must confirm the location of First Frame.The actual test was found that there were synchronous words errors, but the Frame interval was correct.
+        frame_pos2=frame_pos   #Save the old position
         frame_pos,sec_add=find_FIRST_super(buf, ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4), val_first, superframe_counter_set, period, count_mask )
-        pm_sec += sec_add  #加上时间增量
+        pm_sec += sec_add  #Add time incremental
         if frame_pos>=ttl_len -2:
-            #-----超出文件结尾，退出-----
+            #----- Beyond the end of the file, exit -----
             break
 
         for pm_set in superpm_set:
-            #获取anrinc429,第一步应该用super_set中的bout,blen设置,获取数据后,再用superpm_set中的配置取出最终bits。
-            #但是因为super_set中的内容都是12,12。所以这里就直接用了最终配置。
+            #Get Anrinc429, the first step should be set with the bout, blen settings in Super_Set, and after getting the data, use the configuration in Superpm_Set to take out the final BITS.
+            #But because the content in Super_Set is 12,12.So the final configuration is used here.
             value=get_arinc429(buf, frame_pos, pm_set, word_sec )  #ARINC 429 format
             value =arinc429_decode(value ,par )
-            # superpm_set 中有个 resolution 似乎是无用的。AGS配置中,说是自动计算的,不让改。
-            # 试着乘上去，数据就不对了。
+            # There is a resolution in superpm_set seems useless.In the AGS configuration, it is said to be automatically calculated and not allowed to change.
+            #Try to ride, the data is wrong.
             #if pm_set[0]['resol'] != 0.0 and pm_set[0]['resol'] != 1.0: 
             #    value *= pm_set[0]['resol']
 
@@ -382,26 +382,26 @@ def get_super(fra,par):
             #pm_list.append({'t':round(pm_sec,10),'v':bin(value)})
             #pm_list.append({'t':round(pm_sec,10),'v':value,'c':frame_counter})
 
-        pm_sec += 4.0 * period  #一个frame是4秒
-        frame_pos += word_sec * 4 * 2 * period   # 4subframe, 2bytes,直接跳过一个period,哪怕中间有frame错误/缺失，都不管了。
+        pm_sec += 4.0 * period  #A frame is 4 seconds
+        frame_pos += word_sec * 4 * 2 * period   # 4Subframe, 2bytes, skipped a period directly, even if there is a Frame error/lack in the middle, it doesn't matter.
     return pm_list
 
 def find_FIRST_super(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync, val_first, superframe_counter_set, period, count_mask ):
     '''
-    判断 first frame 的位置，如果不是，则向后推 1 frame再找。
-    根据 superframe_counter 的内容，找到conter的值为 first value 的frame位置
-       author:南方航空,LLGZ@csair.com  
+    To judge the location of the FIRST FRAME, if not, push 1 frame and look back.
+        According to the content of Superframe_Counter, find the Frame position of the value of Conter
+        Author: Southern Airlines, llgz@csair.com
     '''
-    pm_sec=0.0   #参数的时间轴,秒数
+    pm_sec=0.0   #The timeline of the parameter, the number of seconds
     while True:
-        frame_pos2=frame_pos   #保存旧位置
-        frame_pos=find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync )  #判断同步字，或继续寻找新位置
+        frame_pos2=frame_pos   #Save the old position
+        frame_pos=find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync )  #Determine synchronization words, or continue to find new positions
         if frame_pos>=ttl_len -2:
-            #-----超出文件结尾，退出-----
+            #----- Beyond the end of the file, exit -----
             break
         if frame_pos>frame_pos2:
             print('==>ERR, SYNC loss at x%X，refound at x%X' % (frame_pos2, frame_pos) )
-            pm_sec +=4  #如果失去同步,重新同步后,时间加4秒。(这里应该根据跳过的距离确定时间增量,这里就简单粗暴了)
+            pm_sec +=4  #If the synchronization is lost, after the synchronization, the time will be 4 seconds.(This should be determined according to the jump distance, it is simple and rude here)
 
         frame_counter=get_arinc429(buf, frame_pos, superframe_counter_set, word_sec )
         if count_mask > 0:
@@ -411,10 +411,10 @@ def find_FIRST_super(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync, val
             break
         else:
             print('NotFound first superframe at x%X, cnter:%d' % (frame_pos, frame_counter) )
-            pm_sec += 4.0   #一个frame是4秒
+            pm_sec += 4.0   #A frame is 4 seconds
             frame_pos += word_sec * 4 * 2   # 4subframe, 2bytes
 
-    return frame_pos, pm_sec  #返回位置, 时间增量
+    return frame_pos, pm_sec  #Return position, time increment
 
 def get_param(fra,par):
     '''
@@ -432,8 +432,8 @@ def get_param(fra,par):
 
     #Initialize variables
     word_sec=int(fra['1'][0])
-    sync_word_len=int(fra['1'][1])//12  #整除, 同步字的字数(长度)
-    sync1=int(fra['1'][2],16)  #同步字1
+    sync_word_len=int(fra['1'][1])//12  #Extract, the number (length) of the synchronous word (length)
+    sync1=int(fra['1'][2],16)  #Synchronous word 1
     sync2=int(fra['1'][3],16)
     sync3=int(fra['1'][4],16)
     sync4=int(fra['1'][5],16)
@@ -448,15 +448,15 @@ def get_param(fra,par):
             'bin' :12,
             'occur': -1,
             }]
-    if sync_word_len>1: #如果同步字 > 1 word
-        sync1=(sync1 << (12 * (sync_word_len-1))) +1  #生成长的同步字
+    if sync_word_len>1: #If synchronous words> 1 word
+        sync1=(sync1 << (12 * (sync_word_len-1))) +1  #Synchronous word for growth
         sync2=(sync2 << (12 * (sync_word_len-1))) +1
         sync3=(sync3 << (12 * (sync_word_len-1))) +1
         sync4=(sync4 << (12 * (sync_word_len-1))) +1
 
-    param_set=getDataFrameSet(fra['2'],word_sec)  #整理参数位置记录的配置
+    param_set=getDataFrameSet(fra['2'],word_sec)  #Configuration of sorting parameter location records
 
-    #----------打印参数-----------
+    #----------Print parameter-----------
     print('Frame定义: Word/SEC:%d, syncLen(word):%d, sync1234: %X,%X,%X,%X'%(word_sec,sync_word_len,sync1,sync2,sync3,sync4) )
     print('   SuperFrame Counter:',superframe_counter_set)
     print()
@@ -476,9 +476,9 @@ def get_param(fra,par):
             par['type'].find('UTC')!=0 :
         print('!!!Warning!!! Data Type "%s" Decoding maybe NOT correct.\n' % (par['type']) )
 
-    #----------打开zip压缩文件-----------
+    #----------Open the zip compression file-----------
     try:
-        fzip=zipfile.ZipFile(FNAME,'r') #打开zip文件
+        fzip=zipfile.ZipFile(FNAME,'r') #Open the zip file
     except zipfile.BadZipFile as e:
         print('==>ERR,FailOpenZipFile',e,FNAME,flush=True)
         raise(Exception('ERR,FailOpenZipFile,%s'%FNAME))
@@ -486,53 +486,53 @@ def get_param(fra,par):
     buf=fzip.read(filename_zip)
     fzip.close()
 
-    #----------寻找起始位置-----------
+    #----------Find the starting position-----------
     ttl_len=len(buf)
-    frame_pos=0  #frame开始位置,字节指针
+    frame_pos=0  #Frame starts position, byte pointer
     frame_pos=find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4) )
     if frame_pos > 0:
         print('!!!Warning!!! First SYNC at x%X, not beginning of DATA.'%(frame_pos),flush=True)
     if frame_pos >= ttl_len - sync_word_len *2:
-        #整个文件都没找到同步字
+        #No synchronous word was found throughout the file
         print('==>ERR, SYNC not found at end of DATA.',flush=True)
         raise(Exception('ERR,SYNC not found at end of DATA.'))
     
-    #----------读参数-----------
-    ii=0    #计数
-    pm_list=[] #参数列表
-    pm_sec=0.0   #参数的时间轴,秒数
+    #----------Read parameter-----------
+    ii=0    #count
+    pm_list=[] #parameter list
+    pm_sec=0.0   #The timeline of the parameter,秒数
     while True:
-        # 有几个dataVer的数据,不是从文件头开始,只匹配sync1会找错。且不排除中间会错/乱。
-        #所以每次都要用find_SYNC1()判断。  实际测试,发现有同步字错误,但frame间隔正确。
-        frame_pos2=frame_pos   #保存旧位置
-        frame_pos=find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4) )  #判断同步字，或继续寻找新位置
+        #There are several DataVER data, not starting from the file header, only sync1 will find it wrong.It is not ruled out that it will be wrong/chaos in the middle.
+        #So use Find_Sync1 () to judge each time.The actual test was found that there were synchronous words errors, but the Frame interval was correct.
+        frame_pos2=frame_pos   #Save the old position
+        frame_pos=find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4) )  #Determine synchronization words, or continue to find new positions
         if frame_pos>=ttl_len -2:
-            #-----超出文件结尾，退出-----
+            #----- Beyond the end of the file, exit -----
             break
         if frame_pos>frame_pos2:
             print('==>ERR, SYNC loss at x%X，refound at x%X' % (frame_pos2, frame_pos) )
-            pm_sec +=4  #如果失去同步,重新同步后,时间加4秒。(这里应该根据跳过的距离确定时间增量,这里就简单粗暴了)
+            pm_sec +=4  #If the synchronization is lost, after the synchronization, the time will be 4 seconds.(This should be determined according to the jump distance, it is simple and rude here)
 
 
-        sec_add = 4.0 / len(param_set)  #一个frame是4秒
+        sec_add = 4.0 / len(param_set)  #A frame is 4 seconds
         for pm_set in param_set:
             value=get_arinc429(buf, frame_pos, pm_set, word_sec )  #ARINC 429 format
             value =arinc429_decode(value ,par )
 
             pm_list.append({'t':round(pm_sec,10),'v':value})
             #pm_list.append({'t':round(pm_sec,10),'v':bin(value)})
-            pm_sec += sec_add   #时间轴累加
+            pm_sec += sec_add   #Time axis accumulation
 
         frame_pos += word_sec * 4 * 2   # 4subframe, 2bytes
     return pm_list
 
 def find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync):
     '''
-    判断 frame_pos 位置，是否满足同步字特征。如果不满足, 继续寻找下一个起始位置
+Determine whether the Frame_POS position meets the characteristics of synchronization.If not satisfied, continue to find the next starting location
     '''
     #ttl_len=len(buf)
-    while frame_pos<ttl_len - sync_word_len *2:  #寻找frame开始位置
-        #----似乎只判断连续两个同步字位置正确, 就够了-----
+    while frame_pos<ttl_len - sync_word_len *2:  #Find the starting position of Frame
+        #----It seems that it is enough to judge that the two consecutive synchronous words are correct.-----
         if getWord(buf,frame_pos, sync_word_len) == sync[0] and \
                 getWord(buf,frame_pos+word_sec*2,sync_word_len) == sync[1] :
         #if getWord(buf,frame_pos, sync_word_len) == sync[0] and \
@@ -546,27 +546,27 @@ def find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync):
 
 def getDataFrameSet(fra2,word_sec):
     '''
-    整理参数在arinc717位置记录的配置(在12 bit word中的位置)
-    如果不是 self-distant , 会有每个位置的配置。 对所有的位置记录分组。
-        需要根据rate值，补齐其他的subframe。
-        比如:rate=4, 就是1-4subframe都有。rate=2，就是在1,3或2,4subframe中。
-    如果是 self-distant , 只有第一个位置的配置。 根据 rate, 补齐所有的位置记录，并分组。
-        需要根据rate值，补齐其他的subframe, 和word位置。
-        subframe的补齐同上，word的间隔是,用 word/sec除以记录数确定。在每个subframe中均匀分部的。
-        author:南方航空,LLGZ@csair.com  
+    The configuration of the compilation parameters in the ArIinc717 position (position in 12 bit word)
+        If it is not Self-Distant, there will be configuration of each position.Record all positions.
+            You need to make up for other subframes according to the Rate value.
+            For example: Rate = 4, that is, 1-4Subframe.Rate = 2 is in 1,3 or 2,4Subframe.
+        If it is Self-Distant, there is only the configuration of the first position.Based on Rate, make up for all location records and group.
+            You need to make up for other Subframe and Word position according to the Rate value.
+            Subframe's complement is the same as above. The interval between Word is to use Word/SEC to remove the record number.Uniformly divided into each subframe.
+            Author: Southern Airlines, llgz@csair.com
     '''
-    # ---分组---
+    # ---Group---
     group_set=[]
-    p_set=[]  #临时变量
+    p_set=[]  #Temporary variables
     last_part=0
     for vv in fra2:
         vv[0]=int(vv[0]) #part
         if vv[0]<=last_part:
-            #part=1,2,3 根据part分组
+            #Part = 1,2,3 according to the part group
             group_set.append(p_set)
             p_set=[]
         last_part=vv[0]
-        #rate: 1=1/4HZ(一个frame一个记录), 2=1/2HZ, 4=1HZ(每个subframe一个记录), 8=2HZ, 16=4HZ, 32=8HZ(每个subframe有8条记录)
+        #Rate: 1 = 1/4Hz (a record of a Frame), 2 = 1/2Hz, 4 = 1Hz (a record of each subframe), 8 = 2Hz, 16 = 4Hz, 32 = 8Hz (each subframe has 8 records in 8 recordsCure
         p_set.append({
             'part':vv[0],
             'rate':int(vv[1]),
@@ -577,30 +577,30 @@ def getDataFrameSet(fra2,word_sec):
             'bin' :int(vv[6]),
             'occur' :int(vv[7]) if len(vv[7])>0 else -1,
             })
-    if len(p_set)>0: #最后一组
+    if len(p_set)>0: #Last group
         group_set.append(p_set)
 
-    # --------打印 分组配置----------
-    #print('分组配置: len:%d'%(len(group_set) ) )
+    # -------------------------------
+    #Print ('group configuration: len:%d'%(len (group_set)))
     #for vv in group_set:
     #    print(vv)
 
-    # --------根据rate补齐记录-------
+    # --------Based on the Rate replacement record-------
     param_set=[]
     frame_rate=group_set[0][0]['rate']
     if frame_rate>4:
-        frame_rate=4           #一个frame中占几个subframe
-    subf_sep=4//frame_rate  #整除
-    for subf in range(0,4,subf_sep):  #补subframe, 仅根据第一条记录的rate补
+        frame_rate=4           #A few filga in a Frame
+    subf_sep=4//frame_rate  #Divide
+    for subf in range(0,4,subf_sep):  #Subframe, only the Rate supplement based on the first record
         for group in group_set:
             frame_rate=group[0]['rate']
             if frame_rate>4:
-                sub_rate=frame_rate//4  #一个subframe中有几个记录 ,整除
+                sub_rate=frame_rate//4  #There are several records in a subframe, which is divided
             else:
                 sub_rate=1
-            word_sep=word_sec//sub_rate  #整除
-            for word_rate in range(sub_rate):  #补word, 根据分组记录的第一条rate补
-                p_set=[]  #临时变量
+            word_sep=word_sec//sub_rate  #Divide
+            for word_rate in range(sub_rate):  #Make up Word, according to the first Rate recorded by the group record
+                p_set=[]  #Temporary variables
                 for vv in group:
                     p_set.append({
                         'part':vv['part'],
@@ -617,9 +617,9 @@ def getDataFrameSet(fra2,word_sec):
 
 def arinc429_decode(word,conf):
     '''
-    par可能有的 Type: 'CONSTANT' 'DISCRETE' 'PACKED BITS' 'BNR LINEAR (A*X)' 'COMPUTED ON GROUND' 'CHARACTER' 'BCD' 'BNR SEGMENTS (A*X+B)' 'UTC'
-    par实际有的 Type: 'BNR LINEAR (A*X)' 'BNR SEGMENTS (A*X+B)' 'CHARACTER' 'BCD' 'UTC' 'PACKED BITS'
-        author:南方航空,LLGZ@csair.com  
+    PAR may have the Type: 'Constant' 'Discrete' 'Packed Bits' 'BNR Linear (A*X)' 'Compute on Group' 'Character' 'BCD' BNR Segments (A*X+B) 'UTC'
+        Par's actual Type: 'BNR LINEAR (A*X)' 'BNR Segments (A*X+B)' Character '' BCD '' '' UTC 'Packed Bits'
+            Author: Southern Airlines, llgz@csair.com
     '''
     if conf['type'].find('BNR')==0 or \
             conf['type'].find('PACKED BITS')==0:
@@ -638,7 +638,7 @@ def arinc429_decode(word,conf):
 
 def arinc429_BCD_decode(word,conf):
     '''
-    从 ARINC429格式中取出 值
+    Take the value from the ArIinc429 format
         conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
                 'signBit':tmp2.iat[0,6],   #bitLen,SignBit
                 'pos'   :tmp2.iat[0,7],   #MSB
@@ -652,53 +652,53 @@ def arinc429_BCD_decode(word,conf):
                 'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
                 'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
                     }]
-    author:南方航空,LLGZ@csair.com
+Author: Southern Airlines, llgz@csair.com
     '''
     if conf['type']=='CHARACTER':
         if len(conf['part'])>0:
             #有分步配置
             value = ''
             for vv in conf['part']:
-                #根据blen，获取掩码值
+                #According to Blen, obtain the mask value
                 bits= (1 << vv['blen']) -1
-                #把值移到最右(移动到bit0)，并获取值
+                #Move the value to the right (move to BIT0) and get the value
                 tmp = ( word >> (vv['pos'] - vv['blen']) ) & bits
                 value +=  chr(tmp)
         else:
-            #根据blen，获取掩码值
+           #According to Blen, get mask value
             bits= (1 << conf['blen']) -1
-            #把值移到最右(移动到bit0)，并获取值
+            #Move the value to the right (move to BIT0) and get the value
             value = ( word >> (conf['pos'] - conf['blen']) ) & bits
             value =  chr(value)
         return value
     else:  #BCD
-        #符号位
+        #Symbol
         sign=1
         if conf['signBit']>0:
             bits=1
-            bits <<= conf['signBit']-1  #bit位编号从1开始,所以-1
+            bits <<= conf['signBit']-1  #Bit bit number starts from 1, so -1
             if word & bits:
                 sign=-1
 
         if len(conf['part'])>0:
-            #有分步配置
+            #Stepped configuration
             value = 0
             for vv in conf['part']:
-                #根据blen，获取掩码值
+                #According to Blen, obtain the mask value
                 bits= (1 << vv['blen']) -1
-                #把值移到最右(移动到bit0)，并获取值
+                #Move the value to the right (move to BIT0) and get the value
                 tmp = ( word >> (vv['pos'] - vv['blen']) ) & bits
                 value = value * 10 + tmp
         else:
-            #根据blen，获取掩码值
+            #According to Blen, get mask value
             bits= (1 << conf['blen']) -1
-            #把值移到最右(移动到bit0)，并获取值
+            #Move the value to the right (move to BIT0) and get the value
             value = ( word >> (conf['pos'] - conf['blen']) ) & bits
         return value * sign
 
 def arinc429_BNR_decode(word,conf):
     '''
-    从 ARINC429格式中取出 值
+    Take the value from the ArIinc429 format
         conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
                 'signBit':tmp2.iat[0,6],   #bitLen,SignBit
                 'pos'   :tmp2.iat[0,7],   #MSB
@@ -712,16 +712,16 @@ def arinc429_BNR_decode(word,conf):
                 'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
                 'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
                     }]
-    author:南方航空,LLGZ@csair.com
+Author: Southern Airlines, llgz@csair.com
     '''
-    #根据blen，获取掩码值
+    #According to Blen, obtain the mask value
     bits= (1 << conf['blen']) -1
-    #把值移到最右(移动到bit0)，并获取值
+    #Move the value to the right (move to BIT0) and get the value
     value = ( word >> (conf['pos'] - conf['blen']) ) & bits
 
-    #符号位
+    #Symbol
     if conf['signBit']>0:
-        bits = 1 << (conf['signBit']-1)  #bit位编号从1开始,所以-1
+        bits = 1 << (conf['signBit']-1)  #Bit bit number starts from 1, so -1
         if word & bits:
             value -= 1 << conf['blen']
     #Resolution
@@ -734,35 +734,35 @@ def arinc429_BNR_decode(word,conf):
         if len(conf['B'])>0:
             value += float(conf['B'])
     else:
-        #----已知 PACKED BITS, UTC, DISCRETE, 就应该按 BNR 处理---
-        #其他不能识别的类型，默认按BNR处理
-        #在此，无需给出错误提示
+    #---- known Packed Bits, UTC, Discrete, you should process it according to BNR ---
+            #Other types that cannot be recognized, press BNR by default
+            #Here, no need to give an error prompt
         pass
     return value 
 
 def get_arinc429(buf, frame_pos, param_set, word_sec ):
     '''
-    根据 fra的配置，获取arinc429格式的32bit word
-      另:fra 配置中有多条不同的记录,对应多个32bit word(完成)
-      bit位置，是从1开始编号。word位置也是从1开始编号。同步字位置为1，数据字是从2开始编号(假设同步字只占1word)。
-    author:南方航空,LLGZ@csair.com
+    According to FRA configuration, obtain 32bit word in the Arinc429 format
+        Another: There are multiple different records in the FRA configuration, corresponding to multiple 32bit word (completed)
+        BIT position is numbered from 1.Word position is also numbered from 1.The position of the synchronous word is 1, and the data word starts from 2 (assuming that synchronous words only occupy 1Word).
+        Author: Southern Airlines, llgz@csair.com
     '''
     value=0
     pre_id=0
     for pm_set in param_set:
-        #if pm_set['part']>pre_id:  #有多组配置，只执行第一组。//配置经过整理，只剩一组了。
+        #if pm_set ['part']> Pre_id: #There are multiple sets of configuration, only the first group is executed.// The configuration has been sorted, and there is only one group.
         #    pre_id=pm_set['part']
         #else:
         #    break
         word=getWord(buf,
-                frame_pos + word_sec *2 *(pm_set['sub']-1) +(pm_set['word']-1)*2  #同步字所占的位置,编号为1,所以要-1
+                frame_pos + word_sec *2 *(pm_set['sub']-1) +(pm_set['word']-1)*2  #The position occupied by the synchronous word, number is 1, so -1
                 )
-        #根据blen，获取掩码值
+        #According to Blen, obtain the mask value
         bits= (1 << pm_set['blen']) -1
-        #根据bout，把掩码移动到对应位置
+        #According to BOUT, move the mask to the corresponding location
         bits <<= pm_set['bout'] - pm_set['blen']
-        word &= bits  #获取值
-        #把值移动到目标位置
+        word &= bits  #Gain
+        #Move the value to the target location
         move=pm_set['bin'] - pm_set['bout']
         if move>0:
             word <<= move
@@ -773,20 +773,20 @@ def get_arinc429(buf, frame_pos, param_set, word_sec ):
 
 def getWord(buf,pos, word_len=1):
     '''
-    读取两个字节，取12bit为一个word。低位在前。littleEndian,low-byte first.
-    支持取 12bits,24bits,36bits,48bits,60bits
-       author:南方航空,LLGZ@csair.com
+    Read two bytes and take 12bit as a word.The low position is in front.LittleEndian, Low-Byte First.
+        Support 12bits, 24bits, 36bits, 48bits, 60bits
+        Author: Southern Airlines, llgz@csair.com
     '''
     #print(type(buf), type(buf[pos]), type(buf[pos+1])) #bytes, int, int
 
-    ttl=len(buf)  #读数据的时候,开始位置加上subframe和word的偏移，可能会超限
+    ttl=len(buf)  #When reading the data, the starting position and the offset of Subframe and Word may exceed the limit
     if word_len==1:
         if pos+1 >= ttl:
-            return 0  #超限返回0
+            return 0  #Excellence returns 0
         else:
             return ((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF
 
-    #word_len>1 //只有获取大于1个word 的同步字,才有用
+    #Word_len> 1 // Only by getting a synchronous word greater than 1 word can it useful
     word=0
     for ii in range(0,word_len):
         if pos+ii*2+1 >= ttl:
@@ -798,9 +798,9 @@ def getWord(buf,pos, word_len=1):
 
 def getPAR(dataver,param):
     '''
-    获取参数在arinc429的32bit word中的位置配置
-    挑出有用的,整理一下,返回
-       author:南方航空,LLGZ@csair.com
+    Obtain the position configuration of the 32bit word of the parameter in Arinc429
+    Pick out useful, sort it out, return to
+       Author: Southern Airlines, llgz@csair.com
     '''
     global DATA
     if not hasattr(DATA,'par'):
@@ -809,7 +809,7 @@ def getPAR(dataver,param):
         return {}
     param=param.upper()  #改大写
     tmp=DATA.par
-    tmp2=tmp[ tmp.iloc[:,0]==param ].copy(deep=True) #dataframe ,找到对应参数的记录行
+    tmp2=tmp[ tmp.iloc[:,0]==param ].copy(deep=True) #dataframe ,Find the record line of the corresponding parameter
     #pd.set_option('display.max_columns',78)
     #pd.set_option('display.width',156)
     #print('=>',type(tmp2))
@@ -819,18 +819,18 @@ def getPAR(dataver,param):
     else:
         tmp_part=[]
         if isinstance(tmp2.iat[0,36], list):
-            #如果有多个部分的bits的配置, 组合一下
+            #If there are multiple parts of the configuration of bits, combine it
             for ii in range(len(tmp2.iat[0,36])):
                 tmp_part.append({
-                        'id'  :int(tmp2.iat[0,36][ii]),  #Digit ,顺序标记
-                        'pos' :int(tmp2.iat[0,37][ii]),  #MSB   ,开始位置
-                        'blen':int(tmp2.iat[0,38][ii]),  #bitLen,DataBits,数据长度
+                        'id'  :int(tmp2.iat[0,36][ii]),  #Digit ,Sequential labeling
+                        'pos' :int(tmp2.iat[0,37][ii]),  #MSB   ,Start position
+                        'blen':int(tmp2.iat[0,38][ii]),  #bitLen,DataBits,Data length
                         })
         return {
                 'ssm'    :int(tmp2.iat[0,5]) if len(tmp2.iat[0,5])>0 else -1,   #SSM Rule , (0-15)0,4 
-                'signBit':int(tmp2.iat[0,6]) if len(tmp2.iat[0,6])>0 else -1,   #bitLen,SignBit  ,符号位位置
-                'pos'   :int(tmp2.iat[0,7]) if len(tmp2.iat[0,7])>0 else -1,   #MSB  ,开始位置
-                'blen'  :int(tmp2.iat[0,8]) if len(tmp2.iat[0,8])>0 else -1,   #bitLen,DataBits ,数据部分的总长度
+                'signBit':int(tmp2.iat[0,6]) if len(tmp2.iat[0,6])>0 else -1,   #bitLen,SignBit  ,Symbol position
+                'pos'   :int(tmp2.iat[0,7]) if len(tmp2.iat[0,7])>0 else -1,   #MSB  ,Start position
+                'blen'  :int(tmp2.iat[0,8]) if len(tmp2.iat[0,8])>0 else -1,   #bitLen,DataBits ,The total length of the data part
                 'part'    :tmp_part,
                 'type'    :tmp2.iat[0,2],    #Type(BCD,CHARACTER)
                 'format'  :tmp2.iat[0,17],    #Display Format Mode (DECIMAL,ASCII)
@@ -842,9 +842,9 @@ def getPAR(dataver,param):
 
 def getFRA(dataver,param):
     '''
-    获取参数在arinc717的12bit word中的位置配置
-    挑出有用的,整理一下,返回
-       author:南方航空,LLGZ@csair.com
+    Get the position configuration of the 12bit word in Arinc717
+    Pick out useful, sort it out, return to
+       Author: Southern Airlines, llgz@csair.com
     '''
     global PARAMLIST
     global DATA
@@ -866,16 +866,16 @@ def getFRA(dataver,param):
         tmp=DATA.fra['2']
         tmp=tmp[ tmp.iloc[:,0]==param].copy()  #dataframe
         #print(tmp)
-        if len(tmp.index)>0:  #找到记录
+        if len(tmp.index)>0:  #Find a record
             for ii in range( len(tmp.index)):
-                tmp2=[  #regular 参数配置
-                    tmp.iat[ii,1],   #part(1,2,3),会有多组记录,对应返回多个32bit word. 同一组最多3个part,3个part分别读出,写入同一个32bit word.
-                    tmp.iat[ii,2],   #recordRate, 记录频率(记录次数/Frame)
-                    tmp.iat[ii,3],   #subframe, 位于哪个subframe(1-4)
-                    tmp.iat[ii,4],   #word, 在subframe中第几个word(sync word编号为1)
-                    tmp.iat[ii,5],   #bitOut, 在12bit中,第几个bit开始
-                    tmp.iat[ii,6],   #bitLen, 共几个bits
-                    tmp.iat[ii,7],   #bitIn,  写入arinc429的32bits word中,从第几个bits开始写
+                tmp2=[  #regular Parameter configuration
+                    tmp.iat[ii,1],   #part(1,2,3),There will be multiple sets of records, corresponding to multiple 32bit word. The same group of up to 3 parts, 3 parts read out separately, write the same 32bit word.
+                    tmp.iat[ii,2],   #recordRate, Record frequency (record number/frame)
+                    tmp.iat[ii,3],   #subframe, Which subframe is located (1-4)
+                    tmp.iat[ii,4],   #word, Several Word (SYNC WORD number as 1) in Subframe
+                    tmp.iat[ii,5],   #bitOut, In 12bit, several bits start
+                    tmp.iat[ii,6],   #bitLen, A few bits in total
+                    tmp.iat[ii,7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits, write writing
                     tmp.iat[ii,12],  #Occurence No
                     tmp.iat[ii,8],   #Imposed,Computed
                     ]
@@ -884,47 +884,47 @@ def getFRA(dataver,param):
         tmp=DATA.fra['4']
         tmp=tmp[ tmp.iloc[:,0]==param].copy()  #dataframe
         #print(tmp)
-        if len(tmp.index)>0:  #找到记录
+        if len(tmp.index)>0:  #Find a record
             superframeNo=tmp.iat[0,3]
             for ii in range( len(tmp.index)):
-                tmp2=[ #superframe 单一参数记录
-                    tmp.iat[ii,1],   #part(1,2,3),会有多组记录,对应返回多个32bit word. 同一组最多3个part,3个part分别读出,写入同一个32bit word.
-                    tmp.iat[ii,2],   #period, 周期,每几个frame出现一次
-                    tmp.iat[ii,3],   #superframe no, 对应"superframe全局配置"中的superframe no
-                    tmp.iat[ii,4],   #Frame,  位于第几个frame (由superframe counter,找出编号为1的frame)
-                    tmp.iat[ii,5],   #bitOut, 在12bit中,第几个bit开始
-                    tmp.iat[ii,6],   #bitLen, 共几个bits
-                    tmp.iat[ii,7],   #bitIn,  写入arinc429的32bits word中,从第几个bits开始写
-                    tmp.iat[ii,10],  #resolution, 未用到
+                tmp2=[ #superframe Single parameter record
+                    tmp.iat[ii,1],   #part(1,2,3),There will be multiple sets of records, corresponding to multiple 32bit word. The same group of up to 3 parts, 3 parts read out separately, write the same 32bit word.
+                    tmp.iat[ii,2],   #period, In the cycle, every few frames appear once
+                    tmp.iat[ii,3],   #superframe no, Corresponding to the Superframe No
+                    tmp.iat[ii,4],   #Frame,  Located in several Frames (by superframe counter, find Frame with number 1)
+                    tmp.iat[ii,5],   #bitOut, In 12bit, several bits start
+                    tmp.iat[ii,6],   #bitLen, A few bits in total
+                    tmp.iat[ii,7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits, write writing
+                    tmp.iat[ii,10],  #resolution, Unused
                     ]
                 ret4.append(tmp2)
             tmp=DATA.fra['3']
             tmp=tmp[ tmp.iloc[:,0]==superframeNo].copy()  #dataframe
             for ii in range( len(tmp.index)):
-                tmp2=[ #superframe 全局配置
+                tmp2=[ #superframe Global configuration
                     tmp.iat[ii,0],   #superframe no
-                    tmp.iat[ii,1],   #subframe, 位于哪个subframe(1-4)
-                    tmp.iat[ii,2],   #word, 在subframe中第几个word(sync word编号为1)
-                    tmp.iat[ii,3],   #bitOut, 在12bit中,第几个bit开始(通常=12)
-                    tmp.iat[ii,4],   #bitLen, 共几个bits(通常=12)
-                    tmp.iat[ii,5],   #superframe counter 1/2, 对应Frame总配置中的第几个counter
+                    tmp.iat[ii,1],   #subframe,Which subframe is located (1-4)
+                    tmp.iat[ii,2],   #word, Several Word (SYNC WORD number as 1) in Subframe
+                    tmp.iat[ii,3],   #bitOut, In 12bit, several bits start (usually = 12)
+                    tmp.iat[ii,4],   #bitLen, A total of several bits (usually = 12)
+                    tmp.iat[ii,5],   #superframe counter 1/2, Corresponding to the number of counters in the total configuration
                     ]
                 ret3.append(tmp2)
                     
 
     return { '1':
-            [  #Frame 总配置, 最多两条记录(表示有两个counter)
-                DATA.fra['1'].iat[1,1],  #Word/Sec, 每秒的word数量,即 word/subframe
-                DATA.fra['1'].iat[1,2],  #sync length, 同步字长度(bits=12,24,36)
-                DATA.fra['1'].iat[1,3],  #sync1, 同步字,前12bits
+            [  #Frame total configuration, up to two records (indicating two counters)
+                DATA.fra['1'].iat[1,1],  #WORD/SEC, the number of Word per second, that is, word/subframe
+                DATA.fra['1'].iat[1,2],  #sync length, Synchronous word length (bits = 12,24,36)
+                DATA.fra['1'].iat[1,3],  #sync1, Synchronous word, first 12bits
                 DATA.fra['1'].iat[1,4],  #sync2
                 DATA.fra['1'].iat[1,5],  #sync3
                 DATA.fra['1'].iat[1,6],  #sync4
-                DATA.fra['1'].iat[1,7],  #subframe,[superframe counter],每个frame中都有,这4项是counter的位置
+                DATA.fra['1'].iat[1,7],  #subframe,[superframe counter],There are from each frame, these 4 items are the position of the counter
                 DATA.fra['1'].iat[1,8],  #word,    [superframe counter]
                 DATA.fra['1'].iat[1,9],  #bitOut,  [superframe counter]
                 DATA.fra['1'].iat[1,10], #bitLen,  [superframe counter]
-                DATA.fra['1'].iat[1,11], #Value in 1st frame (0/1), 编号为1的frame,counter的值(counter的最小值)
+                DATA.fra['1'].iat[1,11], #Value in 1st frame (0/1), The value of the number of numbers 1, the value of the counter (the minimum value of the counter)
                 ],
              '2':ret2,
              '3':ret3,
@@ -933,14 +933,14 @@ def getFRA(dataver,param):
 
 def getAIR(reg):
     '''
-    获取机尾号对应解码库的配置。
-    挑出有用的,整理一下,返回
-       author:南方航空,LLGZ@csair.com
+    Get the configuration of the decoding library corresponding to the tail number.
+    Pick out useful, sort it out, return to
+       Author: Southern Airlines, llgz@csair.com
     '''
     reg=reg.upper()
     df_flt=AIR.csv(conf.aircraft)
     tmp=df_flt[ df_flt.iloc[:,0]==reg].copy()  #dataframe
-    if len(tmp.index)>0:  #找到记录
+    if len(tmp.index)>0:  #Find a record
         return [tmp.iat[0,12],   #dataver
                 tmp.iat[0,13],   #dataver
                 tmp.iat[0,16],   #recorderType
@@ -955,7 +955,7 @@ def getREG(fname):
     '''
     basename=os.path.basename(fname)
     tmp=basename.strip().split('_',1)
-    if len(tmp[0])>6: #787的文件名没有用 _ 分隔
+    if len(tmp[0])>6: #787's file name is useless
         return tmp[0][:6]
     elif len(tmp[0])>0:
         return tmp[0]
@@ -981,26 +981,26 @@ def sysmem():
     '''
     获取本python程序占用的内存大小
     '''
-    size=psutil.Process(os.getpid()).memory_info().rss #实际使用的物理内存，包含共享内存
-    #size=psutil.Process(os.getpid()).memory_full_info().uss #实际使用的物理内存，不包含共享内存
+    size=psutil.Process(os.getpid()).memory_info().rss #The actual physical memory, including shared memory
+    #size=psutil.Process(os.getpid()).memory_full_info().uss #The actual physical memory used does not include shared memory
     return showsize(size)
 
 import os,sys,getopt
 def usage():
     print(u'Usage:')
-    print(u'   命令行工具。')
-    print(u' 读取 wgl中 raw.dat,根据参数编码规则,解码一个参数。')
+    print(u'   Command line tool.')
+    print(u' 读取 wgl中 raw.dat,Decoder a parameter according to the parameter coding rules.')
 
     print(sys.argv[0]+' [-h|--help]')
-    print('   * (必要参数)')
+    print('   * (Necessary parameters)')
     print('   -h, --help                 print usage.')
     print(' * -f, --file xxx.wgl.zip     "....wgl.zip" filename')
-    print(' * -p, --param alt_std        show "ALT_STD" param. 自动全部大写。')
+    print(' * -p, --param alt_std        show "ALT_STD" param. Automatically all uppercase.')
     print('   --paramlist                list all param name.')
-    print('   -w xxx.csv            参数写入文件"xxx.csv"')
-    print('   -w xxx.csv.gz         参数写入文件"xxx.csv.gz"')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
-    print(u' 认为此项目对您有帮助，请发封邮件给我，让我高兴一下.')
+    print('   -w xxx.csv            Parameter writing file"xxx.csv"')
+    print('   -w xxx.csv.gz         Parameter writing file"xxx.csv.gz"')
+    print(u'\n               author:Southern Airlines, llgz@csair.com')
+    print(u'I think this project is helpful to you. Please send me an email and make me happy.')
     print(u' If you think this project is helpful to you, please send me an email to make me happy.')
     print()
     return
@@ -1033,8 +1033,8 @@ if __name__=='__main__':
             PARAMLIST=True
         elif op in('-p','--param',):
             PARAM=value
-    if len(args)>0:  #命令行剩余参数
-        FNAME=args[0]  #只取第一个
+    if len(args)>0:  #Command line remaining parameters
+        FNAME=args[0]  #Only take the first one
     if FNAME is None:
         usage()
         exit()
