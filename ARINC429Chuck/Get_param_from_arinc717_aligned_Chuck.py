@@ -181,13 +181,13 @@ def main():
         if len(fra['2'])<1 and len(fra['4'])<1:
             print('Parameter not found.')
             return
-        #print(PARAM,'(fra):',fra)
-        #print(PARAM,'(par):',par)
-        #print()
+        print(PARAM,'(fra):',fra)
+        print(PARAM,'(par):',par)
+        print()
 
         print('PARAM:',PARAM)
         if len(fra['2'])>0:
-            pm_list=get_param(fra,par) #Get a parameter, regula
+            pm_list=get_param(fra,par) #Get a parameter, regular
         else:
             pm_list=get_super(fra,par) #Get a parameter, superframe
         #print(pm_list)
@@ -224,10 +224,10 @@ def get_super(fra,par):
     '''
     global FNAME,WFNAME,DUMPDATA
 
-    #初始化变量
+    #Initialize variables
     word_sec=int(fra['1'][0])
-    sync_word_len=int(fra['1'][1])//12  #整除, 同步字的字数(长度)
-    sync1=int(fra['1'][2],16)  #同步字1
+    sync_word_len=int(fra['1'][1])//12  #Extract, the number (length) of the synchronous word (length)
+    sync1=int(fra['1'][2],16)  #Synchronous word 1
     sync2=int(fra['1'][3],16)
     sync3=int(fra['1'][4],16)
     sync4=int(fra['1'][5],16)
@@ -645,7 +645,7 @@ def arinc429_decode(word,conf):
     else:
         return arinc429_BNR_decode(word ,conf)
 
-def arinc429_BCD_decode(word,conf):
+def arinc429_BCD_decode(word,conf): #BCD Binary Coded Decimal
     '''
     Take the value from the ArIinc429 format
         conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
@@ -665,7 +665,7 @@ def arinc429_BCD_decode(word,conf):
     '''
     if conf['type']=='CHARACTER':
         if len(conf['part'])>0:
-            #有分步配置
+            #Stepped configuration
             value = ''
             for vv in conf['part']:
                 #According to Blen, obtain the mask value
@@ -679,7 +679,7 @@ def arinc429_BCD_decode(word,conf):
             #Move the value to the right (move to BIT0) and get the value
             value = ( word >> (conf['pos'] - conf['blen']) ) & bits
             value =  chr(value)
-            characters = arinc429_to_characters(value)
+            characters = arinc429_to_characters(word)
         return value
     else:  #BCD
         #Symbol
@@ -706,7 +706,7 @@ def arinc429_BCD_decode(word,conf):
             value = ( word >> (conf['pos'] - conf['blen']) ) & bits
         return value * sign
 
-def arinc429_BNR_decode(word,conf):
+def arinc429_BNR_decode(word,conf): #BNR Binary Number Representation
     '''
     Take the value from the ArIinc429 format
         conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
@@ -941,15 +941,12 @@ def getFRA(dataver,param):
              '4':ret4,
             }
 
-def arinc429_to_characters(arinc_word):
+#doesnt work
+def arinc429_to_characters(arinc_word): #Chucks code    
     # Extract the 18-bit data segment from the ARINC 429 word (bits 11-28)
-   
-    encoding_table = {
-    0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J',
-    10: 'K', 11: 'L', 12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q', 17: 'R', 18: 'S', 19: 'T',
-    20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y', 25: 'Z', 26: ' ', 27: '0', 28: '1', 29: '2',
-    30: '3', 31: '4', 32: '5', 33: '6', 34: '7', 35: '8', 36: '9', 37: '.', 38: ',', 39: '-'
-    }
+    ss= arinc_word & 0x3f         #6bits
+    mm= (arinc_word >>6) & 0x3f   #6bits
+    hh= (arinc_word >>12) & 0x1f  #5bits
 
     data_segment = (arinc_word >> 3) & 0x3FFFF
 
@@ -960,7 +957,7 @@ def arinc429_to_characters(arinc_word):
     char_segments[2] = data_segment & 0x3F
 
     # Convert the 6-bit segments into characters using the provided encoding table
-    characters = [encoding_table[seg] for seg in char_segments]
+    #characters = [encoding_table[seg] for seg in char_segments]
 
     return ''.join(characters)
 

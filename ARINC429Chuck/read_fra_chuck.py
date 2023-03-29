@@ -114,10 +114,7 @@ def main():
             '(Data Bits)',
             '(Bit In)',
             '(Imposed or Computed)',
-            'Recorded Range Min',
-            'Recorded Range Max',
-            'Recorded Resolution',
-            'Occurence No']
+            ]
             )
     #print(FRA['2'].iloc[:,12].unique() )  #show Occurence No
 
@@ -128,7 +125,7 @@ def main():
             '(Word)',
             '(Bit Out)',
             '(Data Bits)',
-            '',]
+            ]
             )
     else:
         print('No Superframe.')
@@ -142,14 +139,23 @@ def main():
             'Frame',
             '(Bit Out)',
             '(Data Bits)',
-            '(Bit In)',
-            'Range Min',
-            'Range Max',
-            'Resolution']
+            '(Bit In)']
             )
     else:
         print('No Superframe Parameter.')
-
+    
+    if len(FRA['5'])>1:
+            print_fra(FRA, '4', [
+                'Sequence No',
+                'Start Logic',
+                'Stop Logic',
+                'Timeout',
+                'M Starts',
+                'During N Flights',
+                ]
+                )
+    else:
+        print('No Superframe Parameter.')
     print()
     memsize=0
     for kk in FRA:
