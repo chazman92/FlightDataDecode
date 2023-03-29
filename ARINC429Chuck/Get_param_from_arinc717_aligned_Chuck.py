@@ -959,7 +959,7 @@ def arinc429_to_characters(arinc_word): #Chucks code
     # Convert the 6-bit segments into characters using the provided encoding table
     #characters = [encoding_table[seg] for seg in char_segments]
 
-    return ''.join(characters)
+    return
 
 
 # def getAIR(reg):
