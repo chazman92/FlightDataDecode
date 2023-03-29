@@ -262,7 +262,7 @@ if __name__=='__main__':
     # if len(args)>0:  #Command line remaining parameters
     #     FNAME=args[0]  #Only take the first one
 
-    FNAME='5471'
+    FNAME='5461'
     #ARINC429Chuck/DataFrames/5471.par.zip
     DUMPDATA=True
     TOCSV=''

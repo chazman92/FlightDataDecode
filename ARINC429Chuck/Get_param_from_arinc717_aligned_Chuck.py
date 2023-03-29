@@ -490,7 +490,8 @@ def get_param(fra,par):
 
 
     #read into buffer
-    dar_file='ARINC429Chuck/DataFrames/N2002J-REC25038.DAT'
+    #dar_file='ARINC429Chuck/DataFrames/N2002J-REC25038.DAT'
+    dar_file='ARINC429Chuck/DataFrames/N703JB-REC25134.DAT'
     fp=open(dar_file,'rb')
     buf=fp.read()
     fp.close()
@@ -679,7 +680,7 @@ def arinc429_BCD_decode(word,conf): #BCD Binary Coded Decimal
             #Move the value to the right (move to BIT0) and get the value
             value = ( word >> (conf['pos'] - conf['blen']) ) & bits
             value =  chr(value)
-            characters = arinc429_to_characters(word)
+            #characters = arinc429_to_characters(word)
         return value
     else:  #BCD
         #Symbol
@@ -1071,11 +1072,11 @@ if __name__=='__main__':
     # if len(args)>0:  #Command line remaining parameters
     #     FNAME=args[0]  #Only take the first one
 
-    FNAME='5471'
+    FNAME='5461'
     WFNAME=None
     DUMPDATA=True
     PARAMLIST=False
-    PARAM='ACID1'
+    PARAM='ACID2'
     # if FNAME is None:
     #     usage()
     #     exit()
