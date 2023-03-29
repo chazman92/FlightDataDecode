@@ -19,13 +19,17 @@ def main():
     # filename_zip='eoflocat.qar'
     # buf=fzip.read(filename_zip)
     # fzip.close()
-    buf = FNAME
+
+    #read into buffer
+    fp=open(FNAME,'rb')
+    buf=fp.read()
+    fp.close()
     
     ss=struct.Struct('8s')
     ttl_size=len(buf)
-    #print(buf[12:20])
-    #print(buf[32:40])
-    #print(ss.unpack_from(buf[12:20]))
+    print(buf[12:20])
+    print(buf[32:40])
+    print(ss.unpack_from(buf[12:20]))
     for ii in range(0,ttl_size,32):
         print(buf[ii:ii+28].strip(b'\0').decode(),end=',\t')
         tm2=struct.unpack('<l',buf[ii+28:ii+32])[0]

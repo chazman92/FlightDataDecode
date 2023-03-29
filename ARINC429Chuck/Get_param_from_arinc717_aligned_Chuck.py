@@ -128,8 +128,9 @@ def main():
 
     #print('mem:',sysmem())
 
-    reg=getREG(FNAME)
-    air=getAIR(reg)
+    # reg=getREG(FNAME)
+    air = [4]
+    air[0] = FNAME
 
     if PARAMLIST:
         #-----------List all the parameter names in the record--------------
@@ -169,7 +170,7 @@ def main():
             for vv in fra['2']:
                 print('Part:{0[0]:<5}, recordRate:{0[1]:<5}, subframe:{0[2]:<5}, word:{0[3]:<5}, bitOut:{0[4]:<5}, bitLen:{0[5]:<5}, bitIn:{0[6]:<5}, type:{0[7]:<5}, '.format(vv) )
             print()
-        print('dataVer:',air[0],air[1])
+        print('dataVer:',air[0])
     else:
         #-----------Get a parameter--------------------
         fra =getFRA(air[0],PARAM)
@@ -458,7 +459,7 @@ def get_param(fra,par):
     param_set=getDataFrameSet(fra['2'],word_sec)  #Configuration of sorting parameter location records
 
     #----------Print parameter-----------
-    print('Frame定义: Word/SEC:%d, syncLen(word):%d, sync1234: %X,%X,%X,%X'%(word_sec,sync_word_len,sync1,sync2,sync3,sync4) )
+    print('Frame definition: Word/SEC:%d, syncLen(word):%d, sync1234: %X,%X,%X,%X'%(word_sec,sync_word_len,sync1,sync2,sync3,sync4) )
     print('   SuperFrame Counter:',superframe_counter_set)
     print()
     print('param(fra): len:%d'%( len(param_set)) )
@@ -478,14 +479,21 @@ def get_param(fra,par):
         print('!!!Warning!!! Data Type "%s" Decoding maybe NOT correct.\n' % (par['type']) )
 
     #----------Open the zip compression file-----------
-    try:
-        fzip=zipfile.ZipFile(FNAME,'r') #Open the zip file
-    except zipfile.BadZipFile as e:
-        print('==>ERR,FailOpenZipFile',e,FNAME,flush=True)
-        raise(Exception('ERR,FailOpenZipFile,%s'%FNAME))
-    filename_zip='raw.dat'
-    buf=fzip.read(filename_zip)
-    fzip.close()
+    # try:
+    #     fzip=zipfile.ZipFile(FNAME,'r') #Open the zip file
+    # except zipfile.BadZipFile as e:
+    #     print('==>ERR,FailOpenZipFile',e,FNAME,flush=True)
+    #     raise(Exception('ERR,FailOpenZipFile,%s'%FNAME))
+    # filename_zip='raw.dat'
+    # buf=fzip.read(filename_zip)
+    # fzip.close()
+
+
+    #read into buffer
+    dar_file='ARINC429Chuck/DataFrames/N2002J-REC25038.DAT'
+    fp=open(dar_file,'rb')
+    buf=fp.read()
+    fp.close()
 
     #----------Find the starting position-----------
     ttl_len=len(buf)
@@ -576,7 +584,7 @@ def getDataFrameSet(fra2,word_sec):
             'bout':int(vv[4]),
             'blen':int(vv[5]),
             'bin' :int(vv[6]),
-            'occur' :int(vv[7]) if len(vv[7])>0 else -1,
+            #'occur' :int(vv[7]) if len(vv[7])>0 else -1,
             })
     if len(p_set)>0: #Last group
         group_set.append(p_set)
@@ -611,7 +619,7 @@ def getDataFrameSet(fra2,word_sec):
                         'bout':vv['bout'],
                         'blen':vv['blen'],
                         'bin' :vv['bin'],
-                        'occur':vv['occur'],
+                       # 'occur':vv['occur'],
                         })
                 param_set.append(p_set)
     return param_set
@@ -671,6 +679,7 @@ def arinc429_BCD_decode(word,conf):
             #Move the value to the right (move to BIT0) and get the value
             value = ( word >> (conf['pos'] - conf['blen']) ) & bits
             value =  chr(value)
+            characters = arinc429_to_characters(value)
         return value
     else:  #BCD
         #Symbol
@@ -862,7 +871,7 @@ def getFRA(dataver,param):
     ret3=[]  #for superframe
     ret4=[]  #for superframe pm
     if len(param)>0:
-        param=param.upper() #改大写
+        param=param.upper() #Rectify
         #---find regular parameter----
         tmp=DATA.fra['2']
         tmp=tmp[ tmp.iloc[:,0]==param].copy()  #dataframe
@@ -871,13 +880,13 @@ def getFRA(dataver,param):
             for ii in range( len(tmp.index)):
                 tmp2=[  #regular Parameter configuration
                     tmp.iat[ii,1],   #part(1,2,3),There will be multiple sets of records, corresponding to multiple 32bit word. The same group of up to 3 parts, 3 parts read out separately, write the same 32bit word.
-                    tmp.iat[ii,2],   #recordRate, Record frequency (record number/frame)
-                    tmp.iat[ii,3],   #subframe, Which subframe is located (1-4)
-                    tmp.iat[ii,4],   #word, Several Word (SYNC WORD number as 1) in Subframe
+                    tmp.iat[ii,2],   #Recording Rate(1 for 1/4Hz,2 for 1/2Hz, 4 for 1 Hz,8 for 2Hz ...)
+                    tmp.iat[ii,3],   #Output Word (Subframe)
+                    tmp.iat[ii,4],   #Output Word (Word), Several Word (SYNC WORD number as 1) in Subframe
                     tmp.iat[ii,5],   #bitOut, In 12bit, several bits start
                     tmp.iat[ii,6],   #bitLen, A few bits in total
                     tmp.iat[ii,7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits, write writing
-                    tmp.iat[ii,12],  #Occurence No
+                    #tmp.iat[ii,12],  #Occurence No
                     tmp.iat[ii,8],   #Imposed,Computed
                     ]
                 ret2.append(tmp2)
@@ -932,40 +941,64 @@ def getFRA(dataver,param):
              '4':ret4,
             }
 
-def getAIR(reg):
-    '''
-    Get the configuration of the decoding library corresponding to the tail number.
-    Pick out useful, sort it out, return to
-       Author: Southern Airlines, llgz@csair.com
-    '''
-    reg=reg.upper()
-    df_flt=AIR.csv(conf.aircraft)
-    tmp=df_flt[ df_flt.iloc[:,0]==reg].copy()  #dataframe
-    if len(tmp.index)>0:  #Find a record
-        return [tmp.iat[0,12],   #dataver
-                tmp.iat[0,13],   #dataver
-                tmp.iat[0,16],   #recorderType
-                tmp.iat[0,16]]   #recorderType
-    else:
-        return [0,0,0]
+def arinc429_to_characters(arinc_word):
+    # Extract the 18-bit data segment from the ARINC 429 word (bits 11-28)
+   
+    encoding_table = {
+    0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J',
+    10: 'K', 11: 'L', 12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q', 17: 'R', 18: 'S', 19: 'T',
+    20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y', 25: 'Z', 26: ' ', 27: '0', 28: '1', 29: '2',
+    30: '3', 31: '4', 32: '5', 33: '6', 34: '7', 35: '8', 36: '9', 37: '.', 38: ',', 39: '-'
+    }
 
-def getREG(fname):
-    '''
-    从zip文件名中，找出机尾号
-       author:南方航空,LLGZ@csair.com
-    '''
-    basename=os.path.basename(fname)
-    tmp=basename.strip().split('_',1)
-    if len(tmp[0])>6: #787's file name is useless
-        return tmp[0][:6]
-    elif len(tmp[0])>0:
-        return tmp[0]
-    else:
-        return ''
+    data_segment = (arinc_word >> 3) & 0x3FFFF
+
+    # Split the data segment into three 6-bit segments
+    char_segments = [0, 0, 0]
+    char_segments[0] = (data_segment >> 12) & 0x3F
+    char_segments[1] = (data_segment >> 6) & 0x3F
+    char_segments[2] = data_segment & 0x3F
+
+    # Convert the 6-bit segments into characters using the provided encoding table
+    characters = [encoding_table[seg] for seg in char_segments]
+
+    return ''.join(characters)
+
+
+# def getAIR(reg):
+#     '''
+#     Get the configuration of the decoding library corresponding to the tail number.
+#     Pick out useful, sort it out, return to
+#        Author: Southern Airlines, llgz@csair.com
+#     '''
+#     reg=reg.upper()
+#     df_flt=AIR.csv(conf.aircraft)
+#     tmp=df_flt[ df_flt.iloc[:,0]==reg].copy()  #dataframe
+#     if len(tmp.index)>0:  #Find a record
+#         return [tmp.iat[0,12],   #dataver
+#                 tmp.iat[0,13],   #dataver
+#                 tmp.iat[0,16],   #recorderType
+#                 tmp.iat[0,16]]   #recorderType
+#     else:
+#         return [0,0,0]
+
+# def getREG(fname):
+    # '''
+    # From the name of the ZIP file, find out the tail number of the machine
+    #    Author: Southern Airlines, llgz@csair.com
+    # '''
+    # basename=os.path.basename(fname)
+    # tmp=basename.strip().split('_',1)
+    # if len(tmp[0])>6: #787's file name is useless
+    #     return tmp[0][:6]
+    # elif len(tmp[0])>0:
+    #     return tmp[0]
+    # else:
+    #     return ''
 
 def showsize(size):
     '''
-    显示，为了 human readable
+    Show, for Human Readable
     '''
     if size<1024.0*2:
         return '%.0f B'%(size)
@@ -993,7 +1026,7 @@ import getopt
 def usage():
     print(u'Usage:')
     print(u'   Command line tool.')
-    print(u' 读取 wgl中 raw.dat,Decoder a parameter according to the parameter coding rules.')
+    print(u' Read in WGL raw.dat,Decoder a parameter according to the parameter coding rules.')
 
     print(sys.argv[0]+' [-h|--help]')
     print('   * (Necessary parameters)')
@@ -1010,42 +1043,48 @@ def usage():
     return
 
 if __name__=='__main__':
-    if(len(sys.argv)<2):
-        usage()
-        sys.exit()
-    try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],'hw:df:p:',['help','file=','paramlist','param=',])
-    except getopt.GetoptError as e:
-        print(e)
-        usage()
-        sys.exit(2)
-    FNAME=None
+    # if(len(sys.argv)<2):
+    #     usage()
+    #     sys.exit()
+    # try:
+    #     opts, args = getopt.gnu_getopt(sys.argv[1:],'hw:df:p:',['help','file=','paramlist','param=',])
+    # except getopt.GetoptError as e:
+    #     print(e)
+    #     usage()
+    #     sys.exit(2)
+    # FNAME=None
+    # WFNAME=None
+    # DUMPDATA=False
+    # PARAMLIST=False
+    # PARAM=None
+    # for op,value in opts:
+    #     if op in ('-h','--help'):
+    #         usage()
+    #         exit()
+    #     elif op in('-f','--file'):
+    #         FNAME=value
+    #     elif op in('-w',):
+    #         WFNAME=value
+    #     elif op in('-d',):
+    #         DUMPDATA=True
+    #     elif op in('--paramlist',):
+    #         PARAMLIST=True
+    #     elif op in('-p','--param',):
+    #         PARAM=value
+    # if len(args)>0:  #Command line remaining parameters
+    #     FNAME=args[0]  #Only take the first one
+
+    FNAME='5471'
     WFNAME=None
-    DUMPDATA=False
+    DUMPDATA=True
     PARAMLIST=False
-    PARAM=None
-    for op,value in opts:
-        if op in ('-h','--help'):
-            usage()
-            exit()
-        elif op in('-f','--file'):
-            FNAME=value
-        elif op in('-w',):
-            WFNAME=value
-        elif op in('-d',):
-            DUMPDATA=True
-        elif op in('--paramlist',):
-            PARAMLIST=True
-        elif op in('-p','--param',):
-            PARAM=value
-    if len(args)>0:  #Command line remaining parameters
-        FNAME=args[0]  #Only take the first one
-    if FNAME is None:
-        usage()
-        exit()
-    if os.path.isfile(FNAME)==False:
-        print(FNAME,'Not a file')
-        sys.exit()
+    PARAM='ACID1'
+    # if FNAME is None:
+    #     usage()
+    #     exit()
+    # if os.path.isfile(FNAME)==False:
+    #     print(FNAME,'Not a file')
+    #     sys.exit()
 
     main()
 

@@ -132,11 +132,11 @@ def read_parameter_file(dataver):
             if tmp1[0] == '1':  #Beginning of the record
                 ki +=1
                 if ki>0:
-                    print('one_par:',one_par,'\n')
+                    #print('one_par:',one_par,'\n')
                     PAR.append( one_PAR(PAR_offset,one_par) )
-                    if ki==1:
-                       print('PAR(%d):'%len(PAR), PAR,'\n')
-                       print('PAR_offset:',PAR_offset,'\n')
+                    #if ki==1:
+                       #print('PAR(%d):'%len(PAR), PAR,'\n')
+                       #print('PAR_offset:',PAR_offset,'\n')
                     # if ki>2:
                     #    break
                 one_par={}
@@ -177,7 +177,7 @@ def one_PAR(PAR_offset,one_par):
                 raise(Exception('one_par[%s] length require %d not %d' % (kk, PAR_offset[kk][1], len(one_par[kk]))))
 
             offset=PAR_offset[ kk ][0]
-            print(len(one_par[kk]))
+            #print(len(one_par[kk]))
             for jj in range( len(one_par[kk]) ):  #The corresponding item of one_par to the corresponding position of the one
                 ONE[offset+jj].extend( one_par[kk][jj] )
     for counter_j in range( len(ONE) ):  #Corresponding records.There is only one record, remove the list

@@ -12,8 +12,8 @@ import os
 #from datetime import datetime
 #pandas cannot use, read_parameter_file() can return list, Does not return a DataFrame.
 import pandas as pd
-import zipfile
-from io import StringIO
+#import zipfile
+#from io import StringIO
 import psutil
 #import config_vec as conf
 
@@ -59,8 +59,8 @@ def main():
             tmp.to_csv(TOCSV,sep='\t')
         return
 
-    if PARAM is not None and len(PARAM)>0:  #显示单个参数名
-        #----------显示单个参数的配置内容-------------
+    if PARAM is not None and len(PARAM)>0:  #Show a single parameter name
+        #----------Display configuration content of a single parameter-------------
         param=PARAM.upper()
         #---regular parameter
         tmp=FRA['2']
@@ -119,7 +119,7 @@ def main():
             'Recorded Resolution',
             'Occurence No']
             )
-    #print(FRA['2'].iloc[:,12].unique() )  #显示 Occurence No
+    #print(FRA['2'].iloc[:,12].unique() )  #show Occurence No
 
     if len(FRA['3'])>1:
         print_fra(FRA, '3', [
@@ -280,9 +280,9 @@ if __name__=='__main__':
     # PARAMLIST=False
     # PARAM=None
     FNAME='5471'
-    DUMPDATA=True
+    DUMPDATA=False
     TOCSV=''
-    PARAMLIST=True
+    PARAMLIST=False
     PARAM=None
 
     # for op,value in opts:

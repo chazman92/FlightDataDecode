@@ -19,9 +19,8 @@ def decode_arinc429(data):
 
 def main():
     # Example ARINC 429 data word (32 bits)
-    arinc429_word = 0b11111111000011110000000000000000
-    #arinc429_word = 0xff0f0000
-
+    #arinc429_word = 0b11111111000011110000000000000000
+    arinc429_word = 0xc9830
     decoded_data = decode_arinc429(arinc429_word)
     print("Decoded ARINC 429 data:")
     for key, value in decoded_data.items():
