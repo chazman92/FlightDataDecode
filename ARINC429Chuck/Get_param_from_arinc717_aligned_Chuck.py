@@ -306,7 +306,7 @@ def get_super(fra,par):
 
     #----------Data Type Warning-----------
     if par['type'].find('BCD')!=0 and \
-            par['type'].find('BNR LINEAR (A*X)')!=0 and \ 
+            par['type'].find('BNR LINEAR (A*X)')!=0 and \
             par['type'].find('BNR SEGMENTS (A*X+B)')!=0 and \
             par['type'].find('CHARACTER')!=0 and \
             par['type'].find('DISCRETE')!=0 and \
