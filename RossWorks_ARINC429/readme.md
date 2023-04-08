@@ -4,7 +4,7 @@ If provided with an ICD it can also parse incoming data.
 ARINC429 is 100% Python with zero to none external dependencies.
 # Quick guide to ARINC429 library and protocol
 ## Physical layout of Arinc 429 lines
-The ARINC 429 protocol is widely used on board of helicopters and airplanes to transport data from one source to up to 20 destinations. Data travels as 32 bit packets along a single wire.
+The ARINC 429 protocol is widely used on board of helicopters and airplanes to transport data from one source to up to 20 destinations. Data travels as 32 bit packets (words) along a single wire.
 <pre><code>
 +-----+     +-----+     +-----+     +-----+     +-----+
 |dest1|     |dest2|     |dest3|     |dest4|     |dest5|
