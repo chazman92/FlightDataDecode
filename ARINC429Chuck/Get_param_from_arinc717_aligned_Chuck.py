@@ -510,7 +510,7 @@ def get_param(fra,par):
     #----------Read parameter-----------
     ii=0    #count
     pm_list=[] #parameter list
-    pm_sec=0.0   #The timeline of the parameter,秒数
+    pm_sec=0.0   #The timeline of the parameter,The number of seconds
     while True:
         #There are several DataVER data, not starting from the file header, only sync1 will find it wrong.It is not ruled out that it will be wrong/chaos in the middle.
         #So use Find_Sync1 () to judge each time.The actual test was found that there were synchronous words errors, but the Frame interval was correct.
@@ -528,6 +528,7 @@ def get_param(fra,par):
         for pm_set in param_set:
             value=get_arinc429(buf, frame_pos, pm_set, word_sec )  #ARINC 429 format
             value =arinc429_decode(value ,par )
+
 
             pm_list.append({'t':round(pm_sec,10),'v':value})
             #pm_list.append({'t':round(pm_sec,10),'v':bin(value)})
@@ -765,13 +766,11 @@ def get_arinc429(buf, frame_pos, param_set, word_sec ):
         #    pre_id=pm_set['part']
         #else:
         #    break
-        word=getWord(buf,
-                frame_pos + word_sec *2 *(pm_set['sub']-1) +(pm_set['word']-1)*2  #The position occupied by the synchronous word, number is 1, so -1
-                )
+        word=getWord(buf, frame_pos + word_sec *2 *(pm_set['sub']-1) +(pm_set['word']-1)*2)  #The position occupied by the synchronous word, number is 1, so -1
         #According to Blen, obtain the mask value
         bits= (1 << pm_set['blen']) -1
         #According to BOUT, move the mask to the corresponding location
-        bits <<= pm_set['bout'] - pm_set['blen']
+        bits <<= pm_set['bout'] - pm_set['blen'] #The <<= operator in Python is a bitwise left shift assignment operator. 
         word &= bits  #Gain
         #Move the value to the target location
         move=pm_set['bin'] - pm_set['bout']
@@ -779,7 +778,9 @@ def get_arinc429(buf, frame_pos, param_set, word_sec ):
             word <<= move
         elif move<0:
             word >>= -1 * move
-        value |= word
+
+        value |= word #The |= operator in Python is a bitwise OR assignment operator. 
+        print(bin(value))
     return value
 
 def getWord(buf,pos, word_len=1):
@@ -1076,7 +1077,7 @@ if __name__=='__main__':
     WFNAME=None
     DUMPDATA=True
     PARAMLIST=False
-    PARAM='ACID2'
+    PARAM='ORIGIN1'
     # if FNAME is None:
     #     usage()
     #     exit()

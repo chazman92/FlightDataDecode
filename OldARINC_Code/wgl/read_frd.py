@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-读解码库， 787xx 的 ARINC 767 记录格式，则读 xxx.frd 文件,
-   ARINC-647A-1 的xml配置文件找不到。所以可能无法解码。
-      author:南方航空,LLGZ@csair.com
+Read the decoding library, 787xx's Arinc 767 record format, then read the xxx.frd file,
+   The XML configuration file of Arinc-647A-1 cannot be found. So it may not be able to decod.
+      Author: Southern Airlines, llgz@csair.com
 """
 import sys
 import os
-import psutil   #非必须库
+import psutil   #Non -required library
 #from datetime import datetime
-#pandas 可以不使用, read_parameter_file() 可以返回list, 不返回DataFrame。
+#Pandas can not be used, read_parameter_file () can return the list, without returning DataFrame.
 import pandas as pd
 import zipfile
 from io import StringIO
@@ -53,9 +53,9 @@ def main():
             FRD['4'].iloc[:,1].to_csv(TOCSV,sep='\t')
         return
 
-    if PARAM is not None and len(PARAM)>0:  #显示单个参数名
-        #----------显示单个参数的配置内容-------------
-        print_fra(FRD, '1', [  #这个也显示一下
+    if PARAM is not None and len(PARAM)>0:  #Show a single parameter name
+        #---------- Display configuration content of a single parameter -------------
+        print_fra(FRD, '1', [  #This also shows it
             'ARINC Version',
             'File Revision',
             'File Date',
