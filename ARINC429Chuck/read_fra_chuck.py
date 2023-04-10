@@ -4,7 +4,7 @@
 """
 Read the decoding library, parameter configuration file vec Mid -xx.fra file.Such as 010xxx.fra
 Only support ARINC 573 PCM Format
-   author:China Southern Airlines, LLGZ@csair.com
+   author:China Southern Airlines, LLGZ@csair.com - Modified by Chuck Cook ccook@jetblue.com
 """
 import sys
 import os
@@ -94,13 +94,7 @@ def main():
             '1(Word)',
             '1(Bit Out)',
             '1(Data Bits)',
-            'Value in 1st Frame (0/1)',
-            'S/F End Synchro',
-            '2(Subframe)',
-            '2(Word)',
-            '2(Bit Out)',
-            '2(Data Bits)',
-            'Value in 1st Frame for Frame Counter 2(0/1)',
+            'PEH duration',
             ]
             )
 
@@ -145,7 +139,7 @@ def main():
         print('No Superframe Parameter.')
     
     if len(FRA['5'])>1:
-            print_fra(FRA, '4', [
+            print_fra(FRA, '5', [
                 'Sequence No',
                 'Start Logic',
                 'Stop Logic',

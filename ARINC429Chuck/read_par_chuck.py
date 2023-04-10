@@ -126,12 +126,12 @@ def read_parameter_file(dataver):
         PAR_offset={}  #Records of various rows, offset and length
         one_par={}  #Record summary of a single parameter
         for line in fp.readlines():
-            line=line.decode('utf-8').strip('\r\n //')
-            tmp1=line.split('|',1)
-            tmp2=tmp1[1].split('\t')
+            line=line.decode('utf-8').strip('\r\n //') #strips the // marks and newlines at the beginning of the file header
+            tmp1=line.split('|',1) #splits the pipe from the values
+            tmp2=tmp1[1].split('\t') #Splits the values by tab after the numbered header
             if tmp1[0] == '1':  #Beginning of the record
                 ki +=1
-                if ki>0:
+                if ki>0: #Actual Parameter Records, not the header definition
                     #print('one_par:',one_par,'\n')
                     PAR.append( one_PAR(PAR_offset,one_par) )
                     #if ki==1:
@@ -140,8 +140,8 @@ def read_parameter_file(dataver):
                     # if ki>2:
                     #    break
                 one_par={}
-            if tmp1[0] == '13': #End of the record
-                continue
+            #if tmp1[0] == '8': #End of the record -- Don't see any 13's in the B6 files
+            #    continue
             if ki==0:  #File header, record header
                 if tmp1[0] in PAR_offset: #There should be no duplication in the file header
                     raise(Exception('ERROR, "%s" in PAR_offset' % (tmp1[0]) ))
@@ -156,6 +156,9 @@ def read_parameter_file(dataver):
             else:
                 for jj in range( len(tmp2) ):
                     one_par[ tmp1[0] ][jj].append( tmp2[jj] )
+            
+            if tmp1[0] == '8': #End of the record -- Don't see any 13's in the B6 files
+                continue
         PAR.append( one_PAR(PAR_offset,one_par) )
 
     #fzip.close()

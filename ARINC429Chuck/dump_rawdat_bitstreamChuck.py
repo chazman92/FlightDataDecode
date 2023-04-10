@@ -87,8 +87,8 @@ Read raw.dat in WGL.The 12bit Frame is expanded to 16bit and 0 4Bit is 0.Conveni
        set 1 for each extra word
   --------------------------------------------  
 
-根据上述的文档的描述。 理论上synchro同步字出现的顺序应该是，sync1,sync2,sync3,sync4, 间隔为 words/sec 的个数。
-   author:南方航空,LLGZ@csair.com
+Based on the description of the above documents.Theoretically, the order of synchronous synchronous words should be: Sync1, Sync2, Sync3, Sync4, the number of Words/SEC.
+   Author: Southern Airlines, llgz@csair.com
   --------------------------
 '''
 Real read files, (BitStream Format, Words/SEC = 1024, Synchro Word Length = 12bits)
