@@ -94,11 +94,9 @@ Only support ArinC 573/717 Aligned format
 The primitive ArinC 573/717 PCM file should be processed first, change 12bits to 16bits storage, and use the empty Frame to make up the missing Frame structure.
  The program will be read in the aligned bit format format.
 """
-import zipfile
-import config_vec as conf
-import read_air as AIR
-import read_fra as FRA
-import read_par as PAR
+
+import read_fra_717Chuck as FRA
+import read_par_717Chuck as PAR
 
 class ARINC717():
     '''
@@ -108,28 +106,26 @@ class ARINC717():
         '''
       For example variables used to save configuration parameters
         '''
-        self.air=None
+        # self.air=None
+        self.datapath = '/workspaces/FlightDataDecode/DataFrames/'
         self.fra=None
-        self.fra_dataver=-1
+        self.fra_dataver='5461'
         self.par=None
-        self.par_dataver=-1
+        self.par_dataver="5461"
         self.qar=None
-        self.qar_filename=''
+        self.qar_filename=""
         if len(fname)>0:
             self.qar_file(fname)
 
     def qar_file(self,qar_filename):
-        #----------Open the zip compression file-----------
+        #----------Open the DAR/QAR file-----------
         if self.qar is None or self.qar_filename != qar_filename:
-            try:
-                fzip=zipfile.ZipFile(qar_filename,'r') #Open the zip file
-            except zipfile.BadZipFile as e:
-                print('==>ERR,FailOpenZipFile',e,qar_filename,flush=True)
-                raise(Exception('ERR,FailOpenZipFile,%s'%qar_filename))
-            filename_zip='raw.dat'
-            self.qar=fzip.read(filename_zip)
-            fzip.close()
+            #read into buffer
+            fp=open(self.datapath + qar_filename,'rb')
+            self.qar=fp.read()
             self.qar_filename=qar_filename
+            fp.close()
+
         self.readFRA()
         self.readPAR()
 
@@ -176,9 +172,9 @@ class ARINC717():
                 'word':int(fra['1'][7]),
                 'bout':int(fra['1'][8]),
                 'blen':int(fra['1'][9]),
-                'v_first':int(fra['1'][10]),
-                'bin' :12,
-                'occur': -1,
+                'peh':int(fra['1'][10]),
+                # 'bin' :12,
+                # 'occur': -1,
                 },
                 #Counter2 does not read from the configuration file (TODO)
                 #{'part':1,}
@@ -362,9 +358,9 @@ class ARINC717():
                 'word':int(fra['1'][7]),
                 'bout':int(fra['1'][8]),
                 'blen':int(fra['1'][9]),
-                'v_first':int(fra['1'][10]),
-                'bin' :12,
-                'occur': -1,
+                'peh':int(fra['1'][10]),
+                # 'bin' :12,
+                # 'occur': -1,
                 }]
         if sync_word_len>1: #If synchronous words> 1 word
             sync1=(sync1 << (12 * (sync_word_len-1))) +1  #Synchronous word for growth
@@ -473,7 +469,7 @@ class ARINC717():
                 'bout':int(vv[4]),
                 'blen':int(vv[5]),
                 'bin' :int(vv[6]),
-                'occur' :int(vv[7]) if len(vv[7])>0 else -1,
+                'location' :(vv[7]) if len(vv[7])>0 else '',
                 })
         if len(p_set)>0: #Last group
             group_set.append(p_set)
@@ -508,7 +504,7 @@ class ARINC717():
                             'bout':vv['bout'],
                             'blen':vv['blen'],
                             'bin' :vv['bin'],
-                            'occur':vv['occur'],
+                            'location':vv['location'],
                             })
                     param_set.append(p_set)
         return param_set
@@ -568,6 +564,7 @@ class ARINC717():
                 #Move the value to the right (move to BIT0) and get the value
                 value = ( word >> (conf['pos'] - conf['blen']) ) & bits
                 value =  chr(value)
+            #print (value)
             return value
         else:  #BCD
             #Symbol
@@ -697,15 +694,15 @@ class ARINC717():
 
     def readPAR(self):
         'Read PAR configuration'
-        dataver=self.getAIR()[0]
-        if isinstance(dataver,(str,float)):
-            dataver=int(dataver)
-        if str(dataver).startswith('787'):
-            print('ERR,dataver %s not support.' % (dataver,) ,flush=True)
-            print('Use "read_frd.py instead.',flush=True)
-            return
+        dataver=self.dataVer()
+        # if isinstance(dataver,(str,float)):
+        #     dataver=int(dataver)
+        # if str(dataver).startswith('787'):
+        #     print('ERR,dataver %s not support.' % (dataver,) ,flush=True)
+        #     print('Use "read_frd.py instead.',flush=True)
+        #     return
         if self.par is None or self.par_dataver != dataver: #Don't read it repeatedly if you have
-            self.par=PAR.read_parameter_file(dataver)
+            self.par=PAR.read_parameter_file(self.datapath + dataver + '.par')
             self.par_dataver = dataver
 
     def getPAR(self,param):
@@ -727,13 +724,13 @@ class ARINC717():
             return {}
         else:
             tmp_part=[]
-            if isinstance(pm_find[36], list):
+            if isinstance(pm_find[43], list):
                 #If there are multiple parts of the configuration of bits, combine it
-                for ii in range(len(pm_find[36])):
+                for ii in range(len(pm_find[43])):
                     tmp_part.append({
-                            'id'  :int(pm_find[36][ii]),  #DIGIT, sequential labeling
-                            'pos' :int(pm_find[37][ii]),  #MSB, starting position
-                            'blen':int(pm_find[38][ii]),  #bitlen, databits, data length
+                            'id'  :int(pm_find[43][ii]),  #DIGIT, sequential labeling
+                            'pos' :int(pm_find[44][ii]),  #MSB, starting position
+                            'blen':int(pm_find[45][ii]),  #bitlen, databits, data length
                             })
             return {
                     'ssm'    :int(pm_find[5]) if len(pm_find[5])>0 else -1,   #SSM Rule , (0-15)0,4 
@@ -744,22 +741,22 @@ class ARINC717():
                     'type'    :pm_find[2],    #Type(BCD,CHARACTER)
                     'format'  :pm_find[17],    #Display Format Mode (DECIMAL,ASCII)
                     'Resol'   :pm_find[12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
-                    'A'       :pm_find[29] if pm_find[29] is not None else '',    #Coef A(Res)
-                    'B'       :pm_find[30] if pm_find[30] is not None else '',    #Coef b
+                    'A'       :pm_find[36] if pm_find[36] is not None else '',    #Coef A(Res)
+                    'B'       :pm_find[37] if pm_find[37] is not None else '',    #Coef b
                     'format'  :pm_find[25],    #Internal Format (Float ,Unsigned or Signed)
                     }
 
     def readFRA(self):
         'Read FRA configuration'
-        dataver=self.getAIR()[0]
-        if isinstance(dataver,(str,float)):
-            dataver=int(dataver)
-        if str(dataver).startswith('787'):
-            print('ERR,dataver %s not support.' % (dataver,) ,flush=True)
-            print('Use "read_frd.py instead.',flush=True)
-            return
+        dataver=self.dataVer()
+        # if isinstance(dataver,(str,float)):
+        #     dataver=int(dataver)
+        # if str(dataver).startswith('787'):
+        #     print('ERR,dataver %s not support.' % (dataver,) ,flush=True)
+        #     print('Use "read_frd.py instead.',flush=True)
+        #     return
         if self.fra is None or self.fra_dataver != dataver: #Don't read it repeatedly if you have
-            self.fra=FRA.read_parameter_file(dataver)
+            self.fra=FRA.read_parameter_file(self.datapath + dataver +'.fra')
             self.fra_dataver = dataver
 
     def getFRA(self,param):
@@ -795,7 +792,7 @@ class ARINC717():
                         tmp[ii][5],   #bitOut, In 12bit, several bits start
                         tmp[ii][6],   #bitLen, A total of several bits
                         tmp[ii][7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits
-                        tmp[ii][12],  #Occurence No
+                        # tmp[ii][12],  #Occurence No
                         tmp[ii][8],   #Imposed,Computed
                         ]
                     ret2.append(tmp2)
@@ -859,44 +856,44 @@ class ARINC717():
                  '4':ret4,
                 }
 
-    def getAIR(self):
-        '''
-        Get the configuration of the decoding library corresponding to the tail number.
-        Pick out useful, sort it out, return
-           Author: Southern Airlines, llgz@csair.com
-        '''
-        reg=self.getREG().upper()
-        self.readAIR()
-        idx=0
-        for row in self.air: #Find a machine tail number
-            if row[0]==reg: break
-            idx +=1
-        if idx<len(self.air):  #Find a record
-            return [self.air[idx][12], #dataver
-                    self.air[idx][13], #dataver2
-                    self.air[idx][16], #recorderType
-                    self.air[idx][17]] #recorderType2
-        else:
-            return [0,0,'','']  #did not find
+    # def getAIR(self):
+    #     '''
+    #     Get the configuration of the decoding library corresponding to the tail number.
+    #     Pick out useful, sort it out, return
+    #        Author: Southern Airlines, llgz@csair.com
+    #     '''
+    #     reg=self.getREG().upper()
+    #     self.readAIR()
+    #     idx=0
+    #     for row in self.air: #Find a machine tail number
+    #         if row[0]==reg: break
+    #         idx +=1
+    #     if idx<len(self.air):  #Find a record
+    #         return [self.air[idx][12], #dataver
+    #                 self.air[idx][13], #dataver2
+    #                 self.air[idx][16], #recorderType
+    #                 self.air[idx][17]] #recorderType2
+    #     else:
+    #         return [0,0,'','']  #did not find
 
-    def readAIR(self):
-        'Read AIR configuration'
-        if self.air is None:
-            self.air=AIR.air(conf.aircraft)
+    # def readAIR(self):
+    #     'Read AIR configuration'
+    #     if self.air is None:
+    #         self.air=AIR.air(conf.aircraft)
 
-    def getREG(self):
-        '''
-        From the ZIP file name, find the tail number of the machine
-           Author: Southern Airlines, llgz@csair.com
-        '''
-        basename=os.path.basename(self.qar_filename)
-        reg=basename.strip().split('_',1)
-        if len(reg[0])>6: #787's file name is useless
-            return reg[0][:6]
-        elif len(reg[0])>0:
-            return reg[0]
-        else:
-            return ''
+    # def getREG(self):
+    #     '''
+    #     From the ZIP file name, find the tail number of the machine
+    #        Author: Southern Airlines, llgz@csair.com
+    #     '''
+    #     basename=os.path.basename(self.qar_filename)
+    #     reg=basename.strip().split('_',1)
+    #     if len(reg[0])>6: #787's file name is useless
+    #         return reg[0][:6]
+    #     elif len(reg[0])>0:
+    #         return reg[0]
+    #     else:
+    #         return ''
     def paramlist(self):
         '''
         Get all the records of all record parameters, including Regular and Superframe parameters
@@ -917,7 +914,7 @@ class ARINC717():
         return self.fra_dataver
     def close(self):
         'Clear all configuration and data reserved'
-        self.air=None
+        # self.air=None
         self.fra=None
         self.fra_dataver=-1
         self.par=None
@@ -948,6 +945,9 @@ def usage():
     return
 
 if __name__=='__main__':
-    usage()
+    # usage()
+    MyQAR=ARINC717('N703JB-REC25134.DAT')
+    print(MyQAR.get_param('ACID2'))
+    MyQAR.close()
     exit()
 

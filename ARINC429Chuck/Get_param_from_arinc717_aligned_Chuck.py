@@ -621,7 +621,7 @@ def getDataFrameSet(fra2,word_sec):
                         'bout':vv['bout'],
                         'blen':vv['blen'],
                         'bin' :vv['bin'],
-                       # 'occur':vv['occur'],
+                        'location':vv['location'],
                         })
                 param_set.append(p_set)
     return param_set

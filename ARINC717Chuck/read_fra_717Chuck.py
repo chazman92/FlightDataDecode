@@ -10,7 +10,7 @@ import os
 import zipfile
 import gzip
 from io import StringIO
-import config_vec as conf
+# import config_vec as conf
 
 #FRA=None  #Save the read -in configuration. When used as a module, use it when being called.
 #DataVer=None
@@ -167,42 +167,42 @@ def read_parameter_file(dataver):
     #global FRA
     #global DataVer
 
-    if isinstance(dataver,(str,float)):
-        dataver=int(dataver)
-    if str(dataver).startswith('787'):
-        print('ERR,dataver %s not support.' % (dataver,) )
-        print('Use "read_frd.py instead.')
-        return None
-    dataver='%06d' % dataver  #6 -bit string
-    #if FRA is not None and DataVer==dataver:
+    # if isinstance(dataver,(str,float)):
+    #     dataver=int(dataver)
+    # if str(dataver).startswith('787'):
+    #     print('ERR,dataver %s not support.' % (dataver,) )
+    #     print('Use "read_frd.py instead.')
+    #     return None
+    
+    # dataver='%06d' % dataver  #6 -bit string
+
+    # if FRA is not None and DataVer==dataver:
     #    return FRA
-    #else:
+    # else:
     #    DataVer=dataver
     #    FRA=None
 
-    filename_zip=dataver+'.fra'     #.vec compressed package file name
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec file name
+    # filename_zip=dataver+'.fra'     #.vec compressed package file name
+    # zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.vec file name
 
-    if os.path.isfile(zip_fname)==False:
-        print('ERR,ZipFileNotFound',zip_fname,flush=True)
-        raise(Exception('ERR,ZipFileNotFound,%s'%(zip_fname)))
+    # if os.path.isfile(zip_fname)==False:
+    #     print('ERR,ZipFileNotFound',zip_fname,flush=True)
+    #     raise(Exception('ERR,ZipFileNotFound,%s'%(zip_fname)))
 
-    try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
-    except zipfile.BadZipFile as e:
-        print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
-        raise(Exception('ERR,FailOpenZipFile,%s'%(zip_fname)))
+    # try:
+    #     fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
+    # except zipfile.BadZipFile as e:
+    #     print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
+    #     raise(Exception('ERR,FailOpenZipFile,%s'%(zip_fname)))
+    
     
     fra_conf={}
-    with StringIO(fzip.read(filename_zip).decode('utf16')) as fp:
+    with open(dataver,'rb') as fp:
         for line in fp.readlines():
-            line_tr=line.strip('\r\n //')
+            line_tr=line.decode('utf-8').strip('\r\n //')
             tmp1=line_tr.split('|',1)
-            if line.startswith('//') and tmp1[0] == '3':     #The title of "3 | ..." is special, and one tab is missing at the end
-                tmp1[1] += '\t'
-            if line.startswith('//') and tmp1[0] == '7':     # The title of "7 | ..." is relatively special.
-                tmp1[1]=tmp1[0].lstrip()
             tmp2=tmp1[1].split('\t')
+            
             if tmp1[0] in fra_conf:
                 if fra_conf[ tmp1[0]+'_items' ] != len(tmp2):
                     print('ERR,data(%s) length require %d, but %d.' % (tmp1[0], fra_conf[ tmp1[0]+'_items' ], len(tmp2)) )
@@ -211,7 +211,7 @@ def read_parameter_file(dataver):
             else:
                 fra_conf[ tmp1[0] ]=[ tmp2, ]
                 fra_conf[ tmp1[0]+'_items' ]=len(tmp2)
-    fzip.close()
+    # fzip.close()
     #FRA=fra_conf
     #return FRA
     return fra_conf       #Return to list
@@ -234,39 +234,40 @@ def usage():
     print()
     return
 if __name__=='__main__':
-    if(len(sys.argv)<2):
-        usage()
-        exit()
-    try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],'hvp:f:',['help','ver=','csv=','paramlist','param='])
-    except getopt.GetoptError as e:
-        print(e)
-        usage()
-        exit(2)
-    FNAME=None
+    # if(len(sys.argv)<2):
+    #     usage()
+    #     exit()
+    # try:
+    #     opts, args = getopt.gnu_getopt(sys.argv[1:],'hvp:f:',['help','ver=','csv=','paramlist','param='])
+    # except getopt.GetoptError as e:
+    #     print(e)
+    #     usage()
+    #     exit(2)
+    data_path = '/workspaces/FlightDataDecode/DataFrames/'
+    FNAME = data_path + '5461.fra'
     DUMPDATA=False
     TOCSV=''
     PARAMLIST=False
-    PARAM=None
-    for op,value in opts:
-        if op in ('-h','--help'):
-            usage()
-            exit()
-        elif op in('-v','--ver'):
-            FNAME=value
-        elif op in('-d',):
-            DUMPDATA=True
-        elif op in('--csv',):
-            TOCSV=value
-        elif op in('--paramlist',):
-            PARAMLIST=True
-        elif op in('--param','-p',):
-            PARAM=value
-    if len(args)>0:  #Command line remaining parameters
-        FNAME=args[0]  #Only take the first one
-    if FNAME is None:
-        usage()
-        exit()
+    PARAM='ACID1'
+    # for op,value in opts:
+    #     if op in ('-h','--help'):
+    #         usage()
+    #         exit()
+    #     elif op in('-v','--ver'):
+    #         FNAME=value
+    #     elif op in('-d',):
+    #         DUMPDATA=True
+    #     elif op in('--csv',):
+    #         TOCSV=value
+    #     elif op in('--paramlist',):
+    #         PARAMLIST=True
+    #     elif op in('--param','-p',):
+    #         PARAM=value
+    # if len(args)>0:  #Command line remaining parameters
+    #     FNAME=args[0]  #Only take the first one
+    # if FNAME is None:
+    #     usage()
+    #     exit()
 
     main()
 

@@ -4,8 +4,8 @@ import psutil   #Non -required library
 #from datetime import datetime
 #pandas ,You can return to the list without using Read_parameter_file (), without returning DataFrame.
 import pandas as pd
-import zipfile
-from io import StringIO
+# import zipfile
+# from io import StringIO
 #import config_vec as conf
 
 def main():

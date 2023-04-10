@@ -6,11 +6,11 @@
     Author: Southern Airlines, llgz@csair.com
 """
 import os
-import zipfile
+# import zipfile
 import gzip
 import csv
 from io import StringIO
-import config_vec as conf
+#import config_vec as conf
 
 #PAR=None  #Save the read -in configuration. When used as a module, use it when being called.
 #DataVer=None
@@ -45,11 +45,11 @@ def main():
         return
 
     if PARAM is not None and len(PARAM)>0:
-        #----------显示单个参数的配置内容-------------
+        #----------Display configuration content of a single parameter-------------
         param=PARAM.upper()
         idx=[]
         ii=0
-        for row in par_conf: #找出所有记录
+        for row in par_conf: #Find out all the records
             if row[0] == param: idx.append(ii)
             ii +=1
         if len(idx)>0:
@@ -111,36 +111,36 @@ def read_parameter_file(dataver):
     #global PAR
     #global DataVer
 
-    dataver='%06d' % int(dataver)  #6 -bit string
+    # dataver='%06d' % int(dataver)  #6 -bit string
     #if PAR is not None and DataVer==dataver:
     #    return PAR
     #else:
     #    DataVer=dataver
     #    PAR=None
 
-    filename_zip=dataver+'.par'     #.The file name in VEC compressed package
-    zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.VEC file name
+    # filename_zip=dataver+'.par'     #.The file name in VEC compressed package
+    # zip_fname=os.path.join(conf.vec,dataver+'.vec')  #.VEC file name
 
-    if os.path.isfile(zip_fname)==False:
-        print('ERR,ZipFileNotFound',zip_fname,flush=True)
-        raise(Exception('ERR,ZipFileNotFound'))
+    # if os.path.isfile(zip_fname)==False:
+    #     print('ERR,ZipFileNotFound',zip_fname,flush=True)
+    #     raise(Exception('ERR,ZipFileNotFound'))
 
-    try:
-        fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
-    except zipfile.BadZipFile as e:
-        print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
-        raise(Exception('ERR,FailOpenZipFile'))
+    # try:
+    #     fzip=zipfile.ZipFile(zip_fname,'r') #Open the zip file
+    # except zipfile.BadZipFile as e:
+    #     print('ERR,FailOpenZipFile',e,zip_fname,flush=True)
+    #     raise(Exception('ERR,FailOpenZipFile'))
     
     par_conf=[]
-    with StringIO(fzip.read(filename_zip).decode('utf16')) as fp:
+    with open(dataver,'rb') as fp:
         ki=-1
         offset=0  #Overturn
         PAR_offset={}  #Records of various rows, offset and length
         one_par={}  #Record summary of a single parameter
         for line in fp.readlines():
-            line=line.strip('\r\n //')
-            tmp1=line.split('|',1)
-            tmp2=tmp1[1].split('\t')
+            line=line.decode('utf-8').strip('\r\n //') #strips the // marks and newlines at the beginning of the file header
+            tmp1=line.split('|',1) #splits the pipe from the values
+            tmp2=tmp1[1].split('\t') #Splits the values by tab after the numbered header    
             if tmp1[0] == '1':  #Beginning of the record
                 ki +=1
                 if ki>0:
@@ -152,8 +152,7 @@ def read_parameter_file(dataver):
                     #if ki>2:
                     #    break
                 one_par={}
-            if tmp1[0] == '13': #End of the record
-                continue
+
             if ki==0:  #File header, record header
                 if tmp1[0] in PAR_offset: #There should be no duplication in the file header
                     raise(Exception('ERROR, "%s" in PAR_offset' % (tmp1[0]) ))
@@ -168,9 +167,12 @@ def read_parameter_file(dataver):
             else:
                 for jj in range( len(tmp2) ):
                     one_par[ tmp1[0] ][jj].append( tmp2[jj] )
+
+            if tmp1[0] == '8': #End of the record
+                continue
         par_conf.append( one_PAR(PAR_offset,one_par) )
 
-    fzip.close()
+    # fzip.close()
 
     #PAR=par_conf
     return par_conf       #Return to list
@@ -218,39 +220,41 @@ def usage():
     print()
     return
 if __name__=='__main__':
-    if(len(sys.argv)<2):
-        usage()
-        exit()
-    try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:],'hvp:f:',['help','ver=','csv=','paramlist','param='])
-    except getopt.GetoptError as e:
-        print(e)
-        usage()
-        exit(2)
-    FNAME=None
+    # if(len(sys.argv)<2):
+    #     usage()
+    #     exit()
+    # try:
+    #     opts, args = getopt.gnu_getopt(sys.argv[1:],'hvp:f:',['help','ver=','csv=','paramlist','param='])
+    # except getopt.GetoptError as e:
+    #     print(e)
+    #     usage()
+    #     exit(2)
+
+    data_path = '/workspaces/FlightDataDecode/ARINC429Chuck/DataFrames/'
+    FNAME = data_path + '5461.par'
     DUMPDATA=False
     TOCSV=''
     PARAMLIST=False
     PARAM=None
-    for op,value in opts:
-        if op in ('-h','--help'):
-            usage()
-            exit()
-        elif op in('-v','--ver'):
-            FNAME=value
-        elif op in('-d',):
-            DUMPDATA=True
-        elif op in('--csv',):
-            TOCSV=value
-        elif op in('--paramlist',):
-            PARAMLIST=True
-        elif op in('-p','--param',):
-            PARAM=value
-    if len(args)>0:  #Command line remaining parameters
-        FNAME=args[0]  #Only take the first one
-    if FNAME is None:
-        usage()
-        exit()
+    # for op,value in opts:
+    #     if op in ('-h','--help'):
+    #         usage()
+    #         exit()
+    #     elif op in('-v','--ver'):
+    #         FNAME=value
+    #     elif op in('-d',):
+    #         DUMPDATA=True
+    #     elif op in('--csv',):
+    #         TOCSV=value
+    #     elif op in('--paramlist',):
+    #         PARAMLIST=True
+    #     elif op in('-p','--param',):
+    #         PARAM=value
+    # if len(args)>0:  #Command line remaining parameters
+    #     FNAME=args[0]  #Only take the first one
+    # if FNAME is None:
+    #     usage()
+    #     exit()
 
     main()
 
