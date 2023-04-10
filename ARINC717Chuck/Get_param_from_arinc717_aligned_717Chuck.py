@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-Read raw.dat in WGL.
 Decoding a parameter.
 Only support ArinC 573/717 Aligned format
 ------
@@ -88,13 +87,13 @@ Only support ArinC 573/717 Aligned format
        set 0 otherwise;
        set 1 for each extra word
   --------------------------------------------  
-   Author: Southern Airlines, llgz@csair.com
+   Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com -- Modified by Chuck Cook ccook@jetblue.com
   --------------------------
 '''
 The primitive ArinC 573/717 PCM file should be processed first, change 12bits to 16bits storage, and use the empty Frame to make up the missing Frame structure.
  The program will be read in the aligned bit format format.
 """
-
+import os,sys
 import read_fra_717Chuck as FRA
 import read_par_717Chuck as PAR
 
@@ -102,16 +101,16 @@ class ARINC717():
     '''
    From ArIinc 573/717 Aligned format file, get parameters
     '''
-    def __init__(self,fname):
+    def __init__(self,fpath, fname, dataver):
         '''
       For example variables used to save configuration parameters
         '''
         # self.air=None
-        self.datapath = '/workspaces/FlightDataDecode/DataFrames/'
+        self.datapath= fpath
         self.fra=None
-        self.fra_dataver='5461'
+        self.fra_dataver= dataver
         self.par=None
-        self.par_dataver="5461"
+        self.par_dataver= dataver
         self.qar=None
         self.qar_filename=""
         if len(fname)>0:
@@ -155,7 +154,7 @@ class ARINC717():
         /     \    
        |parity |   
       -------------------------------------  
-       Author: Southern Airlines, llgz@csair.com
+       Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         #Initialize variables
         word_sec=int(fra['1'][0])
@@ -306,7 +305,7 @@ class ARINC717():
         '''
         Judging the position of the first frame, if not, push 1 frame and find it back.
         According to the content of Superframe_Counter, find the Frame position of the value as FIRST VALUE
-           Author: Southern Airlines, llgz@csair.com
+           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         pm_sec=0.0   #The timeline of the parameter, the number of seconds
         while True:
@@ -342,7 +341,7 @@ class ARINC717():
         /     \    
        |parity |   
       -------------------------------------  
-        Author: Southern Airlines, llgz@csair.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         #Initialize variables
         word_sec=int(fra['1'][0])
@@ -447,7 +446,7 @@ class ARINC717():
         If it is Self-Distant, there is only the configuration of the first position.Based on Rate, make up for all location records and group.
             You need to make up for other Subframe and Word positions according to the Rate value.
             Subframe's complement is the same as above. The interval between Word is to determine the number of records with Word/SEC.Uniformly divided into each subframe.
-            Author: Southern Airlines, llgz@csair.com
+            Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         # ---Group---
         group_set=[]
@@ -513,7 +512,7 @@ class ARINC717():
         '''
         PAR may have the Type: 'Constant' 'Discrete' 'Packed Bits'' BITS '' Bnr Linear (A*X) '' Computed on Ground 'Character' 'BCD' BNR Segments (A*X+B) 'UTC'
         Par's actual Type: 'BNR LINEAR (A*X)' 'BNR Segments (A*X+B)' Character '' BCD '' '' Packed Bits' 'Discrete'
-            Author: Southern Airlines, llgz@csair.com
+            Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         if conf['type'].find('BNR')==0 or \
                 conf['type'].find('PACKED BITS')==0:
@@ -546,7 +545,7 @@ class ARINC717():
                     'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
                     'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
                         }]
-        Author: Southern Airlines, llgz@csair.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         if conf['type']=='CHARACTER':
             if len(conf['part'])>0:
@@ -607,7 +606,7 @@ class ARINC717():
                     'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
                     'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
                         }]
-        Author: Southern Airlines, llgz@csair.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         #According to Blen, obtain the mask value
         bits= (1 << conf['blen']) -1
@@ -640,7 +639,7 @@ class ARINC717():
         According to FRA configuration, obtain 32bit word in the Arinc429 format
           Another: There are multiple different records in the FRA configuration, corresponding to multiple 32bit word (completed)
           BIT position is numbered from 1.Word position is also numbered from 1.The position of synchronization is 1, and the data word is from 2 (assuming that synchronous words only occupy 1Word).
-        Author: Southern Airlines, llgz@csair.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         value=0
         pre_id=0
@@ -670,7 +669,7 @@ class ARINC717():
         '''
         Read two bytes and take 12bit as a word.The low position is in front.LittleEndian, Low-Byte First.
         Support 12bits, 24bits, 36bits, 48bits, 60bits
-           Author: Southern Airlines, llgz@csair.com
+           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         buf=self.qar
         #print(type(buf), type(buf[pos]), type(buf[pos+1])) #bytes, int, int
@@ -709,7 +708,7 @@ class ARINC717():
         '''
         Get the position configuration of the 32bit word of the parameter in Arinc429
         Pick out useful, sort it out, return
-           Author: Southern Airlines, llgz@csair.com
+           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         self.readPAR()
         if self.par is None or len(self.par)<1:
@@ -763,7 +762,7 @@ class ARINC717():
         '''
         Get the position configuration of the 12bit word of the parameter in Arinc717
         Pick out useful, sort it out, return
-           Author: Southern Airlines, llgz@csair.com
+           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         self.readFRA()
         if self.fra is None:
@@ -860,7 +859,7 @@ class ARINC717():
     #     '''
     #     Get the configuration of the decoding library corresponding to the tail number.
     #     Pick out useful, sort it out, return
-    #        Author: Southern Airlines, llgz@csair.com
+    #        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
     #     '''
     #     reg=self.getREG().upper()
     #     self.readAIR()
@@ -884,7 +883,7 @@ class ARINC717():
     # def getREG(self):
     #     '''
     #     From the ZIP file name, find the tail number of the machine
-    #        Author: Southern Airlines, llgz@csair.com
+    #        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
     #     '''
     #     basename=os.path.basename(self.qar_filename)
     #     reg=basename.strip().split('_',1)
@@ -923,31 +922,30 @@ class ARINC717():
         self.qar_filename=''
 
 
-import os,sys
+
 def usage():
     print()
-    print(u'Read the raw.dat in WGL, and decode a parameter according to the parameter coding rules.')
+    print(u'Read the QAR/DAR file and decode a parameter according to the parameter coding rules.')
     print(u'Usage:')
 
     print('   import Get_param_from_arinc717_aligned as A717')
-    print('   qar_file="B-1234-xxxxxxxxx.wgl.zip"')
+    print('   qar_file="xxxxxxxxx.DAT"')
     print('   myQAR=A717.ARINC717(qar_file)               #Create examples and open a file')
     print('   regularlist,superlist=myQAR.paramlist()     #List all conventional parameters and superframe parameters, names')
-    print('   fra=myQAR.getFRA("VRTG")      #FRA configuration of the parameter')
-    print('   par=myQAR.getFRA("VRTG")      #Par configuration of the parameter')
+    print('   fra=myQAR.getFRA("ACID1")      #FRA configuration of the parameter')
+    print('   par=myQAR.getFRA("ACID1")      #Par configuration of the parameter')
     print('   dataver=myQAR.dataVer()       #Dataver of the file that has been opened')
-    print('   myQAR.get_param("VRTG")       #Decoding a parameter')
+    print('   myQAR.get_param("ACID1")       #Decoding a parameter')
     print('   myQAR.close()                 #closure')
     print('   myQAR.qar_file(qar_file)      #Open a file again')
-    print(u'\nAuthor: Southern Airlines, llgz@csair.com')
-    print(u' If you think this project is helpful to you, please send me an email to make me happy.')
+    print(u'\nAuthor: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com  Modified by Chuck Cook ccook@jetblue.com')
     print()
     return
 
 if __name__=='__main__':
     # usage()
-    MyQAR=ARINC717('N703JB-REC25134.DAT')
-    print(MyQAR.get_param('ACID2'))
-    MyQAR.close()
+    # MyQAR=ARINC717('N2002J-REC25038.DAT', '5471')
+    # print(MyQAR.get_param('ACID3'))
+    # MyQAR.close()
     exit()
 

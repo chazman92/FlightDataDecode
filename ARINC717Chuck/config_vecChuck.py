@@ -3,7 +3,7 @@
 
 """
 配置文件
-   author:南方航空,LLGZ@csair.com
+   author:南方航空,llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
 """
 import os
 selfpath=os.path.dirname(os.path.realpath(__file__)) #The directory where the script itself is located
@@ -25,7 +25,7 @@ def usage():
     print(sys.argv[0]+' [-h|--help] ')
     print('   -h, --help     print usage.')
     print('   -d             show config.')
-    print(u'\n               author:南方航空,LLGZ@csair.com')
+    print(u'\n               author:南方航空,llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com')
     print()
     return
 if __name__=='__main__':

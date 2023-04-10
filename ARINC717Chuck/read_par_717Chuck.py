@@ -3,7 +3,7 @@
 
 """
  Read the decoding library, the parameter configuration file VEC xx.par file.Such as 010xxx.par
-    Author: Southern Airlines, llgz@csair.com
+    Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
 """
 import os
 # import zipfile
@@ -180,7 +180,7 @@ def read_parameter_file(dataver):
 def one_PAR(PAR_offset,one_par):
     '''
     Dotted a line of record. A record of a parameter
-       Author: Southern Airlines, llgz@csair.com
+       Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
     '''
     ONE=[]
     for kk in PAR_offset:  #Each recorded child line
@@ -216,7 +216,7 @@ def usage():
     print('   --csv xxx.csv.gz     save to "xxx.csv.gz" file.')
     print('   --paramlist          list all param name.')
     print('   -p,--param alt_std   show "alt_std" param.')
-    print(u'\n Author: Southern Airlines, llgz@csair.com')
+    print(u'\n Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com')
     print()
     return
 if __name__=='__main__':

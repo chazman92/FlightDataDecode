@@ -4,7 +4,7 @@
 """
 Read the decoding library, the parameter configuration file VEC xx.fra file.Such as 010xxx.fra
 Only support ArinC 573 PCM format
-   Author: Southern Airlines, llgz@csair.com
+   Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
 """
 import os
 import zipfile
@@ -230,7 +230,7 @@ def usage():
     print('   --csv xxx.csv.gz     save to "xxx.csv.gz" file.')
     print('   --paramlist          list all param name.')
     print('   -p,--param alt_std   show "alt_std" param.')
-    print(u'\n               Author: Southern Airlines, llgz@csair.com')
+    print(u'\n               Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com')
     print()
     return
 if __name__=='__main__':

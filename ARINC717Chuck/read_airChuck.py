@@ -3,7 +3,7 @@
 
 """
 Read the Aircraft.air file.The corresponding table of the tail number and the decoding library.
-    Author: Southern Airlines, llgz@csair.com
+    Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
 """
 import csv
 import config_vec as conf
@@ -214,7 +214,7 @@ def usage():
     print('   --allreg           list all REGistration number from "aircraft.air" file.')
     print('   --allver           list all DataVer number from "aircraft.air" file.')
     print('   --alltype          list all aircraft Type from "aircraft.air" file.')
-    print(u'\n               Author: Southern Airlines, llgz@csair.com')
+    print(u'\n               Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com')
     print()
     return
 if __name__=='__main__':
