@@ -101,18 +101,18 @@ class ARINC717():
     '''
    From ArIinc 573/717 Aligned format file, get parameters
     '''
-    def __init__(self,fpath, fname, dataver):
+    def __init__(self,fpath, fname):
         '''
       For example variables used to save configuration parameters
         '''
         # self.air=None
         self.datapath= fpath
         self.fra=None
-        self.fra_dataver= dataver
+        self.fra_dataver=''
         self.par=None
-        self.par_dataver= dataver
+        self.par_dataver=''
         self.qar=None
-        self.qar_filename=""
+        self.qar_filename= ""
         if len(fname)>0:
             self.qar_file(fname)
 
@@ -120,17 +120,17 @@ class ARINC717():
         #----------Open the DAR/QAR file-----------
         if self.qar is None or self.qar_filename != qar_filename:
             #read into buffer
-            fp=open(self.datapath + qar_filename,'rb')
-            self.qar=fp.read()
+            file = open(self.datapath + qar_filename,'rb')
+            self.qar=file.read()
             self.qar_filename=qar_filename
-            fp.close()
+            file.close()
 
         self.readFRA()
         self.readPAR()
 
     def get_param(self, parameter):
-        fra =self.getFRA(parameter)
-        par =self.getPAR(parameter)
+        fra = self.getFRA(parameter)
+        par = self.getPAR(parameter)
         if len(fra)<1:
             print('Empty dataVer.',flush=True)
             return []
@@ -637,8 +637,8 @@ class ARINC717():
     def get_arinc429(self, frame_pos, param_set, word_sec ):
         '''
         According to FRA configuration, obtain 32bit word in the Arinc429 format
-          Another: There are multiple different records in the FRA configuration, corresponding to multiple 32bit word (completed)
-          BIT position is numbered from 1.Word position is also numbered from 1.The position of synchronization is 1, and the data word is from 2 (assuming that synchronous words only occupy 1Word).
+        Another: There are multiple different records in the FRA configuration, corresponding to multiple 32bit word (completed)
+        BIT position is numbered from 1.Word position is also numbered from 1.The position of synchronization is 1, and the data word is from 2 (assuming that synchronous words only occupy 1Word).
         Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         value=0
@@ -669,7 +669,7 @@ class ARINC717():
         '''
         Read two bytes and take 12bit as a word.The low position is in front.LittleEndian, Low-Byte First.
         Support 12bits, 24bits, 36bits, 48bits, 60bits
-           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         buf=self.qar
         #print(type(buf), type(buf[pos]), type(buf[pos+1])) #bytes, int, int
@@ -693,7 +693,7 @@ class ARINC717():
 
     def readPAR(self):
         'Read PAR configuration'
-        dataver=self.dataVer()
+        dataver=self.dataVer(self.getREG())
         # if isinstance(dataver,(str,float)):
         #     dataver=int(dataver)
         # if str(dataver).startswith('787'):
@@ -708,7 +708,7 @@ class ARINC717():
         '''
         Get the position configuration of the 32bit word of the parameter in Arinc429
         Pick out useful, sort it out, return
-           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         self.readPAR()
         if self.par is None or len(self.par)<1:
@@ -747,7 +747,7 @@ class ARINC717():
 
     def readFRA(self):
         'Read FRA configuration'
-        dataver=self.dataVer()
+        dataver=self.dataVer(self.getREG())
         # if isinstance(dataver,(str,float)):
         #     dataver=int(dataver)
         # if str(dataver).startswith('787'):
@@ -762,7 +762,7 @@ class ARINC717():
         '''
         Get the position configuration of the 12bit word of the parameter in Arinc717
         Pick out useful, sort it out, return
-           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         self.readFRA()
         if self.fra is None:
@@ -792,7 +792,7 @@ class ARINC717():
                         tmp[ii][6],   #bitLen, A total of several bits
                         tmp[ii][7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits
                         # tmp[ii][12],  #Occurence No
-                        tmp[ii][8],   #Imposed,Computed
+                        tmp[ii][8],   #Location Type(Imposed,Computed)
                         ]
                     ret2.append(tmp2)
             #---find superframe parameter----
@@ -880,19 +880,17 @@ class ARINC717():
     #     if self.air is None:
     #         self.air=AIR.air(conf.aircraft)
 
-    # def getREG(self):
-    #     '''
-    #     From the ZIP file name, find the tail number of the machine
-    #        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
-    #     '''
-    #     basename=os.path.basename(self.qar_filename)
-    #     reg=basename.strip().split('_',1)
-    #     if len(reg[0])>6: #787's file name is useless
-    #         return reg[0][:6]
-    #     elif len(reg[0])>0:
-    #         return reg[0]
-    #     else:
-    #         return ''
+    def getREG(self):
+        '''
+        From the DAT file name, find the tail number of the machine
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        basename=os.path.basename(self.qar_filename)
+        reg=basename.strip().split('-',1)
+        if len(reg[0]) > 0:
+            return reg[0]
+        else:
+            return ''
     def paramlist(self):
         '''
         Get all the records of all record parameters, including Regular and Superframe parameters
@@ -906,11 +904,21 @@ class ARINC717():
         for vv in self.fra['4']:
             super_list.append(vv[0])
         return regular_list,super_list
-    def dataVer(self):
+    def dataVer(self, acReg):
         '''
         Get the dataver of the current file
         '''
-        return self.fra_dataver
+        #list of registrations for each registration number
+        #create a list of registrations for each registration number
+
+        dataver5471 = ['N2002J']
+        dataver5461 = ['N703JB']
+        if acReg in dataver5471:
+            return '5471'
+        elif acReg in dataver5461:
+            return '5461'
+
+        return ''
     def close(self):
         'Clear all configuration and data reserved'
         # self.air=None
@@ -944,8 +952,10 @@ def usage():
 
 if __name__=='__main__':
     # usage()
-    # MyQAR=ARINC717('N2002J-REC25038.DAT', '5471')
-    # print(MyQAR.get_param('ACID3'))
-    # MyQAR.close()
+    FPATH='/workspaces/FlightDataDecode/DataFrames/'
+    myQAR=ARINC717(FPATH, 'N2002J-REC25038.DAT')
+    reg = myQAR.getREG()
+    # print(myQAR.get_param('ACID3'))
+    # myQAR.close()
     exit()
 

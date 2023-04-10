@@ -1,18 +1,18 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
+import psutil         #Non -essential library
 import pandas as pd
 import Get_param_from_arinc717_aligned_717Chuck as A717
 
 def main():
-    global DATAVER, FNAME,WFNAME,DUMPDATA
+    global FNAME,WFNAME,DUMPDATA
     global PARAM,PARAMLIST
 
-    print('mem:',sysmem())
-    myQAR=A717.ARINC717(FPATH, FNAME, DATAVER)
-    print('mem:',sysmem())
+    #print('mem:',sysmem())
+    myQAR=A717.ARINC717(FPATH, FNAME)
+    #print('mem:',sysmem())
     #print(myQAR.get_param('ACID2'))
-    print('mem:',sysmem())
+    #print('mem:',sysmem())
 
     if PARAMLIST:
         #-----------List all parameter names in the record--------------
@@ -46,7 +46,7 @@ def main():
 
     if PARAM is None:
         #-----------Configuration content of print parameterstion content of print parameters-----------------
-        for vv in ('ALT_STD','AC_TAIL7'):
+        for vv in ('ORIGIN1','ALT_FMC'):
             fra=myQAR.getFRA(vv)
             if len(fra)<1:
                 print('Empty dataVer.')
@@ -66,10 +66,10 @@ def main():
             PARAM=PARAM.upper()
             print('The parameter "%s" did not find it, or failed to get.'% PARAM)
             print(pm_list)
-            print('DataVer:',myQAR.dataVer())
+            print('DataVer:',myQAR.dataVer(myQAR.getREG()))
             return
         print('Result[0]:',pm_list[0]) #Print the first set of values
-        print('DataVer:',myQAR.dataVer())
+        print('DataVer:',myQAR.dataVer(myQAR.getREG()))
 
         df_pm=pd.DataFrame(pm_list)
 
@@ -87,10 +87,10 @@ def main():
         else:
             print( df_pm['v'][10:90].tolist() )
 
-    print('mem:',sysmem())
+    #print('mem:',sysmem())
     myQAR.close()
-    print('closed.')
-    print('mem:',sysmem())
+    #print('closed.')
+    #print('mem:',sysmem())
     return
 
 def showsize(size):
@@ -108,7 +108,7 @@ def showsize(size):
     size /=1024.0
     if size<1024.0*2:
         return '%.2f G'%(size)
-import psutil         #Non -essential library
+
 def sysmem():
     '''
     Get the memory occupied by the Python program
@@ -135,6 +135,7 @@ def usage():
 
     print()
     return
+
 if __name__=='__main__':
     # if(len(sys.argv)<2):
     #     usage()
@@ -145,13 +146,13 @@ if __name__=='__main__':
     #     print(e)
     #     usage()
     #     exit(2)
-    DATAVER='5461' #Frame Version
     FPATH='/workspaces/FlightDataDecode/DataFrames/'
     FNAME='N703JB-REC25134.DAT' #DAT Filename
+    #FNAME='N2002J-REC25038.DAT'
     WFNAME=None # FPATH + 'extract.csv.gz' #csv  or .csv.gz filenae
-    DUMPDATA=False
-    PARAMLIST=False
-    PARAM='ACID2' #what Parameter to extract
+    DUMPDATA=False #True,False
+    PARAMLIST=False #True,Fals
+    PARAM='ACID1' #what Parameter to extract
 
     # for op,value in opts:
     #     if op in ('-h','--help'):
