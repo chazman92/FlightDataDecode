@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import os,sys,getopt
 import psutil         #Non -essential library
 import pandas as pd
 import Get_param_from_arinc717_aligned_717Chuck as A717
@@ -117,7 +118,7 @@ def sysmem():
     #size = psutil.process (os.getpid ()). Memory_full_info (). Uss #actual physical memory used
     return showsize(size)
 
-import os,sys,getopt
+
 def usage():
     print(u'Usage:')
     print(u'   Command line tool.')
@@ -152,7 +153,7 @@ if __name__=='__main__':
     WFNAME=None # FPATH + 'extract.csv.gz' #csv  or .csv.gz filenae
     DUMPDATA=False #True,False
     PARAMLIST=False #True,Fals
-    PARAM='ACID1' #what Parameter to extract
+    PARAM='DEST_OR' #what Parameter to extract
 
     # for op,value in opts:
     #     if op in ('-h','--help'):

@@ -1,3 +1,55 @@
+class darPlusDecoder:  
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.data = self.loadfile()
+        self.icd = self.loadicd()
+    
+    #load darPlus File
+    def loadfile(self):
+        with open(self.filename, 'r') as f:
+            data = f.readlines()
+        return data
+
+    #load ICD File
+    def loadicd(self):
+        icd = ICD()
+        icdPath = '/workspaces/FlightDataDecode/DarPlusDecoder/ICD_Chuck.icd'
+        icd.Load(FileDir= icdPath)
+        return icd
+    
+    #decode darPlus File
+    def read_darplus(self):
+        for line in self.data:
+            strip_line=line.strip('\r\n //')
+            split_line = strip_line.split(',')
+            if split_line[0] == 'timestamp':
+                continue
+            if split_line[2] == '110':
+                result = self.decode_label_110(split_line)
+            if split_line[2] == '111':
+                result = self.decode_label_110(split_line)
+            if split_line[2] == '120':
+                continue
+            if split_line[2] == '121':
+                continue
+ 
+    #decode label 110
+    def decode_label_110(self, payload):
+        hex_string = payload[5]
+        int_number = int(hex_string, 16)
+        print(bin(int_number))
+        return {
+                    'time' :payload[0],
+                    'label':payload[2],
+                    'data': bin(int_number)
+                    }
+            #decode label 110
+    def decode_label_111(self, payload):
+        
+        
+        return value
+
 class Frame:
 
     _SSM_Table=("Failure Warning",
@@ -163,6 +215,7 @@ class ICD:
             ICDfile=open(FileDir)
         except:
             return Exception(4)
+
         for line in ICDfile:
             if line[0] == '#':
                 continue
@@ -244,6 +297,6 @@ class Exception:
         if   Code != 0:
             self.message += "\nError code: " + str(Code)
 
-if __name__ == "__main__":
-    print("ARINC429 library by RossWorks.")
-    print("Please refer to documentation to learn how to use this library")
+# if __name__ == "__main__":
+#     print("ARINC429 library by RossWorks.")
+#     print("Please refer to documentation to learn how to use this library")
