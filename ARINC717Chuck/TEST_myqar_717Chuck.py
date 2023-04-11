@@ -118,7 +118,6 @@ def sysmem():
     #size = psutil.process (os.getpid ()). Memory_full_info (). Uss #actual physical memory used
     return showsize(size)
 
-
 def usage():
     print(u'Usage:')
     print(u'   Command line tool.')
