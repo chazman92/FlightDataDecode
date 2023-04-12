@@ -370,6 +370,7 @@ class ARINC717():
         param_set=self.getDataFrameSet(fra['2'],word_sec)  #Configuration of sorting parameter position records
 
         #----------Data Type Warning-----------
+        #Need to update for Jetblue Parameter files
         if par['type'].find('BCD')!=0 and \
                 par['type'].find('BNR LINEAR (A*X)')!=0 and \
                 par['type'].find('BNR SEGMENTS (A*X+B)')!=0 and \
@@ -954,7 +955,7 @@ if __name__=='__main__':
     # usage()
     FPATH='/workspaces/FlightDataDecode/DataFrames/'
     myQAR=ARINC717(FPATH, 'N2002J-REC25038.DAT')
-    reg = myQAR.getREG()
+    #reg = myQAR.getREG()
     # print(myQAR.get_param('ACID3'))
     # myQAR.close()
     exit()
