@@ -959,4 +959,3 @@ if __name__=='__main__':
     # print(myQAR.get_param('ACID3'))
     # myQAR.close()
     exit()
-
