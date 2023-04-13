@@ -633,7 +633,7 @@ class ARINC717():
             #Other types that cannot be recognized, press BNR by default
             #Here, no need to give an error prompt
             pass
-        return value 
+        return value
 
     def get_arinc429(self, frame_pos, param_set, word_sec ):
         '''
