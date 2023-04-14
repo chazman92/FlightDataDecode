@@ -91,7 +91,7 @@ Only support ArinC 573/717 Aligned format
   --------------------------
 '''
 The primitive ArinC 573/717 PCM file should be processed first, change 12bits to 16bits storage, and use the empty Frame to make up the missing Frame structure.
- The program will be read in the aligned bit format format.
+The program will be read in the aligned bit format format.
 """
 import os,sys
 import read_fra_717Chuck as FRA
@@ -305,7 +305,7 @@ class ARINC717():
         '''
         Judging the position of the first frame, if not, push 1 frame and find it back.
         According to the content of Superframe_Counter, find the Frame position of the value as FIRST VALUE
-           Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         pm_sec=0.0   #The timeline of the parameter, the number of seconds
         while True:
