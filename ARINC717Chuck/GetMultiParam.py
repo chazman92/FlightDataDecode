@@ -5,13 +5,13 @@ def main():
     #param = getOriginDestination(myDAR)
     #param = getAircraftID(myDAR)
     #param = getPresentPosition(myDAR)
-    param = getFlightID(myDAR)
-    #param = getParameter(myDAR, "LONP")
+    #param = getFlightID(myDAR)
+    param = getParameter(myDAR, "UTC")
     print(param)
 
 def getParameter(myDAR, param):
     Param = myDAR.get_param(param)
-    return  Param[0]
+    return  Param
 
 def getFlightID(myDAR,):
     FLINUM1 = myDAR.get_param('FLINUM1')

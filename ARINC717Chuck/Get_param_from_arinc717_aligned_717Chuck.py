@@ -523,9 +523,9 @@ class ARINC717():
             return self.arinc429_BCD_decode(word ,conf)
         elif conf['type'].find('UTC')==0:
             val=self.arinc429_BNR_decode(word ,conf)
-            ss= val & 0x3f         #6bits
-            mm= (val >>6) & 0x3f   #6bits
-            hh= (val >>12) & 0x1f  #5bits
+            ss= val & 0x3f         #6bits get first 6bits
+            mm= (val >>6) & 0x3f   #6bits shift 6 bits and get the next 6 bits
+            hh= (val >>12) & 0x1f  #5bits shift 12 bits and get the next 5 bits
             return '%02d:%02d:%02d' % (hh,mm,ss)
         else:
             return self.arinc429_BNR_decode(word ,conf)
@@ -615,7 +615,7 @@ class ARINC717():
         value = ( word >> (conf['pos'] - conf['blen']) ) & bits
 
         #Symbol
-        if conf['signBit']>0:
+        if conf['signBit']>0:  #This checks sign bit and uses two's complement
             bits = 1 << (conf['signBit']-1)  #Bit bit number starts from 1, so -1
             if word & bits:
                 value -= 1 << conf['blen']
