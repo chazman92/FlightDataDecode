@@ -193,7 +193,7 @@ class ARINC717():
                 'word':int(vv[2]),
                 'bout':int(vv[3]),
                 'blen':int(vv[4]),
-                'counterNo' :int(vv[5]),
+                #'counterNo' :int(vv[5]),
                 }
             super_set.append(p_set)
         super_set=super_set[0] #Only the first item, usually a super parameter only corresponds to one frameno
@@ -219,7 +219,7 @@ class ARINC717():
                 'blen':int(vv[5]),  #But because the content in Super_Set is 12,12.So the final configuration is used here.
                 'bin' :int(vv[6]),
                 'occur' : -1,
-                'resol': float(vv[7]), #resolution
+                #'resol': float(vv[7]), #resolution
                 'period':int(vv[1]),
                 })
         if len(p_set)>0: #Last group
@@ -807,15 +807,16 @@ class ARINC717():
             if len(idx)>0:  #Find a record
                 superframeNo=tmp[ idx[0] ][3] #Take the value in the first record found
                 for ii in idx:
+                    #// 4|0Superframe Parameter Name	1Part(1,2 or 3)	2Period Of	3Superframe No	4Frame	5Output Word (Bit Out)	6Output Word (Data Bits)	7Input Raw Data (Bit In)
                     tmp2=[ #superframe Single parameter record
                         tmp[ii][1],   #part(1,2,3),There will be multiple sets of records, corresponding to multiple 32bit words. The same group of up to 3 parts, 3 parts read out separately, write the same 32bit word.
-                        tmp[ii][2],   #period, In the cycle, every few frames appear once
+                        tmp[ii][2],   #period of, In the cycle, every few frames appear once
                         tmp[ii][3],   #superframe no, Corresponding to the Superframe No
                         tmp[ii][4],   #Frame,  Located in the first few Frames (by superframe counter, find Frame with number 1)
                         tmp[ii][5],   #bitOut, In 12bit, several bits start
                         tmp[ii][6],   #bitLen, A total of several bits
                         tmp[ii][7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits
-                        tmp[ii][10],  #resolution, Unused
+                        #tmp[ii][10],  #resolution, Unused
                         ]
                     ret4.append(tmp2)
                 tmp=self.fra['3']
@@ -827,13 +828,14 @@ class ARINC717():
 
                 if len(idx)>0:  #Find the record, usually there must be records
                     for ii in idx:
+                        #// 3|0Superframe No	1Superframe Word Location (Subframe)	2Superframe Word Location (Word)	3Superframe Word Location (Bit Out)	4Superframe Word Location (Data Bits)
                         tmp2=[ #superframe Global configuration
                             tmp[ii][0],   #superframe no
                             tmp[ii][1],   #subframe,Which subframe is located (1-4)
                             tmp[ii][2],   #word, In Subframe, several Word (SYNC WORD number is 1)
                             tmp[ii][3],   #bitOut, In 12bit, several bits start (usually = 12)
                             tmp[ii][4],   #bitLen, A total of several bits (usually = 12)
-                            tmp[ii][5],   #superframe couter 1/2, Corresponding to the number of counters in the total configuration of Frame
+                            #tmp[ii][5],   #superframe couter 1/2, Corresponding to the number of counters in the total configuration of Frame
                             ]
                         ret3.append(tmp2)
 

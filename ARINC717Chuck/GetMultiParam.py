@@ -6,8 +6,9 @@ def main():
     #param = getAircraftID(myDAR)
     #param = getPresentPosition(myDAR)
     #param = getFlightID(myDAR)
-    param = getParameter(myDAR, "UTC")
-    print(param)
+    param = getParameter(myDAR, "ZFW")
+    print (param)
+    #print(param[0], param[len(param)-1])
 
 def getParameter(myDAR, param):
     Param = myDAR.get_param(param)
