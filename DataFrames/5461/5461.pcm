@@ -1,0 +1,2 @@
+// PCMCIA configuration	Ratio for the DAR data continuous recording (0 to 100)	Ratio for the SAR data continuous recording (0 to 100)	Ratio for the Report data continuous recording (0 to 100)	DAR recording option when ratio is reached (Y for Delete oldest record,N for Stop recording)	ACARS message inhibition in case of PCMCIA disk removal (Y for yes,N for No)	Time delay after disk removal detection (sec)	Advisory message	CFDS failure message inhibition in case of: No Disk ('Y' or 'N'), Disk Full ('Y' or 'N')
+90	0	10	Y	Y	0	PCMCIA has been removed	Y	Y	0	Y

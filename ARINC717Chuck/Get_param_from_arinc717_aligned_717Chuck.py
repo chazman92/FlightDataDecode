@@ -171,8 +171,8 @@ class ARINC717():
                 'word':int(fra['1'][7]),
                 'bout':int(fra['1'][8]),
                 'blen':int(fra['1'][9]),
-                'peh':int(fra['1'][10]),
-                # 'bin' :12,
+                #'v_first':int(fra['1'][10]),# this does not seem to exist in the configuration file for Jetblue
+                'bin' :12,
                 # 'occur': -1,
                 },
                 #Counter2 does not read from the configuration file (TODO)
@@ -193,7 +193,8 @@ class ARINC717():
                 'word':int(vv[2]),
                 'bout':int(vv[3]),
                 'blen':int(vv[4]),
-                #'counterNo' :int(vv[5]),
+                #'counterNo' :int(vv[5]), We dont have a superframe coutner in our FRA file
+                'counterNo' : 1, #hardcoded to 1 for Jetblue
                 }
             super_set.append(p_set)
         super_set=super_set[0] #Only the first item, usually a super parameter only corresponds to one frameno
@@ -263,9 +264,12 @@ class ARINC717():
         #print('counter sep:',frame_counter,period,bin(count_mask) )
 
         #----------Looking for the starting position of Superframe-----------
-        val_first=super_set['counterNo'] #superframe counter 1/2
+        val_first=super_set['counterNo'] #superframe counter 1/2 #Jetblue doesnt have a counter hardcoded to 1
         if val_first==2: val_first=1  #Counter2 does not read from the configuration (TODO)
-        val_first=superframe_counter_set[val_first-1]['v_first']
+        #val_first=superframe_counter_set[val_first-1]['v_first']
+        val_first=2145
+        
+        #What is value first?
         pm_sec=0.0   #Parameter of the timeline, seconds number
         frame_pos,sec_add=self.find_FIRST_super( ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4), val_first, superframe_counter_set, period, count_mask )
         pm_sec += sec_add  #Add time increment
@@ -322,10 +326,10 @@ class ARINC717():
             if count_mask > 0:
                 frame_counter &= count_mask
             if frame_counter==val_first:
-                #print('Found first superframe at x%X, cnter:%d' % (frame_pos, frame_counter) )
+                print('Found first superframe at x%X, cnter:%d' % (frame_pos, frame_counter) )
                 break
             else:
-                print('NotFound first superframe at x%X, cnter:%d' % (frame_pos, frame_counter) ,flush=True)
+                #print('NotFound first superframe at x%X, cnter:%d' % (frame_pos, frame_counter) ,flush=True)
                 pm_sec += 4.0   #A frame is 4 seconds
                 frame_pos += word_sec * 4 * 2   # 4subframe, 2bytes
 
@@ -357,8 +361,9 @@ class ARINC717():
                 'word':int(fra['1'][7]),
                 'bout':int(fra['1'][8]),
                 'blen':int(fra['1'][9]),
-                'peh':int(fra['1'][10]),
-                # 'bin' :12,
+                'v_first':int(fra['1'][10]), #Jetblue doesn't have a v_first param ..its PED in the FRA file
+
+                'bin' :12,
                 # 'occur': -1,
                 }]
         if sync_word_len>1: #If synchronous words> 1 word
@@ -851,7 +856,7 @@ class ARINC717():
                     self.fra['1'][1][8],  #word,     [superframe counter]
                     self.fra['1'][1][9],  #bitOut,   [superframe counter]
                     self.fra['1'][1][10], #bitLen,   [superframe counter]
-                    self.fra['1'][1][11], #Value in 1st frame (0/1), The value of the number of the number 1, the value of the counter (the minimum value of the counter)
+                    self.fra['1'][1][11], #JETBLUE this is PEH duration #Value in 1st frame (0/1), The value of the number of the number 1, the value of the counter (the minimum value of the counter)
                     ],
                  '2':ret2,
                  '3':ret3,

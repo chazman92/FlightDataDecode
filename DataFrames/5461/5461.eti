@@ -1,0 +1,2 @@
+// ETHERNET ip configuration	Default configuration	ARP	Mac address1	Mac address2	Mac address3	Mac address4	Mac address5	Mac address6	Ip address1	Ip address2	Ip address3	Ip address4	DHCP	IP address1	IP address2	IP address3	IP address4	Sub mask1	Sub mask2	Sub mask3	Sub mask4	gateaway1	gateawayé	gateaway3	gateaway4	DNS	PDNS1	PDNS2	PDNS3	PDNS4	SDNS1	SDNS2	SDNS3	SDNS4	local mach	Remote mach
+5|Y	N	00	00	00	00	00	00	0	0	0	0	0	0	0	0	255	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	FDIMU	NSU	Y	N	N

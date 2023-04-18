@@ -1,0 +1,12 @@
+[EXPORT]
+Export Type=A
+Export Date=02/03/2021
+GSE Reference=260766954-0602
+Exported Version=5461
+Modif Level=8
+Version Description=A318,A319,A320,A321, IAE ED48A100 - APU monitoring
+DMU Soft=AI09
+Write Protect=Y
+Components=equipment;parameter;frame;qar;sar;sae;pcmcia;add;logic;report;acars;mcdu;ethernet
+Note=
+0

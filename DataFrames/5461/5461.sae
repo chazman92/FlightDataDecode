@@ -1,0 +1,6 @@
+// 1|Monitoring	Sequence number	Start logic	Data set	M starts	During n flights	ACARS message inhibition(Y/N)	Condition met advisory message
+// 2|Type of SAR (3 for event recording)	Parameter name
+// 3|Data set (1 to 50)	Description
+// 4|Data set(1 to 50)	Parameter name
+// 5|ACARS message inhibition(Y/N)	Memory dump successfull message	Memory dump unsuccessfull message	Automatic retrieval of data statistics by ACARS(day in the month)
+5|Y			0

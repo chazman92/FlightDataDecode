@@ -1,0 +1,6 @@
+// 1| Date ('Nodate' if date is null)	Aircraft/Computed parameter nr	PEH nr	Constant parameter nr
+// 2| Parameter Name	Used Rate(1:0.5Hz,2:1Hz,4:2Hz,8:4Hz,16:8Hz,32:16Hz,64:32Hz)	PEH Rate	J index (-1 if no index)	Z index (-1 if no index)	L index (-1 if no index)
+// 3| Procedure	Used Rate(1:0.5Hz,2:1Hz,4:2Hz,8:4Hz,16:8Hz,32:16Hz,64:32Hz)	J index
+// 4| Report No	Description
+// 5| Report Code	Printer Code(0:No Print,1:Print at Landing,2:Print Immediatly)	ACARS Code(0:No Acars,1:Acars ground,2:Acars Satcom,3:Acars VHF)	If no ACARS trans code(0:Delete,1:Print,2:Store)	If memory is full code(0:Delete,1:Print)
+1|Nodate	0	0	0

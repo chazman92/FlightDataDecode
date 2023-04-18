@@ -1,0 +1,12 @@
+//Parameter name	ACARS label	ACARS sdi	ACARS rate(1:1Hz,2:2Hz)	Output format(0:As received,1:General BCD)
+FT_INNER_1	177	10	1	0
+FT_INNER_2	201	10	1	0
+FUEL_D	272	10	1	0
+FUEL_PR	250	10	1	0
+GS_1	312	01	1	0
+GS_2	312	10	1	0
+LATP_1	310		1	0
+LATP_2	314		1	0
+LONP_1	311		1	0
+LONP_2	315		1	0
+TFUEL	247	10	1	0

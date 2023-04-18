@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-配置文件
-   author:南方航空,llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+Configuration file
+   Author: Southern Airlines, llgz@csair.com - Modified  by Chuck Cook CCook@jetblue.com
 """
 import os
 selfpath=os.path.dirname(os.path.realpath(__file__)) #The directory where the script itself is located

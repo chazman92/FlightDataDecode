@@ -1,0 +1,891 @@
+// 1!no	description	rate(1:1Hz,2:2Hz,4:4Hz,8:8Hz,16:16Hz,32:32Hz)	shortname	visible
+// Body of the procedure
+// 2! End of text
+1!1001	Standard triggering of report 01	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1002	Standard triggering of report 02	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1003	Standard triggering of report 03	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1004	Standard triggering of report 04	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1005	Standard triggering of report 05	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1006	Standard triggering of report 06	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1007	Standard triggering of report 07	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1008	Standard triggering of report 08	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1009	Standard triggering of report 09	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1010	Standard triggering of report 10	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1011	Standard triggering of report 11	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1012	Standard triggering of report 12	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1013	Standard triggering of report 13	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1014	Standard triggering of report 14	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1015	Standard triggering of report 15	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1016	Standard triggering of report 16	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1017	Standard triggering of report 17	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1018	Standard triggering of report 18	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1019	Standard triggering of report 19	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1020	Standard triggering of report 20	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1021	Standard triggering of report 21	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1022	Standard triggering of report 22	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1024	TRUE if APU start in progress (APU_STR_ON_F = 1 & NA > 1%)	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1030	TRUE if fleight mode > 1 and < 9	1		Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1301	FLAP OVERSPEED TRIGGER	1		Y
+l5_0 = FLAP_1_A320 
+l8_0 = CAS_1 
+l2_0 = CAS_1 
+l10_0 = FLAP_1_A320 
+l21_0 = CAS_2 
+l23_0 = FLAP_2_A320 
+l14_0 = CAS_2 
+l16_0 = FLAP_2_A320 
+l30_0 = FLAP_1_A320 
+l28_0 = CAS_2 
+l31_0 = 0 
+l29_0 = 230 
+l17_0 = 15 
+l22_0 = 215 
+l24_0 = 10 
+l15_0 = 200 
+l3_0 = 177 
+l6_0 = 40 
+l9_0 = 185 
+l11_0 = 20 
+l4_0 = ( l2_0 >= l3_0 ) 
+l7_0 = ( l5_0 >= l6_0 ) 
+l13_0 = ( l10_0 >= l11_0 ) 
+l19_0 = ( l16_0 >= l17_0 ) 
+l18_0 = ( l14_0 >= l15_0 ) 
+l12_0 = ( l8_0 >= l9_0 ) 
+l25_0 = ( l21_0 >= l22_0 ) 
+l26_0 = ( l23_0 >= l24_0 ) 
+l32_0 = ( l28_0 >= l29_0 ) 
+l33_0 = ( l30_0 > l31_0 ) 
+l27_0 = l25_0 AND l26_0 
+l38_0 = l32_0 AND l33_0 
+l20_0 = l18_0 AND l19_0 
+l1_0 = l12_0 AND l13_0 
+l0_0 = l4_0 AND l7_0 
+l36_0 = l20_0 OR l27_0 
+l35_0 = l0_0 OR l1_0 
+l37_0 = l35_0 OR l36_0 
+l34_0 = l37_0 OR l38_0 
+IF (l34_0) THEN START ELSE STOP ENDIF 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1303	AST Report Trigger	8		Y
+IF(LDGM_ON=1 AND LDGM_ON(-1)=0 AND FLIMOD_INT>8 AND FLIMOD_INT<12) THEN 
+  START
+ELSE
+  IF(FLIMOD_INT=13 AND FLIMOD_INT(-1)=12) THEN
+     STOP
+  ENDIF
+ENDIF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1304	APU MONITORING REPORT/APU START	1		Y
+//REPORT TRANSMITTED EVERYTIME APU IS STARTED
+IF(FLAGAPUINIT=1) THEN
+  START
+ELSE
+  STOP
+ENDIF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1305	APU MONITORING REPORT/ APU STOP	1		Y
+//REPORT TRANSMITTED EVERYTIME APU IS STOP
+IF(FLAGAPUSTOP=1) THEN
+  START
+ELSE
+  STOP
+ENDIF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1306	APU MONITORING REPORT/ SAR report	1		Y
+//REPORT TRANSMITTED EVERYTIME APU IS STOP
+IF(FLIMOD_INT>=1 AND FLIMOD_INT<=5)THEN 
+START
+ENDIF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1307	APU MONITORING REPORT/ SAR report	1		Y
+//REPORT TRANSMITTED EVERYTIME APU IS STOP
+IF(FLIMOD_INT>=11 AND FLIMOD_INT<=13)THEN 
+START
+ENDIF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1308	Default Start/Stop condition for automatic QAR	1		Y
+IF ((FLIMOD_INT >= 3 )  AND ( FLIMOD_INT < 13 ) )  THEN  
+   START
+ELSE
+   STOP
+ENDIF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!
+1!1999	test logic	1		Y
+ true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2!

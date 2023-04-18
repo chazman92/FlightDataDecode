@@ -1,0 +1,195 @@
+// 1!no	description	rate(1:1HZ,2:2HZ,4:4HZ,8:8HZ,16:16HZ,32:32HZ)	active(Y/N)	shortname	protect	visible
+// Body of the procedure
+// 2! End of text
+1!1	AST Version Code	1	Y		N	Y
+AST_VER='ASTD'
+AST_VER2=015
+VERNUM=61
+DB_LEVEL=07
+2!
+1!2	Markers Speed and Time	8	Y		N	Y
+// OUTER
+// =====
+IF(OUTER_M_ON=1 AND OUTER_M_ON(-1)=0) THEN
+  AST_OUTER_S=GS
+  start_out=1
+ENDIF
+
+IF(FLIMOD_INT<11 AND start_out=1) THEN
+  AST_OUTER_T=AST_OUTER_T+1
+ENDIF  
+
+// MIDDLE
+// ======
+IF(MIDDLE_M_ON=1 AND MIDDLE_M_ON(-1)=0) THEN
+  AST_MIDDLE_S=GS
+  start_mid=1
+ENDIF
+
+IF(FLIMOD_INT<11 AND start_mid=1) THEN
+  AST_MIDDLE_T=AST_MIDDLE_T+1
+ENDIF
+
+// IN
+// ==
+IF(INNER_M_ON=1 AND INNER_M_ON(-1)=0) THEN
+  AST_INNER_S=GS
+  start_in=1
+ENDIF
+
+IF(FLIMOD_INT<11 AND start_in=1) THEN
+  AST_INNER_T=AST_INNER_T+1
+ENDIF
+
+// RESET
+// =====
+IF(FLIMOD_INT=12) THEN
+  AST_OUTER_T=0
+  AST_OUTER_S=0
+  start_out=0
+  AST_MIDDLE_T=0
+  AST_MIDDLE_S=0
+  start_mid=0
+  AST_INNER_T=0
+  AST_INNER_S=0
+  start_IN=0
+ENDIF
+2!
+1!3	APU Computation	1	Y		N	Y
+// Report 35 - APU running report (SMADLANGBAYAN)
+// ================================================================================================
+// APU Run time reset
+// ------------
+IF((APU_MSW_OF(-1)=0)AND(APU_MSW_OF=1)) THEN  
+  APUSTOP_TTT=000000
+  APUSTRT_TTT=000000
+  FLAGAPUSTOP=000000  
+WHEEL_SPEED1=0
+WHEEL_SPEED2=0
+WHEEL_SPEED3=0
+WHEEL_SPEED4=0
+ENDIF
+
+// APU Start Time Computation if APU START before DMU.
+// ================================================================================================
+IF((FLAGAPUINIT=0)AND(APU_MSW_OF(-1)=0 AND APU_MSW_OF=1)) THEN 
+   APUSTRT_TTT=UTC 
+   FLAGAPUINIT=1
+ENDIF
+IF (FLAGAPUINIT=1)THEN
+ wheel_speed=wheel_speed+1
+ENDIF
+
+IF (wheel_speed>=1 AND wheel_speed<=99999) THEN
+MAX(WS1,ws1)
+MAX(WS2,ws2)
+MAX(WS3,ws3)
+MAX(WS4,ws4)
+ENDIF
+ 
+WS_COUNTER=wheel_speed
+
+// APU Stop Time Computation.
+// ===============================================================================================
+IF((APU_MSW_OF(-1)=1)AND(APU_MSW_OF=0)) THEN 
+WHEEL_SPEED1=ws1
+WHEEL_SPEED2=ws2
+WHEEL_SPEED3=ws3
+WHEEL_SPEED4=ws4
+  APUSTOP_TTT=UTC 
+  FLAGAPUSTOP=1
+  FLAGAPUINIT=0
+wheel_speed=0
+ENDIF
+
+2!
+1!4	Origin/Destination computation	1	Y		N	Y
+// Origin/Destination parameter computation.
+// Declaration of local constants
+shift8! = 8
+shift16! = 16
+shift24! = 24
+ 
+  IF ((ISVALID(ORIGIN_1)) AND (ISVALID(ORIGIN_2)) AND (ISVALID(ORIGIN_3)) AND
+      (ISVALID(ORIGIN_4))) THEN
+   ORIGIN_35 = (ORIGIN_1<<shift24!) | (ORIGIN_2<<shift16!) | (ORIGIN_3<<shift8!) | ORIGIN_4
+   SETVALID(ORIGIN_35,1)
+  ELSE
+   SETVALID(ORIGIN_35,0)
+  ENDIF
+ 
+  IF ((ISVALID(DESTIN_1)) AND (ISVALID(DESTIN_2)) AND (ISVALID(DESTIN_3)) AND
+      (ISVALID(DESTIN_4))) THEN
+   DEST_35 = (DESTIN_1<<shift24!) | (DESTIN_2<<shift16!) | (DESTIN_3<<shift8!) | DESTIN_4
+   SETVALID(DEST_35,1)
+  ELSE
+   SETVALID(DEST_35,0)
+  ENDIF
+
+IF (ORIGIN#0000) THEN
+ ORIGIN_STN=ORIGIN
+ELSE IF (ORIGIN=0000) THEN
+ORIGIN_STN='NODT'
+ENDIF
+ ENDIF
+
+
+IF (DESTINATIO#0000)THEN
+DEST_STN=DESTINATIO
+ELSE IF (DESTINATIO=0000) THEN
+DEST_STN='NODT'
+ENDIF
+ ENDIF
+
+FLINUM_35=FLINUM
+
+IF (FLIMOD_INT>=2 AND FLIMOD_INT<=13) THEN
+ LATP_APU=LATP
+ LONP_APU=LONP
+ENDIF
+IF (LATP=00000 OR LONP=00000)THEN
+ LATP_APU_35=LATP_APU
+ LONP_APU_35=LONP_APU
+ELSE 
+ LATP_APU_35=LATP
+ LONP_APU_35=LONP
+ENDIF
+ 
+
+2!
+1!5	ENG START/STOP TIME	1	Y		N	Y
+// Report 35 - APU RUNNING REPORT (SMADLANGBAYAN)
+// ================================================================================================
+// ENGINE Run time Counter initilization
+// ------------
+IF((ENG1_MLVR_ON(-1)=0 AND ENG1_MLVR_ON>=1)) THEN  
+  ENG1STRT_TTT=000000  
+  ENG1STOP_TTT=000000
+ENDIF
+IF ((ENG2_MLVR_ON(-1)=0 AND ENG2_MLVR_ON>=1)) THEN
+  ENG2STRT_TTT=000000
+  ENG2STOP_TTT=000000
+ENDIF
+
+// ENG1 ENG2 START TIME.
+// ================================================================================================
+IF((ENG1_MLVR_ON(-1)=0 AND ENG1_MLVR_ON>=1)) THEN 
+   ENG1STRT_TTT=UTC 
+ENDIF
+IF ((ENG2_MLVR_ON(-1)=0 AND ENG2_MLVR_ON>=1)) THEN 
+   ENG2STRT_TTT=UTC 
+ENDIF
+
+// ENG1 ENG2 STOP TIME.
+// ===============================================================================================
+IF((ENG1_MLVR_ON(-1)=1)AND(ENG1_MLVR_ON=0)) THEN 
+  ENG1STOP_TTT=UTC 
+  ENDIF
+IF((ENG2_MLVR_ON(-1)=1)AND(ENG2_MLVR_ON=0)) THEN 
+  ENG2STOP_TTT=UTC 
+  ENDIF
+
+
+
+
+2!
