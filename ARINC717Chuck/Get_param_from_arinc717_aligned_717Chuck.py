@@ -188,13 +188,13 @@ class ARINC717():
         super_set=[]
         for vv in fra['3']: #All content becomes int
             p_set={  #Temporary variables
-                'frameNo':int(vv[0]),
-                'sub' :int(vv[1]),
-                'word':int(vv[2]),
+                'frameNo':int(vv[0]), #Superframe number (jetblue only has one)
+                'sub' :int(vv[1]), #subframe where superframe parameter is located
+                'word':int(vv[2]), #word within supframe where superframe parameter is located
                 'bout':int(vv[3]),
                 'blen':int(vv[4]),
                 #'counterNo' :int(vv[5]), We dont have a superframe coutner in our FRA file
-                'counterNo' : 1, #hardcoded to 1 for Jetblue
+                'counterNo' : 1, #hardcoded to 1 for Jetblue this is not working
                 }
             super_set.append(p_set)
         super_set=super_set[0] #Only the first item, usually a super parameter only corresponds to one frameno
@@ -214,14 +214,14 @@ class ARINC717():
             p_set.append({
                 'part':vv[0],
                 'rate': 1,
-                'sub' :super_set['sub'],
-                'word':super_set['word'] + (int(vv[3])-1) * word_sec * 4, #subframe + (Frame-1) * word_sec *4
+                'sub' :super_set['sub'], #superframe located in this (Sub)frame
+                'word':super_set['word'] + (int(vv[3])-1) * word_sec * 4, #subframe + ({super(sub)}Frame-1) * word_sec *4(total words/frame)  #Location of parameter in 16 frame super frame (ie .. ZFW is in the 3rd (super)frame of the 16 frame (super) frame, so after the first two 4sec frames (2048 subrames) (2* 256*4) it should be the 97th word (superparameter location) in the third frame)
                 'bout':int(vv[4]),  #The following two bouts, blen should be set in Super_Set. After obtaining the data, use the configuration here to remove the final bits.
                 'blen':int(vv[5]),  #But because the content in Super_Set is 12,12.So the final configuration is used here.
                 'bin' :int(vv[6]),
-                'occur' : -1,
+                'occur' : -1,#not sure what this is
                 #'resol': float(vv[7]), #resolution
-                'period':int(vv[1]),
+                'period':int(vv[1]), #how many frames in superframe period 
                 })
         if len(p_set)>0: #Last group
             superpm_set.append(p_set)
@@ -261,14 +261,13 @@ class ARINC717():
             #count_mask= 0xf
         else:
             count_mask= 0
-        #print('counter sep:',frame_counter,period,bin(count_mask) )
+        print('counter sep:',frame_counter,period,bin(count_mask) )
 
         #----------Looking for the starting position of Superframe-----------
         val_first=super_set['counterNo'] #superframe counter 1/2 #Jetblue doesnt have a counter hardcoded to 1
         if val_first==2: val_first=1  #Counter2 does not read from the configuration (TODO)
         #val_first=superframe_counter_set[val_first-1]['v_first']
-        val_first=2145
-        
+        val_first=14
         #What is value first?
         pm_sec=0.0   #Parameter of the timeline, seconds number
         frame_pos,sec_add=self.find_FIRST_super( ttl_len, frame_pos, word_sec, sync_word_len, (sync1,sync2,sync3,sync4), val_first, superframe_counter_set, period, count_mask )
@@ -325,6 +324,7 @@ class ARINC717():
             frame_counter=self.get_arinc429( frame_pos, superframe_counter_set, word_sec )
             if count_mask > 0:
                 frame_counter &= count_mask
+            print("frame_counter: " + str(frame_counter))
             if frame_counter==val_first:
                 print('Found first superframe at x%X, cnter:%d' % (frame_pos, frame_counter) )
                 break
@@ -685,17 +685,19 @@ class ARINC717():
             if pos+1 >= ttl:
                 return 0  #Excellence returns 0
             else:
+                print("word: " + hex(((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF) + " position: " + str(pos)) #Prints hex value of word returned
                 return ((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF
 
         #Word_len> 1 // Only by getting a synchronous word greater than 1 word can it useful
-        word=0
-        for ii in range(0,word_len):
-            if pos+ii*2+1 >= ttl:
-                high = 0
-            else:
-                high = ((buf[pos+ii*2+1] << 8 ) | buf[pos +ii*2] ) & 0xFFF
-            word |= high << (12 * ii)
-        return word
+        #unreachable code due to hardcoded word_len=1
+        # word=0
+        # for ii in range(0,word_len):
+        #     if pos+ii*2+1 >= ttl:
+        #         high = 0
+        #     else:
+        #         high = ((buf[pos+ii*2+1] << 8 ) | buf[pos +ii*2] ) & 0xFFF
+        #     word |= high << (12 * ii)
+        # return word
 
     def readPAR(self):
         'Read PAR configuration'

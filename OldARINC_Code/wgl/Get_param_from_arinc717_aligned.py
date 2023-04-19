@@ -528,7 +528,7 @@ def get_param(fra,par):
 
 def find_SYNC1(buf, ttl_len, frame_pos, word_sec, sync_word_len, sync):
     '''
-    判断 frame_pos 位置，是否满足同步字特征。如果不满足, 继续寻找下一个起始位置
+   Determine whether the Frame_POS position meets the characteristics of synchronization.If not satisfied, continue to find the next starting location
     '''
     #ttl_len=len(buf)
     while frame_pos<ttl_len - sync_word_len *2:  #寻找frame开始位置
