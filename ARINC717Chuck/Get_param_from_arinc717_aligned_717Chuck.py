@@ -921,13 +921,18 @@ class ARINC717():
         #list of registrations for each registration number
         #create a list of registrations for each registration number
 
-        dataver5471 = ['N2002J']
-        dataver5461 = ['N703JB']
+        dataver5471 = ['N2002J', 'N2102J', 'N4048J'] #A321NEO
+        dataver5461 = ['N639JB'] #N531JB-N779JB
+        dataver5445 = ['N784JB','N805JB'] #N784JB-N999JB
+        dataver5419 = ['N503JB'] #N503JB-N529JB
         if acReg in dataver5471:
             return '5471'
         elif acReg in dataver5461:
             return '5461'
-
+        elif acReg in dataver5445:
+            return '5445'
+        elif acReg in dataver5419: 
+            return '5419'
         return ''
     def close(self):
         'Clear all configuration and data reserved'
