@@ -99,7 +99,7 @@ import read_par_717Chuck as PAR
 
 class ARINC717():
     '''
-   From ArIinc 573/717 Aligned format file, get parameters
+    From ArIinc 573/717 Aligned format file, get parameters
     '''
     def __init__(self,fpath, fname):
         '''
@@ -255,6 +255,7 @@ class ARINC717():
         #Some libraries are increased by 1, n period.Some are increasing 256, a period cycle.
         #Determine MASK according to the counter value in the two Frames.
         frame_counter  = self.get_arinc429( frame_pos, superframe_counter_set, word_sec )
+        #print('counter:',frame_counter,frame_pos)
         frame_counter -= self.get_arinc429( frame_pos + word_sec * 4 * 2, superframe_counter_set, word_sec )
         if abs(frame_counter) ==1:
             count_mask = ( 1 << int(pow(period, 0.5)) ) -1  #SQRT: POW (x, 0.5) or (x ** 0.5)
@@ -685,7 +686,7 @@ class ARINC717():
             if pos+1 >= ttl:
                 return 0  #Excellence returns 0
             else:
-                print("word: " + hex(((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF) + " position: " + str(pos)) #Prints hex value of word returned
+                #print("word: " + hex(((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF) + " position: " + str(pos)) #Prints hex value of word returned
                 return ((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF
 
         #Word_len> 1 // Only by getting a synchronous word greater than 1 word can it useful
@@ -865,31 +866,6 @@ class ARINC717():
                  '4':ret4,
                 }
 
-    # def getAIR(self):
-    #     '''
-    #     Get the configuration of the decoding library corresponding to the tail number.
-    #     Pick out useful, sort it out, return
-    #        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
-    #     '''
-    #     reg=self.getREG().upper()
-    #     self.readAIR()
-    #     idx=0
-    #     for row in self.air: #Find a machine tail number
-    #         if row[0]==reg: break
-    #         idx +=1
-    #     if idx<len(self.air):  #Find a record
-    #         return [self.air[idx][12], #dataver
-    #                 self.air[idx][13], #dataver2
-    #                 self.air[idx][16], #recorderType
-    #                 self.air[idx][17]] #recorderType2
-    #     else:
-    #         return [0,0,'','']  #did not find
-
-    # def readAIR(self):
-    #     'Read AIR configuration'
-    #     if self.air is None:
-    #         self.air=AIR.air(conf.aircraft)
-
     def getREG(self):
         '''
         From the DAT file name, find the tail number of the machine
@@ -901,6 +877,7 @@ class ARINC717():
             return reg[0]
         else:
             return ''
+    
     def paramlist(self):
         '''
         Get all the records of all record parameters, including Regular and Superframe parameters
@@ -914,6 +891,7 @@ class ARINC717():
         for vv in self.fra['4']:
             super_list.append(vv[0])
         return regular_list,super_list
+    
     def dataVer(self, acReg):
         '''
         Get the dataver of the current file
@@ -934,6 +912,7 @@ class ARINC717():
         elif acReg in dataver5419: 
             return '5419'
         return ''
+    
     def close(self):
         'Clear all configuration and data reserved'
         # self.air=None
@@ -943,8 +922,6 @@ class ARINC717():
         self.par_dataver=-1
         self.qar=None
         self.qar_filename=''
-
-
 
 def usage():
     print()
