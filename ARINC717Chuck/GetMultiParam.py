@@ -40,7 +40,7 @@ def getOriginDestination(myDAR):
     return ORIGIN1[0]["v"][::-1] + DEST_OR[0]["v"][::-1] + DEST2[0]["v"][::-1]
 
 if __name__=='__main__':
-    FPATH='/workspaces/FlightDataDecode/DataFrames/'
+    FPATH='../FlightDataDecode/DataFrames/'
     #FNAME='N703JB-REC25134.DAT' #DAT Filename
     FNAME='N2002J-REC25038.DAT'
     main()
