@@ -230,8 +230,8 @@ if __name__=='__main__':
     #     usage()
     #     exit(2)
 
-    data_path = '/workspaces/FlightDataDecode/ARINC429Chuck/DataFrames/'
-    FNAME = data_path + '5461.par'
+    data_path = '../FlightDataDecode/ARINC429Chuck/DataFrames/'
+    FNAME = data_path + '5419.par'
     DUMPDATA=False
     TOCSV=''
     PARAMLIST=False

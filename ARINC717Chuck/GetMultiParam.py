@@ -43,6 +43,6 @@ if __name__=='__main__':
     FPATH='../FlightDataDecode/DataFrames/'
     #FNAME='N703JB-REC25134.DAT' #DAT Filename
     #FNAME='N2002J-REC25038.DAT'
-    #FNAME='N639JB-DAR_REC23868.DAT'
-    FNAME='N805JB-QAR_REC00159.DAT'
+    FNAME='N639JB-DAR_REC23868.DAT'
+    #FNAME='N805JB-QAR_REC00159.DAT'
     main()
