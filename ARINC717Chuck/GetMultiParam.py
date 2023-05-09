@@ -2,9 +2,9 @@ import Get_param_from_arinc717_aligned_717Chuck as A717
 
 def main():
     myDAR=A717.ARINC717(FPATH, FNAME)
-    param = getOriginDestination(myDAR)
+    #param = getOriginDestination(myDAR)
     #param = getAircraftID(myDAR)
-    #param = getPresentPosition(myDAR)
+    param = getPresentPosition(myDAR)
     #param = getFlightID(myDAR)
     #param = getParameter(myDAR, "ZFCG")
     print (param)
@@ -42,7 +42,7 @@ def getOriginDestination(myDAR):
 if __name__=='__main__':
     FPATH='../FlightDataDecode/DataFrames/'
     #FNAME='N703JB-REC25134.DAT' #DAT Filename
-    #FNAME='N2002J-REC25038.DAT'
-    FNAME='N639JB-DAR_REC23868.DAT'
+    FNAME='N2002J-REC25038.DAT'
+    #FNAME='N639JB-DAR_REC23868.DAT'
     #FNAME='N805JB-QAR_REC00159.DAT'
     main()
