@@ -1,13 +1,23 @@
+from datetime import datetime
+import csv
+
+
 class darPlusDecoder:  
 
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, filepath, filename):
+        self.full_filename = filepath + filename
         self.data = self.loadfile()
-        self.icd = self.loadicd()
+        self.tailnumber = self.Split_Tailnumber_From_Filename(filename)
+        self.darplus_results = []
+        #self.icd = self.loadicd()
+    
+    def Split_Tailnumber_From_Filename(self, filename):
+     parts = filename.split('_')
+     return parts[0]
     
     #load darPlus File
     def loadfile(self):
-        with open(self.filename, 'r') as f:
+        with open(self.full_filename, 'r') as f:
             data = f.readlines()
         return data
 
@@ -25,30 +35,66 @@ class darPlusDecoder:
             split_line = strip_line.split(',')
             if split_line[0] == 'timestamp':
                 continue
-            if split_line[2] == '110':
-                result = self.decode_label_110(split_line)
-            if split_line[2] == '111':
-                result = self.decode_label_110(split_line)
-            if split_line[2] == '120':
+            if split_line[1] == '9': #lineid 9
+                if split_line[2] == '205': #429 label 205
+                    result = self.decode_label_205(split_line)
+                    self.darplus_results.append(result)
                 continue
-            if split_line[2] == '121':
-                continue
+            # if split_line[2] == '111':
+            #     result = self.decode_label_110(split_line)
+            # if split_line[2] == '120':
+            #     continue
+            # if split_line[2] == '121':
+            #     continue
  
-    #decode label 110
-    def decode_label_110(self, payload):
-        hex_string = payload[5]
-        int_number = int(hex_string, 16)
-        print(bin(int_number))
+    #convert Unix Epoch to UTC
+    def convert_epoch_to_utc(self, epoch):
+        epoch_time_in_seconds = epoch / 1000.0
+        return datetime.utcfromtimestamp(epoch_time_in_seconds).strftime('%Y-%m-%d %H:%M:%S')
+    
+    #decode label 205 lineid 9
+    def decode_label_205(self, payload):
+        binary_range = 65536
+        engineering_range = 4.096
+        #hex_string = payload[5]
+        #truncated_hex = hex_string[1:-1] #in 429 example only bits 28-13 are used representing the middle hex number
+        #int_number = int(truncated_hex, 16)
+        extracted_decimal = self.extract_429_bits_from_hex(payload[5], 13, 28)
+        mach = extracted_decimal * (engineering_range / binary_range)
         return {
-                    'time' :payload[0],
-                    'label':payload[2],
-                    'data': bin(int_number)
+                    'tailnumber':self.tailnumber,
+                    'time' :self.convert_epoch_to_utc(int(payload[0])),
+                    'label':'Mach',
+                    'data': round(mach, 4)
                     }
-            #decode label 110
-    def decode_label_111(self, payload):
+    
+
+    def extract_429_bits_from_hex(self, hex_num, start_bit, end_bit):
+        # Step 1: Convert hex to binary
+        bin_num = bin(int(hex_num, 16))[2:]
+        padded_bin_num = bin_num.zfill(24)
+
+        # Step 2: Extract specific bits
+        extracted_bits = padded_bin_num[-(end_bit-9):-(start_bit-9)] # -9 because we are only using the middle 16 bits of the 24 bit hex number
+
+        # Step 3: Convert the extracted bits back to decimal
+        decimal_result = int(extracted_bits, 2)
+            
+        return decimal_result
+
+    def write_dict_to_csv(self, data, file_name):
+        # Automatically determine the field names (keys in the dictionaries)
+        fields = data[0].keys() if data else []
         
-        
-        return value
+        # Open the file in write mode
+        with open(file_name, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fields)
+            
+            # Write the header
+            writer.writeheader()
+            
+            # Write the data
+            writer.writerows(data)
 
 class Frame:
 
@@ -172,14 +218,13 @@ class Frame:
         return LogicalData
 
 class ICD:
+    #<timestamp>,<line id>,<label>,<subframe>,<word>,<value><LF>
     class DataField:
         Name       : str
-        Encoding   : str
-        MSB        : int
-        LSB        : int
-        SDI        : str
-        Type       : str
-        Resolution : float
+        LineId   : str
+        Label        : int
+        Subframe        : int
+        Word        : str
 
         def __init__(self,
                      Name,
@@ -197,16 +242,16 @@ class ICD:
             self.Type       = Type
             self.Resolution = Resolution
 
-    _ChannelList  = []
+    _LineIdList  = [1,2,3,4,5,6]
     _Content      = {}
     Valid  : bool = False
 
     def __init__(self) -> None:
         pass
 
-    def GetChannelList(self) -> list:
-        return self._ChannelList
-
+    def GetLineIdList(self) -> list:
+        return self._LineIdList
+#
     def Load(self,
              FileDir : str) -> Exception:
         TmpLine = [str]
@@ -222,11 +267,11 @@ class ICD:
             TmpLine=str.split(line,sep=';')
             if len(TmpLine) <= 1:
                 return Exception(5)
-            Channel = TmpLine[1]
+            LineId = TmpLine[1]
             Label   = TmpLine[2]
-            Key     = Channel + ';' + Label
-            if Channel not in self._ChannelList:
-                self._ChannelList.append(Channel)
+            Key     = LineId + ';' + Label
+            if LineId not in self._LineIdList:
+                self._ChannelList.append(LineId)
             if TmpLine[7] == "":
                 TmpLine[7] = 0.0
             TmpField = self.DataField(Name       = TmpLine[0],
