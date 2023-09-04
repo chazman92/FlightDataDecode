@@ -99,35 +99,10 @@ class darPlusDecoder:
                     'data': round(darplus_result, 4)
                     }
 
-    def decode_label_205(self, payload):
-        binary_range = 65536
-        engineering_range = 4.096
-        #hex_string = payload[5]
-        #truncated_hex = hex_string[1:-1] #in 429 example only bits 28-13 are used representing the middle hex number
-        #int_number = int(truncated_hex, 16)
-        extracted_decimal = self.extract_429_bits_from_hex(payload[5], 13, 28)
-        mach = extracted_decimal * (engineering_range / binary_range)
-        return mach
-
-    def decode_label_1(self, word):
-        # binary_range = 65536
-        # engineering_range = 4.096
-        # #hex_string = payload[5]
-        # #truncated_hex = hex_string[1:-1] #in 429 example only bits 28-13 are used representing the middle hex number
-        # #int_number = int(truncated_hex, 16)
-        # extracted_decimal = self.extract_429_bits_from_hex(payload[5], 13, 28)
-        # mach = extracted_decimal * (engineering_range / binary_range)
-
-        #According to Blen, obtain the mask value
-        bits= (1 << 19) -1
-        #Move the value to the right (move to BIT0) and get the value
-        value = ( word >> ((19+11) - 19) ) & bits
-        return value * sign
-
     def get_label_from_lineid(self, lineid, darplus_429label, darplus_A717label):
         # Try to retrieve the label number
-        if lineid == '1' and darplus_429label == "1":
-             print('lineid 18')
+        # if lineid == '1' and darplus_429label == "1":
+        #      print('lineid 18')
         if darplus_429label is not '':
             try:
                 labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters'].keys()
@@ -155,8 +130,6 @@ class darPlusDecoder:
                 return None
         else:
             return None
-
-
 
     def extract_429_bits_from_hex(self, hex_num, start_bit, end_bit):
         # Step 1: Convert hex to binary
