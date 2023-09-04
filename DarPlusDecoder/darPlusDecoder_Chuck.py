@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import csv
+import json
 import re
 
 
@@ -8,31 +9,27 @@ class darPlusDecoder:
 
     def __init__(self, filepath, filename, framepath):
         self.full_filename = filepath + filename
+        self.darplus_labels = self.GetDataVerJson()
         self.dataversion = self.GetDataVer(self.Split_acReg_From_Filename(filename))
         self.data = self.load_darplus_file()
         self.acReg = self.Split_acReg_From_Filename(filename)
         self.darplus_results = []
         self.icd = self.loadicd(framepath)
 
+    def GetDataVerJson(self):
+        # Read JSON data from file
+        with open('FlightDataDecode_Chuck/DarPlusDecoder/darplus_dataframes.json', 'r') as f:
+            data = json.load(f)
+        return data
+    
     def GetDataVer(self, acReg):
         '''
         Get the dataver of the current file
         '''
-        #list of registrations for each registration number
-        #create a list of registrations for each registration number
 
-        dataver5471 = ['N2002J', 'N2102J', 'N4048J'] #A321NEO
-        dataver5461 = ['N639JB'] #N531JB-N779JB
-        dataver5445 = ['N784JB','N805JB', 'N988JT'] #N784JB-N999JB
-        dataver5419 = ['N503JB'] #N503JB-N529JB
-        if acReg in dataver5471:
-            return '5471'
-        elif acReg in dataver5461:
-            return '5461'
-        elif acReg in dataver5445:
-            return '5445'
-        elif acReg in dataver5419: 
-            return '5419'
+        for frame_id, frame_data in self.darplus_labels['DataFrame'].items():
+            if acReg in frame_data['aircraftReg']:
+                return frame_id
         return ''   
     def Split_acReg_From_Filename(self, filename):
         pattern = r'N\d+[A-Z]*'
@@ -61,46 +58,40 @@ class darPlusDecoder:
         for line in self.data:
             strip_line=line.strip('\r\n //')
             split_line = strip_line.split(',')
-            if split_line[0] == 'timestamp':
+
+            epoch_time = split_line[0]
+            darplus_lineid = split_line[1]
+            darplus_429label = split_line[2]
+            darplus_A717label = split_line[4]
+            try:
+                darplus_word = int(split_line[5],16) #convert hex to decimal for bitwise operations
+            except ValueError:
                 continue
-            if split_line[1] == '9': #lineid 9
-                if split_line[2] == '205': #429 label 205
-                    result = self.decode_label_205(split_line)
-                    self.darplus_results.append(result)
+
+            if epoch_time == 'timestamp':
                 continue
-            if split_line[1] == '18': #A717 Biphase
-                if split_line[4] == '78': #DAR Subframe word 22 Aileron position
-                    param_set = self.get_param_spec('AIL_1')
-                    result = self.get_darplus_arinc429(param_set, int(split_line[5],16))
-                    #result = self.decode_A717_word_78(split_line)
-                    self.darplus_results.append(result)
-                continue
- 
-    #decode A717 Biphase subframe 3 word 22
-    def decode_A717_word_78(self, payload):
-        #// 1|Parameter Name	Description	Type Name	Source1 (Equip/Label/SDI)	Source2 (Equip/Label/SDI)	SSM	Sign Bit	MSB	Data Bits	Complement Of	Angle (Y or N)	Offset	Value=Constant Value or Resol=Coef A(Resolution) or ()	Word Range Min	Word Range Max	Operational Range Min	Operational Range Max	Display Format Mode	Positive Sign	Negative Sign	Field Length.Fractional Part	Units	Allowed Categories	Update Date	Update Rate	Internal Format (Float ,Unsigned or Signed)	Hidden Parameter
-        #1|AIL_1	Aileron position left	BNR LINEAR (A*X)	FCDC-1/310/01	FCDC-2/310/10	4	29	28	11	2	N		Resol=.087890625	-180	180	-180	180	DECIMAL	0	N	5.1	DEG	ABCDEFGHIJKLMNOP	1998-03-09	16	Float		Y	Y	1				Y
-        #1|AIL_2	Aileron position right	BNR LINEAR (A*X)	FCDC-1/330/01	FCDC-2/330/10	4	29	28	11	2	N		Resol=.087890625	-180	180	-180	180	DECIMAL	0	N	5.1	DEG	ABCDEFGHIJKLMNOP	1998-03-09	16	Float		Y	Y	1				Y
-        #// 2|Regular Parameter Name	Part(1,2 or 3)	Recording Rate(1 for 1/4Hz,2 for 1/2Hz, 4 for 1 Hz,8 for 2Hz ...)	Output Word (Subframe)	Output Word (Word)	Output Word (Bit Out)	Input Raw Data (Data Bits)	Input Raw Data (Bit In)	Location Type(Imposed or Computed)
-        #2|AIL_1	1	4	1	79	12	1	29	Imposed
-        #2|AIL_1	2	4	1	79	11	9	26	Imposed
-        #2|AIL_2	1	4	1	207	12	1	29	Imposed
-        #2|AIL_2	2	4	1	207	11	9	26	Imposed
-        
-        
-        
-        AIL_1_part1 = self.extract_717_bits_from_hex(payload[5], 11, 12)
-        AIL_1_part1 *= 0.087890625
-        AIL_1_part2 = self.extract_717_bits_from_hex(payload[5], 1, 10)
-        AIL_1_part2 *= 0.087890625
-        #mach = extracted_decimal * (engineering_range / binary_range)
+            darplus_parameter = self.get_label_from_lineid(darplus_lineid, darplus_429label, darplus_A717label)
+            if darplus_parameter is not None:
+                if darplus_lineid == '9': #lineid 9
+                    if darplus_parameter == "MACH": #429 label 205
+                        result = self.decode_label_205(split_line)
+                        self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
+                    continue
+                elif darplus_lineid == '18': #A717 Biphase
+                        param_set = self.get_param_spec(darplus_parameter) #get the FRA file data for the parameter
+                        par_set = self.icd.getPAR(darplus_parameter)
+                        A429word = self.get_darplus_arinc429(param_set, darplus_word)
+                        result = self.arinc429_BNR_decode(A429word, par_set)
+                        self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
+
+    def export_darplus_results(self, epoch_time, darplus_result, darplus_parameter):
         return {
                     'tailnumber':self.acReg,
-                    'time' :self.convert_epoch_to_utc(int(payload[0])),
-                    'label':'Aileeon Position Left',
-                    'data': str(round(AIL_1_part1, 4)) + ':' + str(round(AIL_1_part2, 4))
+                    'time' :self.convert_epoch_to_utc(epoch_time),
+                    'label':darplus_parameter,
+                    'data': round(darplus_result, 4)
                     }
-    #decode label 205 lineid 9
+
     def decode_label_205(self, payload):
         binary_range = 65536
         engineering_range = 4.096
@@ -109,23 +100,42 @@ class darPlusDecoder:
         #int_number = int(truncated_hex, 16)
         extracted_decimal = self.extract_429_bits_from_hex(payload[5], 13, 28)
         mach = extracted_decimal * (engineering_range / binary_range)
-        return {
-                    'tailnumber':self.acReg,
-                    'time' :self.convert_epoch_to_utc(int(payload[0])),
-                    'label':'Mach',
-                    'data': round(mach, 4)
-                    }
-    def extract_717_bits_from_hex(self, hex_num, start_bit, end_bit):
-        # Step 1: Convert hex to binary
-        bin_num = bin(int(hex_num, 16))[2:]
-        padded_bin_num = bin_num.zfill(16)
+        return mach
 
-        # Step 2: Extract specific bits
-        extracted_bits = padded_bin_num[-end_bit:-(start_bit) + 1 if -(start_bit) + 1 != 0 else None] # 
-        # Step 3: Convert the extracted bits back to decimal
-        decimal_result = int(extracted_bits, 2)
-            
-        return decimal_result   
+    def get_label_from_lineid(self, lineid, darplus_429label, darplus_A717label):
+        # Try to retrieve the label number
+        # if lineid == '18' and darplus_A717label == "206":
+        #     print('lineid 18')
+        if darplus_429label is not '':
+            try:
+                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters'].keys()
+                if len(labels) ==1 :
+                    return list(labels)[0]
+            except KeyError:
+                return None
+        elif darplus_A717label is not '':
+            try:
+                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters']
+                # Loop through the keys and values to find the desired value
+                for key, value in labels.items():
+                    if value == darplus_A717label:
+                        return key
+                
+            except KeyError as e:
+                print(f"KeyError: The key {e} does not exist.")
+
+            except json.JSONDecodeError:
+                print("JSONDecodeError: Invalid JSON format.")
+
+            except Exception as e:
+                print(f"An unexpected error occurred: {e}")
+            except KeyError:
+                return None
+        else:
+            return None
+
+
+
     def extract_429_bits_from_hex(self, hex_num, start_bit, end_bit):
         # Step 1: Convert hex to binary
         bin_num = bin(int(hex_num, 16))[2:]
@@ -157,7 +167,7 @@ class darPlusDecoder:
 
     def get_param_spec(self, parameter):
         fra = self.icd.getFRA(parameter)
-        par = self.icd.getPAR(parameter)
+        #par = self.icd.getPAR(parameter)
         if len(fra)<1:
             print('Empty dataVer.',flush=True)
             return []
@@ -203,14 +213,15 @@ class darPlusDecoder:
                 'location' :(vv[7]) if len(vv[7])>0 else '',
                 })
         return p_set
-    def get_darplus_arinc429(self, param_set, word):
+    def get_darplus_arinc429(self, param_set, darplus_word):
         '''
         needs input param_set that includes all parts of the parameter
         '''
-
+        #darplus_word = 0xE9 #testing hardcoded darplus word
         value=0
         pre_id=0
         for part_set in param_set:
+            word = darplus_word #using the same darplus word to recompile all parts of A429
             #According to Blen, obtain the mask value
             bits= (1 << part_set['blen']) -1
             #According to BOUT, the mask is moved to the corresponding position
@@ -224,6 +235,58 @@ class darPlusDecoder:
                 word >>= -1 * move
             value |= word
         return value
+    def arinc429_BNR_decode(self, word,conf):
+        '''
+        Take the value from the Arinc429 format
+            conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
+                    'signBit':tmp2.iat[0,6],   #bitLen,SignBit
+                    'pos'   :tmp2.iat[0,7],   #MSB
+                    'blen'  :tmp2.iat[0,8],   #bitLen,DataBits
+                    'part': [{
+                        'id'     :tmp2.iat[0,36],  #Digit
+                        'pos'    :tmp2.iat[0,37],  #MSB
+                        'blen'   :tmp2.iat[0,38],  #bitLen,DataBits
+                    'type'    :tmp2.iat[0,2],     #Type(BCD,CHARACTER)
+                    'format'  :tmp2.iat[0,17],    #Display Format Mode (DECIMAL,ASCII)
+                    'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
+                    'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
+                        }]
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        #According to Blen, obtain the mask value
+        #It shifts the binary 1 to the left by blen bits and then subtracts 1 to create a mask of 1s of blen length.
+        bits= (1 << conf['blen']) -1
+        #Move the value to the right (move to BIT0) and get the value
+        #It performs a right shift to move the specified section to the least significant bit positions and then uses bitwise AND with the bitmask (bits) to isolate the desired section.
+        #Using bitwise AND with a mask is a common technique for isolating specific bits in a binary number. The reason it works is due to the properties of the AND operation:
+        value = ( word >> (conf['pos'] - conf['blen']) ) & bits
+
+        #Symbol
+        #The two's complement is a standard way to represent negative integers in binary.
+        if conf['signBit']>0:  #This checks sign bit and uses two's complement
+            bits = 1 << (conf['signBit']-1)  #Bit bit number starts from 1, so -1
+            #The bitwise AND (&) operation between word and bits checks whether the sign bit is set in the word. 
+            #If the result is non-zero, that means the sign bit is set, indicating a negative number.
+            if word & bits:
+                #If the number is negative, you convert it to its two's complement representation by subtracting 2**conf['blen'] (which is equivalent to 1 << conf['blen']). 
+                #The -= operator modifies value in-place.
+                value -= 1 << conf['blen']
+        #Resolution
+        if conf['type'].find('BNR LINEAR (A*X)')==0:
+            if conf['Resol'].find('Resol=')==0:
+                value *= float(conf['Resol'][6:])
+        elif conf['type'].find('BNR SEGMENTS (A*X+B)')==0:
+            if len(conf['A'])>0:
+                value *= float(conf['A'])
+            if len(conf['B'])>0:
+                value += float(conf['B'])
+        else:
+            #---- Knowing Packed Bits, UTC, Discrete, you should process it according to BNR ---
+            #Other types that cannot be recognized, press BNR by default
+            #Here, no need to give an error prompt
+            pass
+        return value
+
 class ICD:
 
     def __init__(self,fpath, frame_version):

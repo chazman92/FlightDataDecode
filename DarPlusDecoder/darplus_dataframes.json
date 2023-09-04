@@ -1,0 +1,85 @@
+{
+    "DataFrame": {
+        "5445": {
+            "aircraftReg": ["N988JT", "N784JB", "N805JB"],
+            "LineId": {
+                "18": [
+                    {
+                        "Parameters": {
+                            "AIL_1": "78",
+                            "AIL_2": "206"
+                        }
+                    }
+                ],
+                "9": [
+                    {
+                        "Parameters": {
+                            "MACH": "205"
+                        }
+                    }
+                ]
+            }
+        },
+        "5419": {    
+            "aircraftReg": ["N503JB"],
+            "LineId": {
+                "18": [
+                    {
+                        "Parameters": {
+                            "AIL_1": "39",
+                            "AIL_2": "103"
+                        }
+                    }
+                ],
+                "9": [
+                    {
+                        "Parameters": {
+                            "MACH": "205"
+                        }
+                    }
+                ]
+            }
+        },
+        "5471": {    
+            "aircraftReg": ["N2002J", "N2102J", "N4048J"],
+            "LineId": {
+                "18": [
+                    {
+                        "Parameters": {
+                            "AIL_1": "78",
+                            "AIL_2": "206"
+                        }
+                    }
+                ],
+                "9": [
+                    {
+                        "Parameters": {
+                            "MACH": "205"
+                        }
+                    }
+                ]
+            }
+        },
+        "5461": {    
+            "aircraftReg": ["N639JB"],
+            "LineId": {
+                "18": [
+                    {
+                        "Parameters": {
+                            "AIL_1": "78",
+                            "AIL_2": "206"
+                        }
+                    }
+                ],
+                "9": [
+                    {
+                        "Parameters": {
+                            "MACH": "205"
+                        }
+                    }
+                ]
+            }
+        }
+
+    }
+}

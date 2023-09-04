@@ -617,14 +617,22 @@ class ARINC717():
         Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
         #According to Blen, obtain the mask value
+        #It shifts the binary 1 to the left by blen bits and then subtracts 1 to create a mask of 1s of blen length.
         bits= (1 << conf['blen']) -1
         #Move the value to the right (move to BIT0) and get the value
+        #It performs a right shift to move the specified section to the least significant bit positions and then uses bitwise AND with the bitmask (bits) to isolate the desired section.
+        #Using bitwise AND with a mask is a common technique for isolating specific bits in a binary number. The reason it works is due to the properties of the AND operation:
         value = ( word >> (conf['pos'] - conf['blen']) ) & bits
 
         #Symbol
+        #The two's complement is a standard way to represent negative integers in binary.
         if conf['signBit']>0:  #This checks sign bit and uses two's complement
             bits = 1 << (conf['signBit']-1)  #Bit bit number starts from 1, so -1
+            #The bitwise AND (&) operation between word and bits checks whether the sign bit is set in the word. 
+            #If the result is non-zero, that means the sign bit is set, indicating a negative number.
             if word & bits:
+                #If the number is negative, you convert it to its two's complement representation by subtracting 2**conf['blen'] (which is equivalent to 1 << conf['blen']). 
+                #The -= operator modifies value in-place.
                 value -= 1 << conf['blen']
         #Resolution
         if conf['type'].find('BNR LINEAR (A*X)')==0:
@@ -644,7 +652,7 @@ class ARINC717():
 
     def get_arinc429(self, frame_pos, param_set, word_sec ):
         '''
-        According to FRA configuration, obtain 32bit word in the Arinc429 format
+        According to FRA configuration, rebuild the 32bit word in the Arinc429 format
         Another: There are multiple different records in the FRA configuration, corresponding to multiple 32bit word (completed)
         BIT position is numbered from 1.Word position is also numbered from 1.The position of synchronization is 1, and the data word is from 2 (assuming that synchronous words only occupy 1Word).
         Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
@@ -663,13 +671,13 @@ class ARINC717():
             bits= (1 << pm_set['blen']) -1
             #According to BOUT, the mask is moved to the corresponding position
             bits <<= pm_set['bout'] - pm_set['blen']
-            word &= bits  #Obtain
-            #Move the value to the target location
-            move=pm_set['bin'] - pm_set['bout']
+            word &= bits  #Obtain the value of the corresponding position using the bitmask
+            move=pm_set['bin'] - pm_set['bout'] #Move the value to the target location from A717 back into A429 location
             if move>0:
                 word <<= move
             elif move<0:
                 word >>= -1 * move
+            #this next line performs a bitwise OR between the values of word between multiple parts.  Becasue the parts do not overlap, the or function essentially puts two binary parts together    
             value |= word
         return value
 
@@ -687,7 +695,7 @@ class ARINC717():
             if pos+1 >= ttl:
                 return 0  #Excellence returns 0
             else:
-                #print("word: " + hex(((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF) + " position: " + str(pos)) #Prints hex value of word returned
+                print("word: " + hex(((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF) + " position: " + str(pos)) #Prints hex value of word returned
                 return ((buf[pos +1] << 8 ) | buf[pos] ) & 0xFFF
 
         #Word_len> 1 // Only by getting a synchronous word greater than 1 word can it useful
