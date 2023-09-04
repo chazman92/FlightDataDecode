@@ -1,35 +1,63 @@
 from datetime import datetime
+
 import csv
+import re
 
 
 class darPlusDecoder:  
 
-    def __init__(self, filepath, filename):
+    def __init__(self, filepath, filename, framepath):
         self.full_filename = filepath + filename
-        self.data = self.loadfile()
-        self.tailnumber = self.Split_Tailnumber_From_Filename(filename)
+        self.dataversion = self.GetDataVer(self.Split_acReg_From_Filename(filename))
+        self.data = self.load_darplus_file()
+        self.acReg = self.Split_acReg_From_Filename(filename)
         self.darplus_results = []
-        #self.icd = self.loadicd()
-    
-    def Split_Tailnumber_From_Filename(self, filename):
-     parts = filename.split('_')
-     return parts[0]
+        self.icd = self.loadicd(framepath)
+
+    def GetDataVer(self, acReg):
+        '''
+        Get the dataver of the current file
+        '''
+        #list of registrations for each registration number
+        #create a list of registrations for each registration number
+
+        dataver5471 = ['N2002J', 'N2102J', 'N4048J'] #A321NEO
+        dataver5461 = ['N639JB'] #N531JB-N779JB
+        dataver5445 = ['N784JB','N805JB', 'N988JT'] #N784JB-N999JB
+        dataver5419 = ['N503JB'] #N503JB-N529JB
+        if acReg in dataver5471:
+            return '5471'
+        elif acReg in dataver5461:
+            return '5461'
+        elif acReg in dataver5445:
+            return '5445'
+        elif acReg in dataver5419: 
+            return '5419'
+        return ''   
+    def Split_acReg_From_Filename(self, filename):
+        pattern = r'N\d+[A-Z]*'
+        match = re.search(pattern, filename)
+
+        if match:
+            aircraft_identifier = match.group()
+            return aircraft_identifier
+        else:
+            print("No match found.")
+            return ''
     
     #load darPlus File
-    def loadfile(self):
+    def load_darplus_file(self):
         with open(self.full_filename, 'r') as f:
             data = f.readlines()
         return data
 
     #load ICD File
-    def loadicd(self):
-        icd = ICD()
-        icdPath = '/workspaces/FlightDataDecode/DarPlusDecoder/ICD_Chuck.icd'
-        icd.Load(FileDir= icdPath)
+    def loadicd(self, framepath):
+        icd = ICD(framepath, self.dataversion)
         return icd
     
     #decode darPlus File
-    def read_darplus(self):
+    def decode_darplus(self):
         for line in self.data:
             strip_line=line.strip('\r\n //')
             split_line = strip_line.split(',')
@@ -40,18 +68,38 @@ class darPlusDecoder:
                     result = self.decode_label_205(split_line)
                     self.darplus_results.append(result)
                 continue
-            # if split_line[2] == '111':
-            #     result = self.decode_label_110(split_line)
-            # if split_line[2] == '120':
-            #     continue
-            # if split_line[2] == '121':
-            #     continue
+            if split_line[1] == '18': #A717 Biphase
+                if split_line[4] == '78': #DAR Subframe word 22 Aileron position
+                    param_set = self.get_param_spec('AIL_1')
+                    result = self.get_darplus_arinc429(param_set, int(split_line[5],16))
+                    #result = self.decode_A717_word_78(split_line)
+                    self.darplus_results.append(result)
+                continue
  
-    #convert Unix Epoch to UTC
-    def convert_epoch_to_utc(self, epoch):
-        epoch_time_in_seconds = epoch / 1000.0
-        return datetime.utcfromtimestamp(epoch_time_in_seconds).strftime('%Y-%m-%d %H:%M:%S')
-    
+    #decode A717 Biphase subframe 3 word 22
+    def decode_A717_word_78(self, payload):
+        #// 1|Parameter Name	Description	Type Name	Source1 (Equip/Label/SDI)	Source2 (Equip/Label/SDI)	SSM	Sign Bit	MSB	Data Bits	Complement Of	Angle (Y or N)	Offset	Value=Constant Value or Resol=Coef A(Resolution) or ()	Word Range Min	Word Range Max	Operational Range Min	Operational Range Max	Display Format Mode	Positive Sign	Negative Sign	Field Length.Fractional Part	Units	Allowed Categories	Update Date	Update Rate	Internal Format (Float ,Unsigned or Signed)	Hidden Parameter
+        #1|AIL_1	Aileron position left	BNR LINEAR (A*X)	FCDC-1/310/01	FCDC-2/310/10	4	29	28	11	2	N		Resol=.087890625	-180	180	-180	180	DECIMAL	0	N	5.1	DEG	ABCDEFGHIJKLMNOP	1998-03-09	16	Float		Y	Y	1				Y
+        #1|AIL_2	Aileron position right	BNR LINEAR (A*X)	FCDC-1/330/01	FCDC-2/330/10	4	29	28	11	2	N		Resol=.087890625	-180	180	-180	180	DECIMAL	0	N	5.1	DEG	ABCDEFGHIJKLMNOP	1998-03-09	16	Float		Y	Y	1				Y
+        #// 2|Regular Parameter Name	Part(1,2 or 3)	Recording Rate(1 for 1/4Hz,2 for 1/2Hz, 4 for 1 Hz,8 for 2Hz ...)	Output Word (Subframe)	Output Word (Word)	Output Word (Bit Out)	Input Raw Data (Data Bits)	Input Raw Data (Bit In)	Location Type(Imposed or Computed)
+        #2|AIL_1	1	4	1	79	12	1	29	Imposed
+        #2|AIL_1	2	4	1	79	11	9	26	Imposed
+        #2|AIL_2	1	4	1	207	12	1	29	Imposed
+        #2|AIL_2	2	4	1	207	11	9	26	Imposed
+        
+        
+        
+        AIL_1_part1 = self.extract_717_bits_from_hex(payload[5], 11, 12)
+        AIL_1_part1 *= 0.087890625
+        AIL_1_part2 = self.extract_717_bits_from_hex(payload[5], 1, 10)
+        AIL_1_part2 *= 0.087890625
+        #mach = extracted_decimal * (engineering_range / binary_range)
+        return {
+                    'tailnumber':self.acReg,
+                    'time' :self.convert_epoch_to_utc(int(payload[0])),
+                    'label':'Aileeon Position Left',
+                    'data': str(round(AIL_1_part1, 4)) + ':' + str(round(AIL_1_part2, 4))
+                    }
     #decode label 205 lineid 9
     def decode_label_205(self, payload):
         binary_range = 65536
@@ -62,13 +110,22 @@ class darPlusDecoder:
         extracted_decimal = self.extract_429_bits_from_hex(payload[5], 13, 28)
         mach = extracted_decimal * (engineering_range / binary_range)
         return {
-                    'tailnumber':self.tailnumber,
+                    'tailnumber':self.acReg,
                     'time' :self.convert_epoch_to_utc(int(payload[0])),
                     'label':'Mach',
                     'data': round(mach, 4)
                     }
-    
+    def extract_717_bits_from_hex(self, hex_num, start_bit, end_bit):
+        # Step 1: Convert hex to binary
+        bin_num = bin(int(hex_num, 16))[2:]
+        padded_bin_num = bin_num.zfill(16)
 
+        # Step 2: Extract specific bits
+        extracted_bits = padded_bin_num[-end_bit:-(start_bit) + 1 if -(start_bit) + 1 != 0 else None] # 
+        # Step 3: Convert the extracted bits back to decimal
+        decimal_result = int(extracted_bits, 2)
+            
+        return decimal_result   
     def extract_429_bits_from_hex(self, hex_num, start_bit, end_bit):
         # Step 1: Convert hex to binary
         bin_num = bin(int(hex_num, 16))[2:]
@@ -81,7 +138,9 @@ class darPlusDecoder:
         decimal_result = int(extracted_bits, 2)
             
         return decimal_result
-
+    def convert_epoch_to_utc(self, epoch):
+        epoch_time_in_seconds = epoch / 1000.0
+        return datetime.utcfromtimestamp(epoch_time_in_seconds).strftime('%Y-%m-%d %H:%M:%S')
     def write_dict_to_csv(self, data, file_name):
         # Automatically determine the field names (keys in the dictionaries)
         fields = data[0].keys() if data else []
@@ -96,252 +155,346 @@ class darPlusDecoder:
             # Write the data
             writer.writerows(data)
 
-class Frame:
+    def get_param_spec(self, parameter):
+        fra = self.icd.getFRA(parameter)
+        par = self.icd.getPAR(parameter)
+        if len(fra)<1:
+            print('Empty dataVer.',flush=True)
+            return []
+        if len(fra['2'])<1 and len(fra['4'])<1:
+            print('Parameter not found.',flush=True)
+            return []
 
-    _SSM_Table=("Failure Warning",
-                "Functional Test",
-                "Not Computed Data",
-                "Normal Operation")
+        if len(fra['2'])>0:
+            param_set=self.getDataFrameSet(fra['2'], fra['1'][0])
 
-    _LogicalFrame : dict = {}
-    _BinaryWord   : str
+        return param_set
+    def getDataFrameSet(self,fra2,word_sec):
+        '''
+        The configuration of the compilation parameters in the ArIinc717 position (position in 12 bit word)
+        If it is not Self-Distant, there will be configuration of each position.Record all the location.
+            You need to make up for other subframes according to the Rate value.
+            For example: Rate = 4, that is, 1-4Subframe.Rate = 2 is in 1,3 or 2,4Subframe.
+        If it is Self-Distant, there is only the configuration of the first position.Based on Rate, make up for all location records and group.
+            You need to make up for other Subframe and Word positions according to the Rate value.
+            Subframe's complement is the same as above. The interval between Word is to determine the number of records with Word/SEC.Uniformly divided into each subframe.
+            Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        # ---Group---
+        group_set=[]
+        p_set=[]  #Temporary variables
+        last_part=0
+        for vv in fra2:
+            vv[0]=int(vv[0]) #part
+            if vv[0]<=last_part:
+                #part=1,2,3 According to part groups
+                group_set.append(p_set)
+                p_set=[]
+            last_part=vv[0]
+            #Rate: 1 = 1/4Hz (a Frame record), 2 = 1/2Hz, 4 = 1Hz (a record of each subframe), 8 = 2Hz, 16 = 4Hz, 32 = 8Hz (8 records per subframe have 8 records per subframe.Cure
+            p_set.append({
+                'part':vv[0],
+                'rate':int(vv[1]),
+                'sub' :int(vv[2]),
+                'word':int(vv[3]),
+                'bout':int(vv[4]),
+                'blen':int(vv[5]),
+                'bin' :int(vv[6]),
+                'location' :(vv[7]) if len(vv[7])>0 else '',
+                })
+        return p_set
+    def get_darplus_arinc429(self, param_set, word):
+        '''
+        needs input param_set that includes all parts of the parameter
+        '''
 
-    def _CheckIntegrity(self,
-                       Frame) -> int:
-        oneCount : int = 0
-        if len(Frame) != 32:
-            return 1
-        for bit in Frame:
-            if (bit != '0' and bit != '1'):
-                return 2
-            if (bit == '1'):
-                oneCount +=1
-        if oneCount % 2 == 0:
-            return 3
-        return 0
-
-    def Decode(self,
-               Frame,
-               ICD = None,
-               Channel : str = "") -> Exception:
-        Label  : str
-        Fields : list
-        self._LogicalFrame.clear()
-        FirstCheck = self._CheckIntegrity(Frame)
-        if FirstCheck != 0:
-            self._LogicalFrame = {}
-            return Exception(FirstCheck)
-        Tmpstr=Frame[24:32]
-        Label = oct(int(Tmpstr[::-1],2))
-        self._LogicalFrame["LABEL"]=Label
-        SSM = Frame[1:3]
-        self._LogicalFrame["SSM"]=self._SSM_Table[int(SSM,2)]
-        SDI = Frame[22:24]
-        self._LogicalFrame["SDI"]=SDI
-        PAYLOAD=Frame[3:22]
-        self._LogicalFrame["PAYLOAD"]=PAYLOAD
-        if (ICD == None):
-            return Exception(0)
-        if not ICD.Valid:
-            return Exception(0)
-        if Channel not in ICD._ChannelList:
-            return Exception(6)
-        Key = Channel + ';' + Label[2::]
-        if not ICD.FindKey(Key):
-            return Exception(7)
-        Fields = ICD._Content[Key]
-        if Fields[0].SDI[0:2] == 'XX':
-            self._AttachSDI()
-        FieldDict = self._ParsePayload(Fields)
-        self._LogicalFrame.update(FieldDict)
-        return Exception(0)
-
-    def GetLogicalData(self) -> dict:
-        return self._LogicalFrame
-
-    def _AttachSDI(self):
-        self._LogicalFrame["PAYLOAD"] += self._LogicalFrame["SDI"]
-        self._LogicalFrame["SDI"] = "Extended label"
-
-    def _ParsePayload(self,
-                      DataFields : list) -> dict:
-        FieldDict = dict()
-        for field in DataFields:
-            if field.Encoding == "BNR":
-                FieldDict[field.Name] = self._DecodeBNR(MSB      = field.MSB,
-                                                        LSB      = field.LSB,
-                                                        DataType = field.Type,
-                                                        Resolution = field.Resolution)
-            elif field.Encoding == "ENUM":
-                FieldDict[field.Name] = self._DecodeENUM(MSB      = field.MSB,
-                                                         LSB      = field.LSB,
-                                                         EnumVal  = field.Type)
-        return FieldDict
-
-    def _DecodeBNR(self,
-                   MSB : int,
-                   LSB : int,
-                   DataType : str,
-                   Resolution : float = 0.0) -> str:
-        payload     : str = self._LogicalFrame["PAYLOAD"]
-        RightBound  = 32 - MSB - 3
-        LeftBound   = 32 - LSB - 3 + 1
-        LogicalData : str = ""
-        if DataType == "INT": #signed integer 2's complement
-            SignBitVal  = -int(payload[RightBound])*pow(2,(len(payload)-1))
-            OtherBits   = int(payload[RightBound+1:LeftBound],base = 2)
-            LogicalData = SignBitVal + OtherBits
-        elif DataType == "UINT": #unsigned integer
-            LogicalData = int(payload[RightBound:LeftBound],base = 2)
-        elif DataType == "FLOAT": #floating point signed number
-            SignBitVal  = -int(payload[RightBound])*pow(2,(len(payload)-1))
-            OtherBits   = int(payload[RightBound+1:LeftBound],base = 2)
-            LogicalData = SignBitVal + OtherBits
-            LogicalData = LogicalData * Resolution
-        else:
-            pass
-        return str(LogicalData)
-
-    def _DecodeENUM(self,
-                    MSB : int,
-                    LSB : int,
-                    EnumVal : str) -> str:
-        payload     : str = self._LogicalFrame["PAYLOAD"]
-        RightBound  = 32 - MSB - 3
-        LeftBound   = 32 - LSB - 3 + 1
-        LogicalData : str = ""
-        EnumList = EnumVal.split(sep=',')
-        Selector = int(payload[RightBound:LeftBound],base = 2)
-        if Selector > len(EnumList):
-            return "ENUM OUT OF BOUND"
-        LogicalData = EnumList[Selector]
-        return LogicalData
-
+        value=0
+        pre_id=0
+        for part_set in param_set:
+            #According to Blen, obtain the mask value
+            bits= (1 << part_set['blen']) -1
+            #According to BOUT, the mask is moved to the corresponding position
+            bits <<= part_set['bout'] - part_set['blen']
+            word &= bits  #Obtain
+            #Move the value to the target location
+            move=part_set['bin'] - part_set['bout']
+            if move>0:
+                word <<= move
+            elif move<0:
+                word >>= -1 * move
+            value |= word
+        return value
 class ICD:
-    #<timestamp>,<line id>,<label>,<subframe>,<word>,<value><LF>
-    class DataField:
-        Name       : str
-        LineId   : str
-        Label        : int
-        Subframe        : int
-        Word        : str
 
-        def __init__(self,
-                     Name,
-                     Encoding,
-                     MSB,
-                     LSB,
-                     SDI,
-                     Type,
-                     Resolution = 0) -> None:
-            self.Name       = Name
-            self.Encoding   = Encoding
-            self.MSB        = MSB
-            self.LSB        = LSB
-            self.SDI        = SDI
-            self.Type       = Type
-            self.Resolution = Resolution
+    def __init__(self,fpath, frame_version):
+        self.datapath=fpath
+        self.dataver=frame_version
+        self.fra=None
+        self.par=None
+        if len(frame_version)>0:
+            self.readFRA()
+            self.readPAR()
 
-    _LineIdList  = [1,2,3,4,5,6]
-    _Content      = {}
-    Valid  : bool = False
-
-    def __init__(self) -> None:
-        pass
-
-    def GetLineIdList(self) -> list:
-        return self._LineIdList
-#
-    def Load(self,
-             FileDir : str) -> Exception:
-        TmpLine = [str]
-        self.Valid   = False
-        try:
-            ICDfile=open(FileDir)
-        except:
-            return Exception(4)
-
-        for line in ICDfile:
-            if line[0] == '#':
-                continue
-            TmpLine=str.split(line,sep=';')
-            if len(TmpLine) <= 1:
-                return Exception(5)
-            LineId = TmpLine[1]
-            Label   = TmpLine[2]
-            Key     = LineId + ';' + Label
-            if LineId not in self._LineIdList:
-                self._ChannelList.append(LineId)
-            if TmpLine[7] == "":
-                TmpLine[7] = 0.0
-            TmpField = self.DataField(Name       = TmpLine[0],
-                                      Encoding   = TmpLine[3],
-                                      MSB        = int(TmpLine[4]),
-                                      LSB        = int(TmpLine[5]),
-                                      Type       = TmpLine[6],
-                                      SDI        = TmpLine[8],
-                                      Resolution = float(TmpLine[7]))
-            if Key not in self._Content:
-                self._Content[Key] = list()
-            self._Content[Key].append(TmpField)
-        ICDfile.close()
-        self._ChannelList.sort()
-        self.Valid = True
-        return Exception(0)
-
-    def FindKey(self,
-                Key : str = "") -> bool:
-        if Key in self._Content:
-            return True
+    def getPAR(self,param):
+        '''
+        Get the position configuration of the 32bit word of the parameter in Arinc429
+        Pick out useful, sort it out, return
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        self.readPAR()
+        if self.par is None or len(self.par)<1:
+            return {}
+        param=param.upper()  #Remodel
+        pm_find=None  #Temporary variables
+        for row in self.par:  #Find the first match record, there will only be a record in PAR
+            if row[0] == param:
+                pm_find=row
+                break
+        if pm_find is None:
+            return {}
         else:
-            return False
+            tmp_part=[]
+            if isinstance(pm_find[43], list):
+                #If there are multiple parts of the configuration of bits, combine it
+                for ii in range(len(pm_find[43])):
+                    tmp_part.append({
+                            'id'  :int(pm_find[43][ii]),  #DIGIT, sequential labeling
+                            'pos' :int(pm_find[44][ii]),  #MSB, starting position
+                            'blen':int(pm_find[45][ii]),  #bitlen, databits, data length
+                            })
+            return {
+                    'ssm'    :int(pm_find[5]) if len(pm_find[5])>0 else -1,   #SSM Rule , (0-15)0,4 
+                    'signBit':int(pm_find[6]) if len(pm_find[6])>0 else -1,   #bitLen,SignBit  ,Symbol position
+                    'pos'   :int(pm_find[7]) if len(pm_find[7])>0 else -1,   #MSB  ,Start position
+                    'blen'  :int(pm_find[8]) if len(pm_find[8])>0 else -1,   #bitLen,DataBits ,The total length of the data part
+                    'part'    :tmp_part,
+                    'type'    :pm_find[2],    #Type(BCD,CHARACTER)
+                    'format'  :pm_find[17],    #Display Format Mode (DECIMAL,ASCII)
+                    'Resol'   :pm_find[12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
+                    'A'       :pm_find[36] if pm_find[36] is not None else '',    #Coef A(Res)
+                    'B'       :pm_find[37] if pm_find[37] is not None else '',    #Coef b
+                    'format'  :pm_find[25],    #Internal Format (Float ,Unsigned or Signed)
+                    }
+    def readPAR(self):
+        'Read PAR configuration'
 
-    def ExtractKey(self,
-                   Key : str) -> list:
-        return self._Content[Key]
+        if self.par is None:
+            self.par=self.read_parameter_file(self.datapath + self.dataver + '.par')
+    def read_parameter_file(self, dataver):
 
-    def Invalidate(self):
-        self.Valid = False
-        self._ChannelList.clear()
-        self._Content.clear()
+        par_conf=[]
+        with open(dataver,'rb') as fp:
+            ki=-1
+            offset=0  #Overturn
+            PAR_offset={}  #Records of various rows, offset and length
+            one_par={}  #Record summary of a single parameter
+            for line in fp.readlines():
+                line=line.decode('utf-8').strip('\r\n //') #strips the // marks and newlines at the beginning of the file header
+                tmp1=line.split('|',1) #splits the pipe from the values
+                tmp2=tmp1[1].split('\t') #Splits the values by tab after the numbered header    
+                if tmp1[0] == '1':  #Beginning of the record
+                    ki +=1
+                    if ki>0:
+                        #print('one_par:',one_par,'\n')
+                        par_conf.append(self.one_PAR(PAR_offset,one_par) )
+                        #if ki==1:
+                        #    print('par_conf(%d):'%len(par_conf), par_conf,'\n')
+                        #    print('PAR_offset:',PAR_offset,'\n')
+                        #if ki>2:
+                        #    break
+                    one_par={}
 
-class Exception:
-    title   : str
-    message : str
-    Code    : int
+                if ki==0:  #File header, record header
+                    if tmp1[0] in PAR_offset: #There should be no duplication in the file header
+                        raise(Exception('ERROR, "%s" in PAR_offset' % (tmp1[0]) ))
+                    else:
+                        PAR_offset[ tmp1[0] ]=[ offset , len(tmp2) ]  #Record records should be in the location of the entire record
+                        offset += len(tmp2)  #Overturn
+                #Record a complete parameter record
+                if tmp1[0] not in one_par:
+                    one_par[ tmp1[0] ]=[]
+                    for jj in tmp2:
+                        one_par[ tmp1[0] ].append( [jj,] )
+                else:
+                    for jj in range( len(tmp2) ):
+                        one_par[ tmp1[0] ][jj].append( tmp2[jj] )
 
-    def __init__(self,Code : int = 0) -> None:
-        self.Code = Code
-        if   Code == 0:
-            self.title   = "No errors"
-            self.message = "Execution exited normally"
-        elif Code == 1:
-            self.title   = "ARINC Frame"
-            self.message = "ARINC Frame is not 32 bits long"
-        elif Code == 2:
-            self.title   = "ARINC Frame"
-            self.message = "ARINC Frame is not binary"
-        elif Code == 3:
-            self.title   = "ARINC Frame"
-            self.message = "ARINC Frame must have odd parity"
-        elif Code == 4:
-            self.title   = "ICD file"
-            self.message = "Unable to open ICD file"
-        elif Code == 5:
-            self.title   = "ICD file"
-            self.message = "Invalid ICD file"
-        elif Code == 6:
-            self.title   = "ARINC Channel"
-            self.message = "Provided invalid ARINC Channel"
-        elif Code == 7:
-            self.title   = "ARINC label"
-            self.message = "ARINC label not found in ICD"
-        else:
-            self.title   = "Unknown exception"
-            self.message = "Unknown exception"
-        if   Code != 0:
-            self.message += "\nError code: " + str(Code)
+                if tmp1[0] == '8': #End of the record
+                    continue
+            par_conf.append(self.one_PAR(PAR_offset,one_par) )
 
-# if __name__ == "__main__":
-#     print("ARINC429 library by RossWorks.")
-#     print("Please refer to documentation to learn how to use this library")
+        return par_conf       #Return to list
+    def one_PAR(self, PAR_offset,one_par):
+        '''
+        Dotted a line of record. A record of a parameter
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        ONE=[]
+        for kk in PAR_offset:  #Each recorded child line
+            for jj in range( PAR_offset[ kk ][1] ):  #According to the length of the child, all are initialized to empty list
+                ONE.append([])
+            if kk in one_par:
+                if PAR_offset[kk][1] != len(one_par[kk]):  #The number of recorded records is incorrect
+                    raise(Exception('one_par[%s] length require %d not %d' % (kk, PAR_offset[kk][1], len(one_par))))
+
+                offset=PAR_offset[ kk ][0]
+                for jj in range( len(one_par[ kk ]) ):  #The corresponding item of One_PAR to the corresponding position of one
+                    ONE[offset+jj].extend( one_par[kk][jj] )
+        for jj in range( len(ONE) ):  #Organize records.Only one record, remove list
+            if len(ONE[jj])==0:
+                ONE[jj]=None
+            elif len(ONE[jj])==1:
+                ONE[jj]=ONE[jj][0]
+
+        #print('ONE(%d):'%len(ONE),  ONE, '\n')
+        return ONE
+    
+    def readFRA(self):
+        'Read FRA configuration'
+        if self.fra is None:
+            self.fra=self.read_frame_file(self.datapath + self.dataver +'.fra')
+    def getFRA(self,param):
+        '''
+        Get the position configuration of the 12bit word of the parameter in Arinc717
+        Pick out useful, sort it out, return
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        self.readFRA()
+        if self.fra is None:
+            return None
+
+        ret2=[]  #for regular
+        ret3=[]  #for superframe
+        ret4=[]  #for superframe pm
+        if len(param)>0:
+            param=param.upper() #Remodel
+            #---find regular parameter----
+            tmp=self.fra['2']
+            idx=[]
+            ii=0
+            for row in tmp: #Find out all the records, one parameter will have multiple records
+                if row[0] == param: idx.append(ii)
+                ii +=1
+
+            if len(idx)>0:  #Find a record
+                for ii in idx:
+                    tmp2=[  #regular Parameter configuration
+                        tmp[ii][1],   #part(1,2,3),There will be multiple sets of records, corresponding to multiple 32bit words. The same group of up to 3 parts, 3 parts read out separately, write the same 32bit word.
+                        tmp[ii][2],   #recordRate,Record frequency (record number/frame)
+                        tmp[ii][3],   #subframe, Which subframe is located (1-4)
+                        tmp[ii][4],   #word, In Subframe, several Word (SYNC WORD number is 1)
+                        tmp[ii][5],   #bitOut, In 12bit, several bits start
+                        tmp[ii][6],   #bitLen, A total of several bits
+                        tmp[ii][7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits
+                        # tmp[ii][12],  #Occurence No
+                        tmp[ii][8],   #Location Type(Imposed,Computed)
+                        ]
+                    ret2.append(tmp2)
+            #---find superframe parameter----
+            tmp=self.fra['4']
+            idx=[]
+            ii=0
+            for row in tmp: #Find out all the records
+                if row[0] == param: idx.append(ii)
+                ii +=1
+
+            if len(idx)>0:  #Find a record
+                superframeNo=tmp[ idx[0] ][3] #Take the value in the first record found
+                for ii in idx:
+                    #// 4|0Superframe Parameter Name	1Part(1,2 or 3)	2Period Of	3Superframe No	4Frame	5Output Word (Bit Out)	6Output Word (Data Bits)	7Input Raw Data (Bit In)
+                    tmp2=[ #superframe Single parameter record
+                        tmp[ii][1],   #part(1,2,3),There will be multiple sets of records, corresponding to multiple 32bit words. The same group of up to 3 parts, 3 parts read out separately, write the same 32bit word.
+                        tmp[ii][2],   #period of, In the cycle, every few frames appear once
+                        tmp[ii][3],   #superframe no, Corresponding to the Superframe No
+                        tmp[ii][4],   #Frame,  Located in the first few Frames (by superframe counter, find Frame with number 1)
+                        tmp[ii][5],   #bitOut, In 12bit, several bits start
+                        tmp[ii][6],   #bitLen, A total of several bits
+                        tmp[ii][7],   #bitIn,  Write into ArinC429's 32bits Word, start with several bits
+                        #tmp[ii][10],  #resolution, Unused
+                        ]
+                    ret4.append(tmp2)
+                tmp=self.fra['3']
+                idx=[]
+                ii=0
+                for row in tmp: #Find out all the records
+                    if row[0] == superframeNo: idx.append(ii)
+                    ii +=1
+
+                if len(idx)>0:  #Find the record, usually there must be records
+                    for ii in idx:
+                        #// 3|0Superframe No	1Superframe Word Location (Subframe)	2Superframe Word Location (Word)	3Superframe Word Location (Bit Out)	4Superframe Word Location (Data Bits)
+                        tmp2=[ #superframe Global configuration
+                            tmp[ii][0],   #superframe no
+                            tmp[ii][1],   #subframe,Which subframe is located (1-4)
+                            tmp[ii][2],   #word, In Subframe, several Word (SYNC WORD number is 1)
+                            tmp[ii][3],   #bitOut, In 12bit, several bits start (usually = 12)
+                            tmp[ii][4],   #bitLen, A total of several bits (usually = 12)
+                            #tmp[ii][5],   #superframe couter 1/2, Corresponding to the number of counters in the total configuration of Frame
+                            ]
+                        ret3.append(tmp2)
+
+        return { '1':
+                [  #Frame Total configuration, up to two records (indicating two counters)
+                    self.fra['1'][1][1],  #Word/Sec, The number per second, the word/subframe
+                    self.fra['1'][1][2],  #sync length, Synchronous word length (bits = 12,24,36)
+                    self.fra['1'][1][3],  #sync1, Synchronous word, first 12bits
+                    self.fra['1'][1][4],  #sync2
+                    self.fra['1'][1][5],  #sync3
+                    self.fra['1'][1][6],  #sync4
+                    self.fra['1'][1][7],  #subframe, [superframe counter],Every frame is available, these 4 items are the position of the counter
+                    self.fra['1'][1][8],  #word,     [superframe counter]
+                    self.fra['1'][1][9],  #bitOut,   [superframe counter]
+                    self.fra['1'][1][10], #bitLen,   [superframe counter]
+                    self.fra['1'][1][11], #JETBLUE this is PEH duration #Value in 1st frame (0/1), The value of the number of the number 1, the value of the counter (the minimum value of the counter)
+                    ],
+                 '2':ret2,
+                 '3':ret3,
+                 '4':ret4,
+                }
+    def read_frame_file(self, dataver):
+        '''
+        fra_conf={
+            '1': [ 
+                [x,x,,....],   <-- items number
+                [x,x,,....],
+                ...
+                ]
+            '2': [
+                [x,x,,....],
+                [x,x,,....],
+                ...
+                ]
+            '3': [
+                [x,x,,....],
+                [x,x,,....],
+                ...
+                ]
+            '4': [
+                [x,x,,....],
+                [x,x,,....],
+                ...
+                ]
+            '1_items': xx,
+            '2_items': xx,
+            '3_items': xx,
+            '4_items': xx,
+
+        }
+        '''
+        fra_conf={}
+        with open(dataver,'rb') as fp:
+            for line in fp.readlines():
+                line_tr=line.decode('utf-8').strip('\r\n //')
+                tmp1=line_tr.split('|',1)
+                tmp2=tmp1[1].split('\t')
+                
+                if tmp1[0] in fra_conf:
+                    if fra_conf[ tmp1[0]+'_items' ] != len(tmp2):
+                        print('ERR,data(%s) length require %d, but %d.' % (tmp1[0], fra_conf[ tmp1[0]+'_items' ], len(tmp2)) )
+                        #raise(Exception('ERR,DataLengthNotSame,data(%s) require %d but %d.'% (tmp1[0], fra_conf[ tmp1[0]+'_items' ], len(tmp2)) ))
+                    fra_conf[ tmp1[0] ].append( tmp2 )
+                else:
+                    fra_conf[ tmp1[0] ]=[ tmp2, ]
+                    fra_conf[ tmp1[0]+'_items' ]=len(tmp2)
+
+        return fra_conf       #Return to list

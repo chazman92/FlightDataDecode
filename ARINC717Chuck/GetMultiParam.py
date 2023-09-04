@@ -4,9 +4,9 @@ def main():
     myDAR=A717.ARINC717(FPATH, FNAME)
     #param = getOriginDestination(myDAR)
     #param = getAircraftID(myDAR)
-    param = getPresentPosition(myDAR)
+    #param = getPresentPosition(myDAR)
     #param = getFlightID(myDAR)
-    #param = getParameter(myDAR, "ZFCG")
+    param = getParameter(myDAR, "AIL_1")
     print (param)
     #print(param[0], param[len(param)-1])
 
@@ -40,9 +40,10 @@ def getOriginDestination(myDAR):
     return ORIGIN1[0]["v"][::-1] + DEST_OR[0]["v"][::-1] + DEST2[0]["v"][::-1]
 
 if __name__=='__main__':
-    FPATH='../FlightDataDecode/DataFrames/'
+    FPATH='/home/vscode/FlightDataDecode_Chuck/DataFrames/'
     #FNAME='N703JB-REC25134.DAT' #DAT Filename
-    FNAME='N2002J-REC25038.DAT'
+    #FNAME='N2002J-REC25038.DAT'
+    FNAME='20230325_N923JB_LAX_REC15773_DAR.DAT'
     #FNAME='N639JB-DAR_REC23868.DAT'
     #FNAME='N805JB-QAR_REC00159.DAT'
     main()

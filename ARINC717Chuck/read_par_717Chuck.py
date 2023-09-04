@@ -235,7 +235,7 @@ if __name__=='__main__':
     DUMPDATA=False
     TOCSV=''
     PARAMLIST=False
-    PARAM=None
+    #PARAM=None
     # for op,value in opts:
     #     if op in ('-h','--help'):
     #         usage()

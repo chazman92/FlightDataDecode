@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import re
 
 """
 Decoding a parameter.
@@ -871,11 +872,17 @@ class ARINC717():
         From the DAT file name, find the tail number of the machine
         Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
         '''
+
         basename=os.path.basename(self.qar_filename)
-        reg=basename.strip().split('-',1)
-        if len(reg[0]) > 0:
-            return reg[0]
+
+        pattern = r'N\d+[A-Z]*'
+        match = re.search(pattern, basename)
+
+        if match:
+            aircraft_identifier = match.group()
+            return aircraft_identifier
         else:
+            print("No match found.")
             return ''
     
     def paramlist(self):
@@ -901,7 +908,7 @@ class ARINC717():
 
         dataver5471 = ['N2002J', 'N2102J', 'N4048J'] #A321NEO
         dataver5461 = ['N639JB'] #N531JB-N779JB
-        dataver5445 = ['N784JB','N805JB'] #N784JB-N999JB
+        dataver5445 = ['N784JB','N805JB','N923JB'] #N784JB-N999JB
         dataver5419 = ['N503JB'] #N503JB-N529JB
         if acReg in dataver5471:
             return '5471'
@@ -945,7 +952,7 @@ def usage():
 if __name__=='__main__':
     # usage()
     FPATH='/workspaces/FlightDataDecode/DataFrames/'
-    myQAR=ARINC717(FPATH, 'N2002J-REC25038.DAT')
+    myQAR=ARINC717(FPATH, '20230325_N923JB_LAX_REC15773_DAR.DAT')
     #reg = myQAR.getREG()
     # print(myQAR.get_param('ACID3'))
     # myQAR.close()

@@ -637,23 +637,23 @@ def arinc429_decode(word,conf):
         return arinc429_BNR_decode(word ,conf)
 
 def arinc429_BCD_decode(word,conf):
-'''
-从 Take the value in the arinc429 format
-        conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
-                'signBit':tmp2.iat[0,6],   #bitLen,SignBit
-                'pos'   :tmp2.iat[0,7],   #MSB
-                'blen'  :tmp2.iat[0,8],   #bitLen,DataBits
-                'part': [{
-                    'id'     :tmp2.iat[0,36],  #Digit
-                    'pos'    :tmp2.iat[0,37],  #MSB
-                    'blen'   :tmp2.iat[0,38],  #bitLen,DataBits
-                'type'    :tmp2.iat[0,2],     #Type(BCD,CHARACTER)
-                'format'  :tmp2.iat[0,17],    #Display Format Mode (DECIMAL,ASCII)
-                'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
-                'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
-                    }]
- Author: Southern Airlines, llgz@csair.com
-    '''
+    #
+    # 从 Take the value in the arinc429 format
+    #         conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
+    #                 'signBit':tmp2.iat[0,6],   #bitLen,SignBit
+    #                 'pos'   :tmp2.iat[0,7],   #MSB
+    #                 'blen'  :tmp2.iat[0,8],   #bitLen,DataBits
+    #                 'part': [{
+    #                     'id'     :tmp2.iat[0,36],  #Digit
+    #                     'pos'    :tmp2.iat[0,37],  #MSB
+    #                     'blen'   :tmp2.iat[0,38],  #bitLen,DataBits
+    #                 'type'    :tmp2.iat[0,2],     #Type(BCD,CHARACTER)
+    #                 'format'  :tmp2.iat[0,17],    #Display Format Mode (DECIMAL,ASCII)
+    #                 'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
+    #                 'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
+    #                     }]
+    #  Author: Southern Airlines, llgz@csair.com
+    # '''
     if conf['type']=='CHARACTER':
         if len(conf['part'])>0:
             #Stepped configuration
