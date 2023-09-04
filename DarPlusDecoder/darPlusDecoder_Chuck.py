@@ -74,16 +74,23 @@ class darPlusDecoder:
             if darplus_parameter is not None:
                 if darplus_lineid == '9': #lineid 9
                     if darplus_parameter == "MACH": #429 label 205
-                        result = self.decode_label_205(split_line)
+                        par_set = self.icd.getPAR(darplus_parameter)
+                        par_set['pos'] -= 8 #subtract 8 because darplus payload does not include label bits
+                        result = self.arinc429_BNR_decode(darplus_word , par_set)
                         self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
-                    continue
+                # elif darplus_lineid == "1": #429 label 205
+                #         if darplus_parameter == "DTG": #429 label 205
+                #             #result = self.decode_label_205(split_line)
+                #             par_set = self.icd.getPAR(darplus_parameter)
+                #             Testresult = self.arinc429_BNR_decode(darplus_word, par_set)
+                #             self.darplus_results.append(self.export_darplus_results(int(epoch_time), Testresult, darplus_parameter))               
                 elif darplus_lineid == '18': #A717 Biphase
                         param_set = self.get_param_spec(darplus_parameter) #get the FRA file data for the parameter
                         par_set = self.icd.getPAR(darplus_parameter)
                         A429word = self.get_darplus_arinc429(param_set, darplus_word)
                         result = self.arinc429_BNR_decode(A429word, par_set)
                         self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
-
+                continue
     def export_darplus_results(self, epoch_time, darplus_result, darplus_parameter):
         return {
                     'tailnumber':self.acReg,
@@ -102,10 +109,25 @@ class darPlusDecoder:
         mach = extracted_decimal * (engineering_range / binary_range)
         return mach
 
+    def decode_label_1(self, word):
+        # binary_range = 65536
+        # engineering_range = 4.096
+        # #hex_string = payload[5]
+        # #truncated_hex = hex_string[1:-1] #in 429 example only bits 28-13 are used representing the middle hex number
+        # #int_number = int(truncated_hex, 16)
+        # extracted_decimal = self.extract_429_bits_from_hex(payload[5], 13, 28)
+        # mach = extracted_decimal * (engineering_range / binary_range)
+
+        #According to Blen, obtain the mask value
+        bits= (1 << 19) -1
+        #Move the value to the right (move to BIT0) and get the value
+        value = ( word >> ((19+11) - 19) ) & bits
+        return value * sign
+
     def get_label_from_lineid(self, lineid, darplus_429label, darplus_A717label):
         # Try to retrieve the label number
-        # if lineid == '18' and darplus_A717label == "206":
-        #     print('lineid 18')
+        if lineid == '1' and darplus_429label == "1":
+             print('lineid 18')
         if darplus_429label is not '':
             try:
                 labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters'].keys()
@@ -259,7 +281,7 @@ class darPlusDecoder:
         #Move the value to the right (move to BIT0) and get the value
         #It performs a right shift to move the specified section to the least significant bit positions and then uses bitwise AND with the bitmask (bits) to isolate the desired section.
         #Using bitwise AND with a mask is a common technique for isolating specific bits in a binary number. The reason it works is due to the properties of the AND operation:
-        value = ( word >> (conf['pos'] - conf['blen']) ) & bits
+        value = ( word >> ((conf['pos']) - conf['blen']) ) & bits # darplus payload does not include label, so subtracting 8 bits from position 
 
         #Symbol
         #The two's complement is a standard way to represent negative integers in binary.
@@ -286,7 +308,66 @@ class darPlusDecoder:
             #Here, no need to give an error prompt
             pass
         return value
+    def arinc429_BCD_decode(self,word,conf):
+        '''
+        Take the value from the Arinc429 format
+            conf=[{ 'ssm'    :tmp2.iat[0,5],   #SSM Rule (0-15)0,4 
+                    'signBit':tmp2.iat[0,6],   #bitLen,SignBit
+                    'pos'   :tmp2.iat[0,7],   #MSB
+                    'blen'  :tmp2.iat[0,8],   #bitLen,DataBits
+                    'part': [{
+                        'id'     :tmp2.iat[0,36],  #Digit
+                        'pos'    :tmp2.iat[0,37],  #MSB
+                        'blen'   :tmp2.iat[0,38],  #bitLen,DataBits
+                    'type'    :tmp2.iat[0,2],     #Type(BCD,CHARACTER)
+                    'format'  :tmp2.iat[0,17],    #Display Format Mode (DECIMAL,ASCII)
+                    'Resol'   :tmp2.iat[0,12],    #Computation:Value=Constant Value or Resol=Coef A(Resolution) or ()
+                    'format'  :tmp2.iat[0,25],    #Internal Format (Float ,Unsigned or Signed)
+                        }]
+        Author: Southern Airlines, llgz@csair.com - Modified by Chuck Cook ccook@jetblue.com
+        '''
+        if conf['type']=='CHARACTER':
+            if len(conf['part'])>0:
+                #Stepically configuration
+                value = ''
+                for vv in conf['part']:
+                    #According to Blen, obtain the mask value
+                    bits= (1 << vv['blen']) -1
+                    #Move the value to the right (move to BIT0) and get the value
+                    tmp = ( word >> (vv['pos'] - vv['blen']) ) & bits
+                    value +=  chr(tmp)
+            else:
+                #According to BLEN, get the mask value
+                bits= (1 << conf['blen']) -1
+                #Move the value to the right (move to BIT0) and get the value
+                value = ( word >> (conf['pos'] - conf['blen']) ) & bits
+                value =  chr(value)
+            #print (value)
+            return value
+        else:  #BCD
+            #Symbol
+            sign=1
+            if conf['signBit']>0:
+                bits=1
+                bits <<= conf['signBit']-1  #Bit bit number starts from 1, so -1
+                if word & bits:
+                    sign=-1
 
+            if len(conf['part'])>0:
+                #Stepically configuration
+                value = 0
+                for vv in conf['part']:
+                    #According to Blen, obtain the mask value
+                    bits= (1 << vv['blen']) -1
+                    #Move the value to the right (move to BIT0) and get the value
+                    tmp = ( word >> (vv['pos'] - vv['blen']) ) & bits 
+                    value = value * 10 + tmp
+            else:
+                #According to Blen, obtain the mask value
+                bits= (1 << conf['blen']) -1
+                #Move the value to the right (move to BIT0) and get the value
+                value = ( word >> (conf['pos'] - conf['blen']) ) & bits 
+            return value * sign
 class ICD:
 
     def __init__(self,fpath, frame_version):

@@ -6,7 +6,7 @@ def main():
     #param = getAircraftID(myDAR)
     #param = getPresentPosition(myDAR)
     #param = getFlightID(myDAR)
-    param = getParameter(myDAR, "AIL_1")
+    param = getParameter(myDAR, "MACH")
     print (param)
     #print(param[0], param[len(param)-1])
 
@@ -43,7 +43,7 @@ if __name__=='__main__':
     FPATH='/home/vscode/FlightDataDecode_Chuck/DataFrames/'
     #FNAME='N703JB-REC25134.DAT' #DAT Filename
     #FNAME='N2002J-REC25038.DAT'
-    FNAME='20230325_N923JB_LAX_REC15773_DAR.DAT'
+    FNAME='N988JT_Sept3_LAXJFK/N988JT_20230904_065837.vdr'
     #FNAME='N639JB-DAR_REC23868.DAT'
     #FNAME='N805JB-QAR_REC00159.DAT'
     main()
