@@ -72,18 +72,41 @@ class darPlusDecoder:
                 continue
             darplus_parameter = self.get_label_from_lineid(darplus_lineid, darplus_429label, darplus_A717label)
             if darplus_parameter is not None:
-                if darplus_lineid == '9': #lineid 9
+                if darplus_lineid == "1": 
+                        if darplus_parameter == "DTG": #429 label 1
+                            #result = self.decode_label_205(split_line)
+                            par_set = {}
+                            par_set['type'] = "BCD"
+                            par_set['signBit'] = 0
+                            par_set['part'] = []
+                            par_set['pos'] = 21
+                            par_set['blen'] = 19
+                            par_set['Resol'] = 0.1
+                            Testresult = self.arinc429_BCD_decode(darplus_word, par_set)
+                            self.darplus_results.append(self.export_darplus_results(int(epoch_time), Testresult, darplus_parameter)) 
+                        if darplus_parameter == "APP_TYPE": #429 label 271
+                            #result = self.decode_label_205(split_line)
+                            par_set = {}
+                            par_set['type'] = "BCD"
+                            par_set['signBit'] = 0
+                            par_set['part'] = []
+                            par_set['pos'] = 21
+                            par_set['blen'] = 19
+                            par_set['Resol'] = 0.1
+                            Testresult = self.arinc429_BCD_decode(darplus_word, par_set)
+                            self.darplus_results.append(self.export_darplus_results(int(epoch_time), Testresult, darplus_parameter))               
+                elif darplus_lineid == '8': #lineid 9
+                    if darplus_parameter == "APU_EGT": #429 label 175
+                        par_set = self.icd.getPAR(darplus_parameter)
+                        par_set['pos'] -= 8 #subtract 8 because darplus payload does not include label bits
+                        result = self.arinc429_BNR_decode(darplus_word , par_set)
+                        self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
+                elif darplus_lineid == '9': #lineid 9
                     if darplus_parameter == "MACH": #429 label 205
                         par_set = self.icd.getPAR(darplus_parameter)
                         par_set['pos'] -= 8 #subtract 8 because darplus payload does not include label bits
                         result = self.arinc429_BNR_decode(darplus_word , par_set)
                         self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
-                # elif darplus_lineid == "1": #429 label 205
-                #         if darplus_parameter == "DTG": #429 label 205
-                #             #result = self.decode_label_205(split_line)
-                #             par_set = self.icd.getPAR(darplus_parameter)
-                #             Testresult = self.arinc429_BNR_decode(darplus_word, par_set)
-                #             self.darplus_results.append(self.export_darplus_results(int(epoch_time), Testresult, darplus_parameter))               
                 elif darplus_lineid == '18': #A717 Biphase
                         param_set = self.get_param_spec(darplus_parameter) #get the FRA file data for the parameter
                         par_set = self.icd.getPAR(darplus_parameter)
@@ -101,13 +124,15 @@ class darPlusDecoder:
 
     def get_label_from_lineid(self, lineid, darplus_429label, darplus_A717label):
         # Try to retrieve the label number
-        # if lineid == '1' and darplus_429label == "1":
-        #      print('lineid 18')
+        #if lineid == '1' and darplus_429label == "1":
+         #    print('lineid 18')
         if darplus_429label is not '':
             try:
-                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters'].keys()
-                if len(labels) ==1 :
-                    return list(labels)[0]
+                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters']
+                # Loop through the keys and values to find the desired value
+                for key, value in labels.items():
+                    if value == darplus_429label:
+                        return key
             except KeyError:
                 return None
         elif darplus_A717label is not '':
