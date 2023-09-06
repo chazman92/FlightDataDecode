@@ -10,12 +10,18 @@ class darPlusDecoder:
     def __init__(self, filepath, filename, framepath):
         self.full_filename = filepath + filename
         self.darplus_labels = self.GetDataVerJson()
+        self.darplus_parameters = self.GetParametersJson()
         self.dataversion = self.GetDataVer(self.Split_acReg_From_Filename(filename))
         self.data = self.load_darplus_file()
         self.acReg = self.Split_acReg_From_Filename(filename)
         self.darplus_results = []
         self.icd = self.loadicd(framepath)
 
+    def GetParametersJson(self):
+        # Read JSON data from file
+        with open('FlightDataDecode_Chuck/DarPlusDecoder/darplus_429_parameters.json', 'r') as f:
+            data = json.load(f)
+        return data
     def GetDataVerJson(self):
         # Read JSON data from file
         with open('FlightDataDecode_Chuck/DarPlusDecoder/darplus_dataframes.json', 'r') as f:
@@ -47,12 +53,59 @@ class darPlusDecoder:
         with open(self.full_filename, 'r') as f:
             data = f.readlines()
         return data
-
     #load ICD File
     def loadicd(self, framepath):
         icd = ICD(framepath, self.dataversion)
         return icd
-    
+
+    def decode_darplus429_lineid_label(self, darplus_lineid, darplus_label):
+        for line in self.data:
+            strip_line=line.strip('\r\n //')
+            split_line = strip_line.split(',')
+
+            if darplus_lineid == split_line[1] and darplus_label == split_line[2]:
+                epoch_time = split_line[0]
+                darplus_word = int(split_line[5],16) #convert hex to decimal for bitwise operations  
+                darplus_word_string = split_line[5]  
+                # if darplus_word_string == '1ABECE':
+                #     print('1ABECE')
+
+                darplus_parameters = self.get_parameters_lineid_label(darplus_lineid, darplus_label)
+                if darplus_parameters is not None:
+                    for param in darplus_parameters:
+                       # if param['TYPE'] == 'DISCREET':
+                            result = self.darplus429_decode(darplus_word, param)
+
+                            export = self.export_darplus_results(int(epoch_time),param['NAME'], result)
+                            export.update({'extra': darplus_word_string}) #Debugging
+
+                            self.darplus_results.append(export)      
+    def decode_darplus429(self):
+        for line in self.data:
+            strip_line=line.strip('\r\n //')
+            split_line = strip_line.split(',')
+
+            epoch_time = split_line[0]
+            if epoch_time == 'timestamp':
+                continue
+            darplus_lineid = split_line[1]
+            darplus_429label = split_line[2]
+            darplus_A717label = split_line[4]
+            darplus_word = int(split_line[5],16) #convert hex to decimal for bitwise operations  
+            darplus_word_string = split_line[5]  
+            # if darplus_word_string == '1ABECE':
+            #     print('1ABECE')
+            if darplus_429label is not '':
+                darplus_parameters = self.get_parameters_lineid_label(darplus_lineid, darplus_429label)
+                if darplus_parameters is not None:
+                    for param in darplus_parameters:
+                        result = self.darplus429_decode(darplus_word, param)
+
+                        export = self.export_darplus_results(int(epoch_time),param['NAME'], result)
+                        export.update({'extra': darplus_word_string}) #Debugging
+
+                        self.darplus_results.append(export)     
+             
     #decode darPlus File
     def decode_darplus(self):
         for line in self.data:
@@ -95,32 +148,45 @@ class darPlusDecoder:
                             par_set['Resol'] = 0.1
                             Testresult = self.arinc429_BCD_decode(darplus_word, par_set)
                             self.darplus_results.append(self.export_darplus_results(int(epoch_time), Testresult, darplus_parameter))               
-                elif darplus_lineid == '8': #lineid 9
+                elif darplus_lineid == '8': #lineid 8
                     if darplus_parameter == "APU_EGT": #429 label 175
                         par_set = self.icd.getPAR(darplus_parameter)
                         par_set['pos'] -= 8 #subtract 8 because darplus payload does not include label bits
                         result = self.arinc429_BNR_decode(darplus_word , par_set)
                         self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
-                elif darplus_lineid == '9': #lineid 9
-                    if darplus_parameter == "MACH": #429 label 205
+                    if darplus_parameter == "SDAC": #429 label 2
                         par_set = self.icd.getPAR(darplus_parameter)
                         par_set['pos'] -= 8 #subtract 8 because darplus payload does not include label bits
                         result = self.arinc429_BNR_decode(darplus_word , par_set)
                         self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
-                elif darplus_lineid == '18': #A717 Biphase
-                        param_set = self.get_param_spec(darplus_parameter) #get the FRA file data for the parameter
-                        par_set = self.icd.getPAR(darplus_parameter)
-                        A429word = self.get_darplus_arinc429(param_set, darplus_word)
-                        result = self.arinc429_BNR_decode(A429word, par_set)
-                        self.darplus_results.append(self.export_darplus_results(int(epoch_time), result, darplus_parameter))
-                continue
-    def export_darplus_results(self, epoch_time, darplus_result, darplus_parameter):
+   
+    def export_darplus_results(self, epoch_time, darplus_parameter, darplus_result):
         return {
                     'tailnumber':self.acReg,
                     'time' :self.convert_epoch_to_utc(epoch_time),
                     'label':darplus_parameter,
-                    'data': round(darplus_result, 4)
+                    'data': darplus_result
                     }
+    def get_parameters_lineid_label(self, darplus_lineid, darplus_label):
+        # Try to retrieve the label number
+        #if lineid == '1' and darplus_429label == "1":
+         #    print('lineid 18')
+        if darplus_label is not '':
+            try:
+                parameters = self.darplus_parameters['LineId'][darplus_lineid]['Label'][darplus_label]['Parameter']
+                return parameters
+
+            except KeyError as e:
+                return None
+                print(f"KeyError: The key {e} does not exist.")
+
+            except json.JSONDecodeError:
+                print("JSONDecodeError: Invalid JSON format.")
+
+            except Exception as e:
+                print(f"An unexpected error occurred: {e}")
+        else:
+            return None
 
     def get_label_from_lineid(self, lineid, darplus_429label, darplus_A717label):
         # Try to retrieve the label number
@@ -128,7 +194,7 @@ class darPlusDecoder:
          #    print('lineid 18')
         if darplus_429label is not '':
             try:
-                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters']
+                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Frame']
                 # Loop through the keys and values to find the desired value
                 for key, value in labels.items():
                     if value == darplus_429label:
@@ -137,7 +203,7 @@ class darPlusDecoder:
                 return None
         elif darplus_A717label is not '':
             try:
-                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Parameters']
+                labels = self.darplus_labels['DataFrame'][self.dataversion]['LineId'][lineid][0]['Frame']
                 # Loop through the keys and values to find the desired value
                 for key, value in labels.items():
                     if value == darplus_A717label:
@@ -294,7 +360,7 @@ class darPlusDecoder:
         #Resolution
         if conf['type'].find('BNR LINEAR (A*X)')==0:
             if conf['Resol'].find('Resol=')==0:
-                value *= float(conf['Resol'][6:])
+                value *= float(conf['Resol'][6:])  #trims text off resoltion in PAR file
         elif conf['type'].find('BNR SEGMENTS (A*X+B)')==0:
             if len(conf['A'])>0:
                 value *= float(conf['A'])
@@ -366,6 +432,37 @@ class darPlusDecoder:
                 #Move the value to the right (move to BIT0) and get the value
                 value = ( word >> (conf['pos'] - conf['blen']) ) & bits 
             return value * sign
+    def darplus429_decode(self, darplus_word, parameter):
+        #According to Blen, obtain the mask value
+        #It shifts the binary 1 to the left by blen bits and then subtracts 1 to create a mask of 1s of blen length.
+        bitmask = (1 << parameter['BLEN']) -1
+        #Move the value to the right (move to BIT0) and get the value
+        #It performs a right shift to move the specified section to the least significant bit positions and then uses bitwise AND with the bitmask (bits) to isolate the desired section.
+        #Using bitwise AND with a mask is a common technique for isolating specific bits in a binary number. The reason it works is due to the properties of the AND operation:
+        #value = ( darplus_word >> ((parameter['MSB']-8) - parameter['BLEN']) ) & bitmask # darplus payload does not include label, so subtracting 8 bits from position 
+        value = (darplus_word >> (parameter['LSB'] - 9)) & bitmask #Second way to doing this using LSB vice MSB .. subtracting 9 because darplus payload does not include label bits
+        # if value==1:
+        #     print('value = 1')
+        #Symbol
+        #The two's complement is a standard way to represent negative integers in binary.
+        if parameter['SIGNBIT']>0:  #This checks sign bit and uses two's complement
+            bitmask = 1 << (parameter['SIGNBIT']-1)  #Bit bit number starts from 1, so -1
+            #The bitwise AND (&) operation between word and bits checks whether the sign bit is set in the word. 
+            #If the result is non-zero, that means the sign bit is set, indicating a negative number.
+            if darplus_word & bitmask:
+                #If the number is negative, you convert it to its two's complement representation by subtracting 2**conf['blen'] (which is equivalent to 1 << conf['blen']). 
+                #The -= operator modifies value in-place.
+                value -= 1 << parameter['BLEN']
+        #Resolution
+        if 'RESOL' in parameter:
+                value *= float(parameter['RESOL'])
+
+        if 'VALUE' in parameter:
+            for key, description in parameter['VALUE'].items():
+                if key == str(value):
+                    return description
+            
+        return value
 class ICD:
 
     def __init__(self,fpath, frame_version):

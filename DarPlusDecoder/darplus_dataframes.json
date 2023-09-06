@@ -5,7 +5,7 @@
             "LineId": {
                 "18": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "AIL_1": "78",
                             "AIL_2": "206",
                             "ELEV_1": "44",
@@ -15,7 +15,7 @@
                 ],
                 "1": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "DTG": "1",
                             "APP_TYPE": "271"
                         }
@@ -23,14 +23,14 @@
                 ],
                 "8": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "APU_EGT": "175"
                         }
                     }
                 ],
                 "9": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "MACH": "205"
                         }
                     }
@@ -42,7 +42,7 @@
             "LineId": {
                 "18": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "AIL_1": "39",
                             "AIL_2": "103"
                         }
@@ -50,15 +50,23 @@
                 ],
                 "1": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "DTG": "1",
                             "APP_TYPE": "271"
                         }
                     }
                 ],
+                "8": [
+                    {
+                        "Frame": {
+                            "APU_EGT": "175",
+                            "SDAC": "2"
+                        }
+                    }
+                ],
                 "9": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "MACH": "205"
                         }
                     }
@@ -70,7 +78,7 @@
             "LineId": {
                 "18": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "AIL_1": "78",
                             "AIL_2": "206"
                         }
@@ -78,15 +86,23 @@
                 ],
                 "1": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "DTG": "1",
                             "APP_TYPE": "271"
                         }
                     }
                 ],
+                "8": [
+                    {
+                        "Frame": {
+                            "APU_EGT": "175",
+                            "SDAC": "2"
+                        }
+                    }
+                ],
                 "9": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "MACH": "205"
                         }
                     }
@@ -98,7 +114,7 @@
             "LineId": {
                 "18": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "AIL_1": "78",
                             "AIL_2": "206"
                         }
@@ -106,15 +122,23 @@
                 ],
                 "1": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "DTG": "1",
                             "APP_TYPE": "271"
                         }
                     }
                 ],
+                "8": [
+                    {
+                        "Frame": {
+                            "APU_EGT": "175",
+                            "SDAC": "2"
+                        }
+                    }
+                ],
                 "9": [
                     {
-                        "Parameters": {
+                        "Frame": {
                             "MACH": "205"
                         }
                     }
